@@ -1,5 +1,5 @@
 import gazu
-import os
+# import os
 
 
 class Houpub:
@@ -10,8 +10,6 @@ class Houpub:
     _entity = None
     _asset_types = None
     _task_types = None
-    # _host = None
-    # _identify = None
 
     def __init__(self):
         pass
@@ -63,10 +61,7 @@ class Houpub:
         if self.project is None:
             return
         self._asset = gazu.asset.get_asset_by_name(self.project, asset_name)
-        if self.asset is not None:
-            print(f"asset Set : {self.asset['name']}")
-        else:
-            print("Error")
+        self.check_dict(self.asset)
 
     @property
     def entity(self):
@@ -81,10 +76,10 @@ class Houpub:
 
     @staticmethod
     def check_dict(exp_dict):
-        if exp_dict is not None:
-            print(f"{exp_dict['type']} set : {exp_dict['name']}")
+        if exp_dict is None:
+            raise ValueError("뭐라고적지?")
         else:
-            print("Wrong input")
+            print(f"{exp_dict['type']} set : {exp_dict['name']}")
 
     def set_file_tree(self, mount_point, root):
         file_tree = {
@@ -208,7 +203,7 @@ class Houpub:
         if input_num is None:
             return revision_max
         if type(input_num) is not int:
-            raise
+            raise ValueError("Input type must be int or None")
         if revision_max < input_num:
             return revision_max
         else:
@@ -224,7 +219,7 @@ class Houpub:
     @staticmethod
     def get_software(software_name):
         if software_name not in ['hou', 'hounc', 'houlc']:
-            return gazu.files.get_software_by_name('houdini')
+            return gazu.files.get_software_by_name('houdini')  # 내일 raise 로 변경 예정
         if software_name == 'hou':
             return gazu.files.get_software_by_name('houdini')
         if software_name == 'hounc':
@@ -252,7 +247,7 @@ class Houpub:
         filtered_assets = [asset for asset in asset_castings if asset_name != asset['asset_name']]
         gazu.casting.update_shot_casting(self.project, self.shot, casting=filtered_assets)
 
-    def get_casting_path_for_asset(self):
+    def get_casting_path_for_asset(self):  # 프리셋 안에 캐스팅 된 어셋 넣는거... 오늘 못할거같음 ㅈㅅ ㅠㅠ
         cast_in = gazu.casting.get_asset_cast_in(self.asset)
         for shot in cast_in:
             print(f'sequence name  : {shot.get("sequence_name")} \n'
@@ -277,20 +272,15 @@ class Houpub:
         all_tasks = gazu.task.all_tasks_for_task_status(self.project, task_type, task_status)
         return all_tasks
 
-    def get_task_paths(self, task_type_name, software_name): # 작업중임 테스트 ㄴㄴ
-        task_type = gazu.task.get_task_type_by_name(task_type_name)
-        task_status = gazu.task.get_task_status_by_name("done")
-        tasks = gazu.task.all_tasks_for_task_status(self.project, task_type, task_status)
-        software = self.get_software(software_name)
+    def get_all_working_paths_for_task_type(self, task_type_name, software_name):
+        tasks = self.get_all_tasks(task_type_name)
+        ext = self.get_software(software_name)['file_extension']
         paths = []
-        print(tasks)
-        # for task in tasks:
-        #     revision_max = gazu.files.get_last_working_file_revision(task)
-        #     print(revision_max)
-            # path = gazu.files.build_working_file_path(task, software=software, revision=revision_max)
-            # ext = software['file_extension']
-            # paths.append(path + '.' + ext)
-        # return paths
+        for task in tasks:
+            if task['task_status_id'] == gazu.task.get_task_status_by_name('Done')['id']:
+                working = gazu.files.get_last_working_file_revision(task)
+                paths.append(working['path'] + '.' + ext)
+        return paths
 
     # -----------Unused methods----------
 
@@ -393,14 +383,14 @@ a = Houpub()
 a.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
 # a.project = 'pepper'
 # a.project = 'hoon'
-a.project = 'aatest_03'
-b = a.get_all_tasks('FX Template')
-for i in b:
-    print(i)
+a.project = 'pepper'
+# b = a.get_all_tasks('FX Template')
+# for i in b:
+#     print(i)
 # c = b[0]['task_status_id']
 # d = gazu.task.get_task_status(c)
 # print(d)
-# a.set_file_tree = '/mnt/project', 'hook'
+a.set_file_tree('/mnt/project', 'hook')
 # a.sequence = 'SQ01'
 # a.shot = '0010'
 # a.asset = 'GROOT'
