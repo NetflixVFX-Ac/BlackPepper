@@ -14,9 +14,6 @@ class Houpub:
     # _identify = None
 
     def __init__(self):
-        self.hou = gazu.files.get_software_by_name('houdini')
-        self.hounc = gazu.files.get_software_by_name('houdininc')
-        self.houlc = gazu.files.get_software_by_name('houdinilc')
         pass
         # gazu.client.set_host("http://192.168.3.116/api")
         # gazu.log_in("pipeline@rapa.org", "netflixacademy")
