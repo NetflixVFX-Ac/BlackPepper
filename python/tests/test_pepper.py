@@ -1,3 +1,8 @@
+from unittest import TestCase
+import gazu
+from pepper import Houpub
+
+
 class test_Houpub:
     def test_login(self):
         assert False
