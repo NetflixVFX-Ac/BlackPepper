@@ -364,6 +364,8 @@ class Houpub:
         if type(num) is not int:
             self.error('not_int')
 
+    def
+
     @staticmethod
     def error(code):
         if code == 'not_string':
