@@ -68,7 +68,7 @@ class Houpub:
             self.dict_check(self.asset, 'none')
             self._entity = self._asset
         if ent == 'shot':
-            self.dict_check(self.asset, 'none')
+            self.dict_check(self.shot, 'none')
             self._entity = self._shot
 
     def set_file_tree(self, mount_point, root):
@@ -363,8 +363,6 @@ class Houpub:
     def int_check(self, num):
         if type(num) is not int:
             self.error('not_int')
-
-    def
 
     @staticmethod
     def error(code):
