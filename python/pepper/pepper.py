@@ -2,6 +2,7 @@ import gazu
 
 
 class Houpub:
+    _id = None
     _project = None
     _sequence = None
     _shot = None
@@ -11,10 +12,10 @@ class Houpub:
     def __init__(self):
         pass
 
-    @staticmethod
-    def login(host, identification, password):
+    def login(self, host, identify, password):
         gazu.client.set_host(host)
-        gazu.log_in(identification, password)
+        gazu.log_in(identify, password)
+        self._id = identify
 
     @property
     def project(self):
