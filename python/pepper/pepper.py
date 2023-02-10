@@ -203,7 +203,7 @@ class Houpub:
             need self parameter : project,asset,entity or project,seq,shot,entity
 
         Args:
-            task_type_name(str): str
+            task_type_name(str):
 
         Returns:
             (path) working file revision +1 된 path
