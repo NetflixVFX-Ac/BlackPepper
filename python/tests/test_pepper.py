@@ -5,30 +5,252 @@ from pepper import Houpub
 
 class test_Houpub(TestCase):
     def setUp(self):
-        self.h = Houpub()
-        self.h.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+        self.pepper = Houpub()
+        self.pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
 
     def test_casting_multiple_assets(self):
-        self.h.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
-        self.h.project = 'pepper'
-        sim = self.h.get_all_tasks('simulation')
+        self.pepper.project = 'pepper'
+        sim = self.pepper.get_all_tasks('simulation')
         for task in sim:
             revision_max = gazu.files.get_last_working_file_revision(task)['revision']
             path = gazu.files.build_working_file_path(task, revision=revision_max)
             print(path)
 
     def test_get_task_paths(self):
-        self.h.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
-        self.h.project = 'pepper'
-        self.h.get_all_working_paths_for_task_type('simulation', 'hou')
+        self.pepper.project = 'pepper'
+        self.pepper.get_all_working_paths_for_task_type('simulation', 'hou')
 
-    # def test_working_file_path(self):
-        # self.h.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
-        # self.h.project = 'pepper'
-        # self.h.asset = 'temp_fire'
-        # self.h.entity = 'asset'
-        # path = self.h.working_file_path('simulation', 'hou', 2)
-        # print(path)
+    def test_publish_working_file(self):
+        """
+
+
+
+        Returns:
+
+        """
+        # 실행부
+        self.pepper.project = 'PEPPER'
+        self.pepper.sequence = 'SQ01'
+        self.pepper.shot = '0010'
+        self.pepper.entity = 'shot'
+        task_type_name = 'layout'
+        software_name = 'hou'
+        _, task = self.pepper.get_task(task_type_name)
+        pre_revision = gazu.files.get_last_working_file_revision(task).get('revision')
+        self.pepper.publish_working_file(task_type_name, software_name)
+
+        # 함수를 짤 때,
+        # _, task = self.pepper.get_task(task_type_name)
+        # software = self.pepper.get_software(software_name)
+        # gazu.files.new_working_file(task, software=software)
+
+        # 검증부
+        update_revision = gazu.files.get_last_working_file_revision(task).get('revision')
+        print(pre_revision, update_revision)
+        self.assertLess(pre_revision, update_revision)
+      
+    def test_publish_output_file(self):
+        """
+
+
+
+        Returns:
+
+        """
+        # 조건부
+        self.pepper.project = 'PEPPER'
+        self.pepper.sequence = 'SQ01'
+        self.pepper.shot = '0010'
+        self.pepper.entity = 'shot'
+        task_type_name = 'fx'
+        output_type_name = 'movie_file'
+        comments = 'for unittest_yeolhoon '
+        task_type, task = self.pepper.get_task(task_type_name)
+        output_type = gazu.files.get_output_type_by_name(output_type_name)
+        pre_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type, name='main')
+        task_type, task = self.pepper.get_task(task_type_name)
+
+        self.pepper.publish_output_file(task_type_name, output_type_name, comments)
+
+        # 함수를 짤 때,
+        # task_type, task = self.pepper.get_task(task_type_name)
+        # work_file = gazu.files.get_last_working_file_revision(task)
+        # output_type = gazu.files.get_output_type_by_name(output_type_name)
+        # gazu.files.new_entity_output_file(self.pepper.entity, output_type, task_type, working_file=work_file,
+        #                                   representation=output_type['short_name'], comment=comments)
+
+        # 검증부
+        update_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type, name='main')
+        self.assertLess(pre_revision, update_revision)
+
+
+    def test_working_file_path(self):
+        """
+
+
+
+        Returns:
+
+        """
+        # 실행부
+        self.pepper.project = 'PEPPER'
+        self.pepper.sequence = 'SQ01'
+        self.pepper.shot = '0010'
+        self.pepper.entity = 'shot'
+        task_type_name = 'layout'
+        software_name = 'hou'
+        input_num = 100
+        _, task = self.pepper.get_task(task_type_name)
+        path = self.pepper.working_file_path(task_type_name, software_name, input_num)
+
+        # 함수를 짤 때,
+        # _, task = self.pepper.get_task(task_type_name)
+        # software = self.pepper.get_software(software_name)
+        # revision_max = gazu.files.get_last_working_file_revision(task)['revision']
+        # revision_num = self.get_revision_num(revision_max, input_num)
+        # path = gazu.files.build_working_file_path(task, software=software, revision=revision_num)
+        # ext = software['file_extension']
+        # return path + '.' + ext
+
+        # 검증부
+        latest_revision = gazu.files.get_last_working_file_revision(task).get('revision')
+        self.assertEqual(latest_revision, int(path.strip()[-7:-4]))
+
+
+    def test_make_next_working_path(self):
+        """
+
+
+
+        Returns:
+
+        """
+        # 조건부
+        self.pepper.project = 'PEPPER'
+        self.pepper.sequence = 'SQ01'
+        self.pepper.shot = '0010'
+        self.pepper.entity = 'shot'
+        task_type_name = 'layout'
+        _, task = self.pepper.get_task(task_type_name)
+        path = self.pepper.make_next_working_path(task_type_name)
+
+        # 함수를 짤 때,
+        # _, task = self.pepper.get_task(task_type_name)
+        # revision_max = gazu.files.get_last_working_file_revision(task)['revision']
+        # path = gazu.files.build_working_file_path(task, revision=revision_max + 1)
+        # return path
+
+        # 검증부
+        latest_revision = gazu.files.get_last_working_file_revision(task).get('revision')
+        self.assertEqual(latest_revision+1, int(path.strip()[-3:]))
+
+    def test_output_file_path(self):
+        """
+
+
+
+        Returns:
+
+        """
+        # 조건부
+        self.pepper.project = 'PEPPER'
+        self.pepper.sequence = 'SQ01'
+        self.pepper.shot = '0010'
+        self.pepper.entity = 'shot'
+        task_type_name = 'fx'
+        output_type_name = 'movie_file'
+        input_num = 100
+        _, task = self.pepper.get_task(task_type_name)
+        path = self.pepper.output_file_path(output_type_name, task_type_name, input_num)
+
+        # 함수를 짤 때,
+        task_type = gazu.task.get_task_type_by_name(task_type_name)
+        output_type = gazu.files.get_output_type_by_name(output_type_name)
+        # revision_max = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type, name='main')
+        # revision_num = self.get_revision_num(revision_max, input_num)
+        # path = gazu.files.build_entity_output_file_path(self.pepper.entity, output_type, task_type, revision=revision_num)
+        # ext = output_type['short_name']
+        # return path + '.' + ext
+
+        # 검증부
+        latest_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type, name='main')
+        self.assertEqual(latest_revision, int(path.strip()[-7:-4]))
+
+    def test_make_next_output_path(self):
+        """
+
+
+
+        Returns:
+
+        """
+        # 조건부
+        self.pepper.project = 'PEPPER'
+        self.pepper.sequence = 'SQ01'
+        self.pepper.shot = '0010'
+        self.pepper.entity = 'shot'
+        task_type_name = 'fx'
+        output_type_name = 'movie_file'
+        path = self.pepper.make_next_output_path(output_type_name, task_type_name)
+
+        # 함수를 짤 때,
+        task_type = gazu.task.get_task_type_by_name(task_type_name)
+        output_type = gazu.files.get_output_type_by_name(output_type_name)
+        # revision_max = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type, name='main')
+        # path = gazu.files.build_entity_output_file_path(self.pepper.entity, output_type, task_type, revision=revision_max + 1)
+        # ext = output_type['short_name']
+        # return path + '.' + ext
+
+        # 검증부
+        latest_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type, name='main')
+        self.assertEqual(latest_revision + 1, int(path.strip()[-7:-4]))
+            
+    def test_get_revision_num(self):
+        assert False
+    
+    def test_get_task(self):
+        assert False
+    
+    def test_get_software(self):
+        assert False
+
+    def test_get_casting_path_for_asset(self):
+        """
+
+        asset에 Casting 되어 있는 shot의 working file lastest revision에 해당하는 dictionary를 가져온다.
+        해당 함수에는 key 값이 revision인 value 값이 필요하고, revision이 0보다 커야한다.
+
+        Returns:
+
+        """
+        # 실행부
+        self.pepper.project = 'PEPPER'
+        self.pepper.asset = 'temp_fire'
+
+        # 함수를 짤 때,
+        # out = None
+        # cast_in = gazu.casting.get_asset_cast_in(self.pepper.asset)
+        # for shot in cast_in:
+        #     tasks = gazu.task.all_tasks_for_shot(shot)
+        #     for task in tasks:
+        #         last_revision = gazu.files.get_last_working_file_revision(task)
+        #         out = last_revision
+        # return out
+
+        # 검증부
+        last_revision = self.pepper.get_casting_path_for_asset()
+        self.assertIn('revision', last_revision)
+        self.assertTrue(last_revision.get('revision') > 0)
+
+
+
+
+
+
+
+
+
+
 
 
     # def test_get_task_status(self):
