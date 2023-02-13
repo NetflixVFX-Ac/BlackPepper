@@ -344,26 +344,34 @@ class Houpub:
                 print(last_revision)
                 if last_revision is None:
                     print("None")
-
+                    
     def dict_check(self, test_dict, code):
         if test_dict is None:
             self.error(code)
+        else:
+            return test_dict
 
     def args_str_check(self, *args):
         if type(args) is tuple:
             str_confirms = ','.join(args)
             for str_confirm in str_confirms:
                 self.str_check(str_confirm)
+            return str_confirms
         else:
             self.str_check(args)
+            return args
 
     def str_check(self, strn):
         if type(strn) is not str:
             self.error("not_string")
+        else:
+            return strn
 
     def int_check(self, num):
         if type(num) is not int:
             self.error('not_int')
+        else:
+            return num
 
     @staticmethod
     def error(code):
