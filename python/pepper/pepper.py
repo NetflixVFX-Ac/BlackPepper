@@ -1,4 +1,5 @@
 import gazu
+from hook.python.log.log_pepper import make_logger
 
 
 class Houpub:
@@ -10,6 +11,7 @@ class Houpub:
     _entity = None
 
     def __init__(self):
+        # self._id = None
         pass
 
     def login(self, host, identify, password):
@@ -138,6 +140,9 @@ class Houpub:
         _, task = self.get_task(task_type_name)
         software = self.get_software(software_name)
         gazu.files.new_working_file(task, software=software)
+        logger = make_logger()
+        logger.debug("publish_working_file , revision up")
+
 
     def publish_output_file(self, task_type_name, output_type_name, comments):
         """

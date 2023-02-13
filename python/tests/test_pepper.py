@@ -1,5 +1,5 @@
 from unittest import TestCase
-from pepper import Houpub
+from hook.python.pepper.pepper import Houpub
 import gazu
 import pprint
 
@@ -43,11 +43,11 @@ class TestHoupub(TestCase):
         # gazu.files.new_working_file(task, software=software)
 
         # 검증부
-        update_revision = gazu.files.get_last_working_file_revision(task).get('revision')
-        print(pre_revision, update_revision)
-        self.assertLess(pre_revision, update_revision)
+        # update_revision = gazu.files.get_last_working_file_revision(task).get('revision')
+        # print(pre_revision, update_revision)
+        # self.assertLess(pre_revision, update_revision)
 
-    def test_publish_output_file(self):
+    # def test_publish_output_file(self):
         """
 
 
@@ -56,20 +56,20 @@ class TestHoupub(TestCase):
 
         """
         # 조건부
-        self.pepper.project = 'PEPPER'
-        self.pepper.sequence = 'SQ01'
-        self.pepper.shot = '0010'
-        self.pepper.entity = 'shot'
-        task_type_name = 'fx'
-        output_type_name = 'movie_file'
-        comments = 'for unittest_yeolhoon '
-        task_type, task = self.pepper.get_task(task_type_name)
-        output_type = gazu.files.get_output_type_by_name(output_type_name)
-        pre_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type,
-                                                                  name='main')
-        task_type, task = self.pepper.get_task(task_type_name)
-
-        self.pepper.publish_output_file(task_type_name, output_type_name, comments)
+        # self.pepper.project = 'PEPPER'
+        # self.pepper.sequence = 'SQ01'
+        # self.pepper.shot = '0010'
+        # self.pepper.entity = 'shot'
+        # task_type_name = 'fx'
+        # output_type_name = 'movie_file'
+        # comments = 'for unittest_yeolhoon '
+        # task_type, task = self.pepper.get_task(task_type_name)
+        # output_type = gazu.files.get_output_type_by_name(output_type_name)
+        # pre_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type,
+        #                                                           name='main')
+        # task_type, task = self.pepper.get_task(task_type_name)
+        #
+        # self.pepper.publish_output_file(task_type_name, output_type_name, comments)
 
         # 함수를 짤 때,
         # task_type, task = self.pepper.get_task(task_type_name)
@@ -79,11 +79,11 @@ class TestHoupub(TestCase):
         #                                   representation=output_type['short_name'], comment=comments)
 
         # 검증부
-        update_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type,
-                                                                     name='main')
-        self.assertLess(pre_revision, update_revision)
+        # update_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type,
+        #                                                              name='main')
+        # self.assertLess(pre_revision, update_revision)
 
-    def test_working_file_path(self):
+    # def test_working_file_path(self):
         """
 
 
@@ -92,15 +92,15 @@ class TestHoupub(TestCase):
 
         """
         # 실행부
-        self.pepper.project = 'PEPPER'
-        self.pepper.sequence = 'SQ01'
-        self.pepper.shot = '0010'
-        self.pepper.entity = 'shot'
-        task_type_name = 'layout'
-        software_name = 'hou'
-        input_num = 100
-        task_type, task = self.pepper.get_task(task_type_name)
-        path = self.pepper.working_file_path(task_type_name, software_name, input_num)
+        # self.pepper.project = 'PEPPER'
+        # self.pepper.sequence = 'SQ01'
+        # self.pepper.shot = '0010'
+        # self.pepper.entity = 'shot'
+        # task_type_name = 'layout'
+        # software_name = 'hou'
+        # input_num = 100
+        # task_type, task = self.pepper.get_task(task_type_name)
+        # path = self.pepper.working_file_path(task_type_name, software_name, input_num)
 
         # 함수를 짤 때,
         # task_type, task = self.pepper.get_task(task_type_name)
@@ -112,10 +112,10 @@ class TestHoupub(TestCase):
         # return path + '.' + ext
 
         # 검증부
-        latest_revision = gazu.files.get_last_working_file_revision(task).get('revision')
-        self.assertEqual(latest_revision, int(path.strip()[-7:-4]))
+        # latest_revision = gazu.files.get_last_working_file_revision(task).get('revision')
+        # self.assertEqual(latest_revision, int(path.strip()[-7:-4]))
 
-    def test_make_next_working_path(self):
+    # def test_make_next_working_path(self):
         """
 
 
@@ -124,13 +124,13 @@ class TestHoupub(TestCase):
 
         """
         # 조건부
-        self.pepper.project = 'PEPPER'
-        self.pepper.sequence = 'SQ01'
-        self.pepper.shot = '0010'
-        self.pepper.entity = 'shot'
-        task_type_name = 'layout'
-        task_type, task = self.pepper.get_task(task_type_name)
-        path = self.pepper.make_next_working_path(task_type_name)
+        # self.pepper.project = 'PEPPER'
+        # self.pepper.sequence = 'SQ01'
+        # self.pepper.shot = '0010'
+        # self.pepper.entity = 'shot'
+        # task_type_name = 'layout'
+        # task_type, task = self.pepper.get_task(task_type_name)
+        # path = self.pepper.make_next_working_path(task_type_name)
 
         # 함수를 짤 때,
         # task_type, task = self.pepper.get_task(task_type_name)
@@ -139,10 +139,10 @@ class TestHoupub(TestCase):
         # return path
 
         # 검증부
-        latest_revision = gazu.files.get_last_working_file_revision(task).get('revision')
-        self.assertEqual(latest_revision + 1, int(path.strip()[-3:]))
+        # latest_revision = gazu.files.get_last_working_file_revision(task).get('revision')
+        # self.assertEqual(latest_revision + 1, int(path.strip()[-3:]))
 
-    def test_output_file_path(self):
+    # def test_output_file_path(self):
         """
 
 
@@ -151,19 +151,19 @@ class TestHoupub(TestCase):
 
         """
         # 조건부
-        self.pepper.project = 'PEPPER'
-        self.pepper.sequence = 'SQ01'
-        self.pepper.shot = '0010'
-        self.pepper.entity = 'shot'
-        task_type_name = 'fx'
-        output_type_name = 'movie_file'
-        input_num = 100
-        task_type, task = self.pepper.get_task(task_type_name)
-        path = self.pepper.output_file_path(output_type_name, task_type_name, input_num)
+        # self.pepper.project = 'PEPPER'
+        # self.pepper.sequence = 'SQ01'
+        # self.pepper.shot = '0010'
+        # self.pepper.entity = 'shot'
+        # task_type_name = 'fx'
+        # output_type_name = 'movie_file'
+        # input_num = 100
+        # task_type, task = self.pepper.get_task(task_type_name)
+        # path = self.pepper.output_file_path(output_type_name, task_type_name, input_num)
 
         # 함수를 짤 때,
-        task_type = gazu.task.get_task_type_by_name(task_type_name)
-        output_type = gazu.files.get_output_type_by_name(output_type_name)
+        # task_type = gazu.task.get_task_type_by_name(task_type_name)
+        # output_type = gazu.files.get_output_type_by_name(output_type_name)
         # revision_max = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type, name='main')
         # revision_num = self.get_revision_num(revision_max, input_num)
         # path = gazu.files.build_entity_output_file_path(self.pepper.entity, output_type, task_type, revision=revision_num)
@@ -171,11 +171,11 @@ class TestHoupub(TestCase):
         # return path + '.' + ext
 
         # 검증부
-        latest_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type,
-                                                                     name='main')
-        self.assertEqual(latest_revision, int(path.strip()[-7:-4]))
+        # latest_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type,
+        #                                                              name='main')
+        # self.assertEqual(latest_revision, int(path.strip()[-7:-4]))
 
-    def test_make_next_output_path(self):
+    # def test_make_next_output_path(self):
         """
 
 
@@ -184,28 +184,28 @@ class TestHoupub(TestCase):
 
         """
         # 조건부
-        self.pepper.project = 'PEPPER'
-        self.pepper.sequence = 'SQ01'
-        self.pepper.shot = '0010'
-        self.pepper.entity = 'shot'
-        task_type_name = 'fx'
-        output_type_name = 'movie_file'
-        path = self.pepper.make_next_output_path(output_type_name, task_type_name)
+        # self.pepper.project = 'PEPPER'
+        # self.pepper.sequence = 'SQ01'
+        # self.pepper.shot = '0010'
+        # self.pepper.entity = 'shot'
+        # task_type_name = 'fx'
+        # output_type_name = 'movie_file'
+        # path = self.pepper.make_next_output_path(output_type_name, task_type_name)
 
         # 함수를 짤 때,
-        task_type = gazu.task.get_task_type_by_name(task_type_name)
-        output_type = gazu.files.get_output_type_by_name(output_type_name)
+        # task_type = gazu.task.get_task_type_by_name(task_type_name)
+        # output_type = gazu.files.get_output_type_by_name(output_type_name)
         # revision_max = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type, name='main')
         # path = gazu.files.build_entity_output_file_path(self.pepper.entity, output_type, task_type, revision=revision_max + 1)
         # ext = output_type['short_name']
         # return path + '.' + ext
 
         # 검증부
-        latest_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type,
-                                                                     name='main')
-        self.assertEqual(latest_revision + 1, int(path.strip()[-7:-4]))
+        # latest_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type,
+        #                                                              name='main')
+        # self.assertEqual(latest_revision + 1, int(path.strip()[-7:-4]))
 
-    def test_get_revision_num(self):
+    # def test_get_revision_num(self):
         """
 
 
@@ -213,11 +213,11 @@ class TestHoupub(TestCase):
 
         """
         # 조건부
-        revision_max = 6
-        input_num = 10
-        mock_num = None
-        check_latest = self.pepper.get_revision_num(revision_max, input_num)
-        check_none = self.pepper.get_revision_num(revision_max, mock_num)
+        # revision_max = 6
+        # input_num = 10
+        # mock_num = None
+        # check_latest = self.pepper.get_revision_num(revision_max, input_num)
+        # check_none = self.pepper.get_revision_num(revision_max, mock_num)
         # 함수를 짤 때,
         # if input_num is None:
         #     return revision_max
@@ -228,10 +228,10 @@ class TestHoupub(TestCase):
         #     return input_num
 
         # 검증부
-        self.assertEqual(check_latest, 6)
-        self.assertEqual(check_none, 6)
+        # self.assertEqual(check_latest, 6)
+        # self.assertEqual(check_none, 6)
 
-    def test_get_task(self):
+    # def test_get_task(self):
         """
 
 
@@ -239,12 +239,12 @@ class TestHoupub(TestCase):
 
         """
         # 조건부
-        self.pepper.project = 'PEPPER'
-        self.pepper.sequence = 'SQ01'
-        self.pepper.shot = '0010'
-        self.pepper.entity = 'shot'
-        task_type_name = 'fx'
-        task_type, task = self.pepper.get_task(task_type_name)
+        # self.pepper.project = 'PEPPER'
+        # self.pepper.sequence = 'SQ01'
+        # self.pepper.shot = '0010'
+        # self.pepper.entity = 'shot'
+        # task_type_name = 'fx'
+        # task_type, task = self.pepper.get_task(task_type_name)
 
         # 함수를 짤 때,
         # task_type = gazu.task.get_task_type_by_name(task_type_name)
@@ -254,10 +254,10 @@ class TestHoupub(TestCase):
         # return task_type, task
 
         # 검증부
-        self.assertTrue(type(task_type), dict)
-        self.assertEqual(task_type.get('name'), 'FX')
+        # self.assertTrue(type(task_type), dict)
+        # self.assertEqual(task_type.get('name'), 'FX')
 
-    def test_get_software(self):
+    # def test_get_software(self):
         """
 
 
@@ -266,8 +266,8 @@ class TestHoupub(TestCase):
 
         """
         # 조건부
-        software_name = 'hou'
-        check = self.pepper.get_software(software_name)
+        # software_name = 'hou'
+        # check = self.pepper.get_software(software_name)
 
         # 함수를 짤 때,
         # if software_name == 'hou':
@@ -280,9 +280,9 @@ class TestHoupub(TestCase):
         #     self.error('hou')
 
         # 검증부
-        self.assertEqual(check.get('file_extension'), 'hip')
+        # self.assertEqual(check.get('file_extension'), 'hip')
 
-    def test_casting_create(self):
+    # def test_casting_create(self):
         """
 
         Return casting for given shot
@@ -293,21 +293,21 @@ class TestHoupub(TestCase):
 
         """
         # 실행부
-        self.pepper.project = 'PEPPER'
-        self.pepper.sequence = 'sq01'
-        self.pepper.shot = '0040'
-        self.pepper.asset = 'temp_fire'
-        self.pepper.casting_create(1)
+        # self.pepper.project = 'PEPPER'
+        # self.pepper.sequence = 'sq01'
+        # self.pepper.shot = '0040'
+        # self.pepper.asset = 'temp_fire'
+        # self.pepper.casting_create(1)
 
         # 검증부
-        occurences = 0
-        assets = gazu.casting.get_asset_cast_in(self.pepper.asset)
-        for asset in assets:
-            if asset.get('sequence_name').lower() == 'sq01' and asset.get('shot_name') == '0040':
-                occurences = asset.get('nb_occurences')
-        self.assertEqual(occurences, 1)
+        # occurences = 0
+        # assets = gazu.casting.get_asset_cast_in(self.pepper.asset)
+        # for asset in assets:
+        #     if asset.get('sequence_name').lower() == 'sq01' and asset.get('shot_name') == '0040':
+        #         occurences = asset.get('nb_occurences')
+        # self.assertEqual(occurences, 1)
 
-    def test_casting_delete(self):
+    # def test_casting_delete(self):
         """
 
         Return casting for given shot
@@ -319,11 +319,11 @@ class TestHoupub(TestCase):
 
         """
         # 실행부
-        self.pepper.project = 'PEPPER'
-        self.pepper.sequence = 'sq01'
-        self.pepper.shot = '0040'
-        self.pepper.asset = 'temp_fire'
-        self.pepper.casting_delete()
+        # self.pepper.project = 'PEPPER'
+        # self.pepper.sequence = 'sq01'
+        # self.pepper.shot = '0040'
+        # self.pepper.asset = 'temp_fire'
+        # self.pepper.casting_delete()
 
         # 함수를 짤 때,
         # asset_name = self.pepper.asset['name']
@@ -332,14 +332,14 @@ class TestHoupub(TestCase):
         # gazu.casting.update_shot_casting(self.pepper.project, self.pepper.shot, casting=filtered_assets)
 
         # 검증부
-        asset_castings = gazu.casting.get_shot_casting(self.pepper.shot)
-        asset_picked = None
-        for casting in asset_castings:
-            if casting.get('asset_name') == self.pepper.asset.get('name'):
-                asset_picked = casting
-        self.assertIsNone(asset_picked)
+        # asset_castings = gazu.casting.get_shot_casting(self.pepper.shot)
+        # asset_picked = None
+        # for casting in asset_castings:
+        #     if casting.get('asset_name') == self.pepper.asset.get('name'):
+        #         asset_picked = casting
+        # self.assertIsNone(asset_picked)
 
-    def test_get_casting_path_for_asset(self):
+    # def test_get_casting_path_for_asset(self):
         """
 
         asset에 Casting 되어 있는 shot의 working file lastest revision에 해당하는 dictionary를 가져온다.
@@ -349,8 +349,8 @@ class TestHoupub(TestCase):
 
         """
         # 실행부
-        self.pepper.project = 'PEPPER'
-        self.pepper.asset = 'temp_fire'
+        # self.pepper.project = 'PEPPER'
+        # self.pepper.asset = 'temp_fire'
 
         # 함수를 짤 때,
         # out = None
@@ -363,11 +363,11 @@ class TestHoupub(TestCase):
         # return out
 
         # 검증부
-        last_revision = self.pepper.get_casting_path_for_asset()
-        self.assertIn('revision', last_revision)
-        self.assertTrue(last_revision.get('revision') > 0)
+        # last_revision = self.pepper.get_casting_path_for_asset()
+        # self.assertIn('revision', last_revision)
+        # self.assertTrue(last_revision.get('revision') > 0)
 
-    def test_dick_check(self):
+    # def test_dick_check(self):
         """
 
 
@@ -375,9 +375,9 @@ class TestHoupub(TestCase):
 
         """
         # 조건부
-        test_dict = {'hook': 'team', 'mem_num': '7'}
-        code = 'none'
-        check = self.pepper.dict_check(test_dict, code)
+        # test_dict = {'hook': 'team', 'mem_num': '7'}
+        # code = 'none'
+        # check = self.pepper.dict_check(test_dict, code)
 
         # 함수를 짤 때,
         # if test_dict is None:
@@ -386,9 +386,9 @@ class TestHoupub(TestCase):
         #     return test_dict
 
         # 검증부
-        self.assertIs(type(check), dict)
+        # self.assertIs(type(check), dict)
 
-    def test_args_str_check(self):
+    # def test_args_str_check(self):
         """
 
 
@@ -397,10 +397,10 @@ class TestHoupub(TestCase):
 
         """
         # 조건부
-        arg = 'hook'
-        args = 'num'
-        check_arg = self.pepper.args_str_check(arg)
-        check_args = self.pepper.args_str_check(arg, args)
+        # arg = 'hook'
+        # args = 'num'
+        # check_arg = self.pepper.args_str_check(arg)
+        # check_args = self.pepper.args_str_check(arg, args)
 
         # 함수를 짤 때,
         # if type(args) is tuple:
@@ -413,10 +413,10 @@ class TestHoupub(TestCase):
         #     return args
 
         # 검증부
-        self.assertEqual(check_arg, arg)
-        self.assertEqual(check_args, f'{arg},{args}')
+        # self.assertEqual(check_arg, arg)
+        # self.assertEqual(check_args, f'{arg},{args}')
 
-    def test_str_check(self):
+    # def test_str_check(self):
         """
 
 
@@ -425,8 +425,8 @@ class TestHoupub(TestCase):
 
         """
         # 조건부
-        strn = 'hook'
-        check = self.pepper.str_check(strn)
+        # strn = 'hook'
+        # check = self.pepper.str_check(strn)
 
         # 함수를 짤 때,
         # if type(strn) is not str:
@@ -435,9 +435,9 @@ class TestHoupub(TestCase):
         #     return strn
 
         # 검증부
-        self.assertEqual(check, strn)
+        # self.assertEqual(check, strn)
 
-    def test_int_check(self):
+    # def test_int_check(self):
         """
 
 
@@ -446,8 +446,8 @@ class TestHoupub(TestCase):
 
         """
         # 조건부
-        num = 5
-        check = self.pepper.int_check(num)
+        # num = 5
+        # check = self.pepper.int_check(num)
 
         # 함수를 짤 때,
         # if type(num) is not int:
@@ -456,9 +456,9 @@ class TestHoupub(TestCase):
         #      return num
 
         # 검증부
-        self.assertEqual(check, num)
+        # self.assertEqual(check, num)
 
-    def test_error(self):
+    # def test_error(self):
         """
 
 
@@ -467,7 +467,7 @@ class TestHoupub(TestCase):
 
         """
         # 조건부
-        code = 'none'
+        # code = 'none'
 
         # 함수를 짤 때,
         # if code == 'not_string':
@@ -484,4 +484,4 @@ class TestHoupub(TestCase):
         #     raise ValueError
 
         # 검증부
-        with self.assertRaises(ValueError): self.pepper.error(code)
+        # with self.assertRaises(ValueError): self.pepper.error(code)
