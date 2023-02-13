@@ -144,7 +144,6 @@ class Houpub:
         gazu.files.new_working_file(task, software=software)
         self.mylog.debug("publish working file , last revision up")
 
-
     def publish_output_file(self, task_type_name, output_type_name, comments):
         """
         Create a new 'outputfile' in kitzu with 'task_type', 'task' and 'output_type'
@@ -193,8 +192,7 @@ class Houpub:
         self.args_str_check(task_type_name, software_name)
         _, task = self.get_task(task_type_name)
         software = self.get_software(software_name)
-        revision_max = gazu.files.get_last_working_file_revision(task).get('revision', self.error('no_work_file'))
-        # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음
+        revision_max = self.get_working_revision_max(task)
         revision_num = self.get_revision_num(revision_max, input_num)
         path = gazu.files.build_working_file_path(task, software=software, revision=revision_num)
         ext = software['file_extension']
@@ -217,8 +215,7 @@ class Houpub:
         self.args_str_check(task_type_name)
         _, task = self.get_task(task_type_name)
         self.dict_check(task, 'no_task_in_entity')
-        revision_max = gazu.files.get_last_working_file_revision(task)['revision']
-        # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음
+        revision_max = self.get_working_revision_max(task)
         path = gazu.files.build_working_file_path(task, revision=revision_max + 1)
         return path
 
@@ -242,11 +239,10 @@ class Houpub:
 도
         """
         task_type = gazu.task.get_task_type_by_name(task_type_name)
-        self.dict_check(task_type, 'no_task_type')
+        self.dict_check(task_type, f'no_task_type{task_type_name}_')
         output_type = gazu.files.get_output_type_by_name(output_type_name)
-        self.dict_check(output_type, 'no_output_type')
+        self.dict_check(output_type, f'no_output_type{output_type_name}')
         revision_max = gazu.files.get_last_entity_output_revision(self.entity, output_type, task_type, name='main')
-        # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음도
         revision_num = self.get_revision_num(revision_max, input_num)
         path = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type, revision=revision_num)
         ext = output_type['short_name']
@@ -270,14 +266,20 @@ class Houpub:
 
         """
         task_type = gazu.task.get_task_type_by_name(task_type_name)
-        self.dict_check(task_type, 'no_task_type')
+        self.dict_check(task_type, f'no_task_type{task_type_name}')
         output_type = gazu.files.get_output_type_by_name(output_type_name)
-        self.dict_check(output_type, 'no_output_type')
+        self.dict_check(output_type, f'no_output_type{output_type_name}')
         revision_max = gazu.files.get_last_entity_output_revision(self.entity, output_type, task_type, name='main')
         # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음도
         path = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type, revision=revision_max + 1)
         ext = output_type['short_name']
         return path + '.' + ext
+
+    def get_working_revision_max(self, task):
+        last_working_file = gazu.files.get_last_working_file_revision(task)
+        if last_working_file is None:
+            self.error("no_work_file")
+        return last_working_file['revision']
 
     def get_revision_num(self, revision_max, input_num):
         """
@@ -381,33 +383,33 @@ class Houpub:
     @staticmethod
     def error(code):
         if code == 'not_string':
-            raise ValueError("Input must be string")
+            raise Exception("Input must be string")
         if code == 'not_int':
-            raise ValueError("Input must be integer.")
+            raise Exception("Input must be integer.")
         if code == 'none':
-            raise ValueError("There is no dict")
+            raise Exception("There is no dict")
         if code == 'hou':
-            raise ValueError("Software input must be hou, hounc, or houlc.")
+            raise Exception("Software input must be hou, hounc, or houlc.")
         if code == 'no_task':
-            raise ValueError("There's no task in entity.")
+            raise Exception("There's no task in entity.")
         if code == 'no_project':
-            raise NameError("No project is assigned.")
+            raise Exception("No project is assigned.")
         if code == 'no_sequence':
-            raise NameError("No sequence is assigned.")
+            raise Exception("No sequence is assigned.")
         if code == 'no_shot':
-            raise NameError("No shot is assigned.")
+            raise Exception("No shot is assigned.")
         if code == 'no_asset':
-            raise NameError("No asset is assigned.")
+            raise Exception("No asset is assigned.")
         if code == 'no_work_file':
-            raise NameError("")
+            raise Exception("No working file found.")
         if code == 'no_output_file':
-            raise NameError("")
+            raise Exception("No output file found.")
         if code == 'not_asset_shot':
-            raise NameError("")
+            raise Exception("No shot or asset is assignedl.")
         if 'no_task_type' in code:
-            raise NameError(f"There's no task type named '{code[11:]}")
+            raise Exception(f"There's no task type named '{code[11:]}")
         if 'no_output_type' in code:
-            raise NameError(f"There's no output type named '{code[11:]}")
+            raise Exception(f"There's no output type named '{code[13:]}")
             
     def print_get_all_info(self, select):
         if select == 'project' and self.project is not None:
@@ -447,6 +449,7 @@ class Houpub:
             print('[Select from the list below]')
             for element in list_element:
                 print(f"'{element}'")
+
     # -----------Unused methods----------
 
     # -----Login-----
