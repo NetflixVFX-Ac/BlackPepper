@@ -47,7 +47,7 @@ class TestHoupub(TestCase):
         # print(pre_revision, update_revision)
         # self.assertLess(pre_revision, update_revision)
 
-    # def test_publish_output_file(self):
+    def test_publish_output_file(self):
         """
 
 
@@ -56,20 +56,20 @@ class TestHoupub(TestCase):
 
         """
         # 조건부
-        # self.pepper.project = 'PEPPER'
-        # self.pepper.sequence = 'SQ01'
-        # self.pepper.shot = '0010'
-        # self.pepper.entity = 'shot'
-        # task_type_name = 'fx'
-        # output_type_name = 'movie_file'
-        # comments = 'for unittest_yeolhoon '
-        # task_type, task = self.pepper.get_task(task_type_name)
-        # output_type = gazu.files.get_output_type_by_name(output_type_name)
-        # pre_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type,
-        #                                                           name='main')
-        # task_type, task = self.pepper.get_task(task_type_name)
-        #
-        # self.pepper.publish_output_file(task_type_name, output_type_name, comments)
+        self.pepper.project = 'PEPPER'
+        self.pepper.sequence = 'SQ01'
+        self.pepper.shot = '0010'
+        self.pepper.entity = 'shot'
+        task_type_name = 'fx'
+        output_type_name = 'movie_file'
+        comments = 'for unittest_yeolhoon '
+        task_type, task = self.pepper.get_task(task_type_name)
+        output_type = gazu.files.get_output_type_by_name(output_type_name)
+        pre_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type,
+                                                                  name='main')
+        task_type, task = self.pepper.get_task(task_type_name)
+
+        self.pepper.publish_output_file(task_type_name, output_type_name, comments)
 
         # 함수를 짤 때,
         # task_type, task = self.pepper.get_task(task_type_name)
