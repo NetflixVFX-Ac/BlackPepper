@@ -28,7 +28,7 @@ class Houpub:
         gazu.client.set_host(host)
         gazu.log_in(identify, password)
         self.identif = identify
-        self.mylog = make_logger(self.identif)
+        self.mylslog = make_logger(self.identif)
 
     @property
     def project(self):
@@ -418,7 +418,7 @@ class Houpub:
                 print(last_revision)
                 if last_revision is None:
                     print("None")
-                    
+
     def dict_check(self, test_dict, code):
         """ 테스트 하게 되는 dict 가 아무 것도 없으면 error 코드 발생 시킨다.
         Example:
@@ -486,7 +486,7 @@ class Houpub:
             raise Exception(f"There's no task type named '{code[11:]}")
         if 'no_output_type' in code:
             raise Exception(f"There's no output type named '{code[13:]}")
-            
+
     def print_get_all_info(self, select):
         if select == 'project' and self.project is not None:
             print(self.project['name'])
@@ -587,9 +587,9 @@ class Houpub:
     # def make_output_dirs(self, task_type, output_type):
     #     task_type = gazu.task.get_task_type_by_name(task_type)
     #     output_type = gazu.files.get_output_type_by_name(output_type)
-        # gazu.entity.get_entity_by_name(shot)
-        # a = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type)
-        # print(a)
+    # gazu.entity.get_entity_by_name(shot)
+    # a = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type)
+    # print(a)
 
     # @staticmethod
     # def make_dirs(dir_path):
@@ -696,7 +696,6 @@ class Houpub:
     #             working = gazu.files.get_last_working_file_revision(task)
     #             paths.append(working['path'] + '.' + ext)
     #     return paths
-
 
 # a = Houpub()
 # a.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
