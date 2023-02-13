@@ -9,7 +9,7 @@ class Houpub:
     _entity = None
 
     def __init__(self):
-        self._id = None
+        # self._id = None
         pass
 
     def login(self, host, identify, password):
