@@ -481,45 +481,34 @@ class Houpub:
             raise Exception(f"There's no task type named '{code[11:]}")
         if 'no_output_type' in code:
             raise Exception(f"There's no output type named '{code[13:]}")
-            
-    def print_get_all_info(self, select):
-        if select == 'project' and self.project is not None:
-            print(self.project['name'])
-        if select == 'project' and self.project is None:
-            for proj in gazu.project.all_open_projects():
-                print(proj['name'])
-        if select == 'sequence' and self.sequence is not None:
-            print(self.sequence['name'])
-        if select == 'sequence' and self.sequence is None:
-            for seq in gazu.shot.all_sequences_for_project(self.project):
-                print(seq['name'])
-        if select == 'shot' and self.shot is not None:
-            print(self.shot['name'])
-        if select == 'shot' and self.shot is None:
-            for st in gazu.shot.all_shots_for_sequence(self.sequence):
-                print(st['name'])
-        if select == 'asset' and self.asset is not None:
-            print(self.asset['name'])
-        if select == 'asset' and self.asset is None:
-            for asse in gazu.asset.all_asset_types_for_project(self.project):
-                print(asse['name'])
-        if select == 'asset_task_type' and self.asset is not None:
-            for task_type in gazu.task.all_task_types_for_asset(self.asset):
-                print(task_type['name'])
-        if select == 'shot_task_type' and self.shot is not None:
-            for task_type in gazu.task.all_task_types_for_shot(self.shot):
-                print(task_type['name'])
-        if select == 'casting' and self.shot is not None:
-            casting = gazu.casting.get_shot_casting(self.shot)
-            for cast in casting:
-                print(cast['asset_type_name'] + " : " + cast['asset_name'])
-        if type(select) != str:
-            raise ValueError('Write down as string')
-        list_element = ['project', 'sequence', 'shot', 'asset', 'asset_task_type', 'shot_task_type', 'casting']
-        if select not in list_element:
-            print('[Select from the list below]')
-            for element in list_element:
-                print(f"'{element}'")
+
+    def get_all_info(self, select):  # 수정예
+        if select not in ['all_projects', 'project', 'all_assets', 'asset', 'task_type_for_assets', 'all_sequences',
+                          'all_shots', 'shot', 'task_type_for_shots', 'casted_assets_for_shot']:
+            self.error('wrong_input')
+        if select == 'all_projects':
+            all_projs = [proj['name'] for proj in gazu.project.all_open_projects()]
+            return all_projs
+        self.dict_check(self.project, 'no_project')
+        if select == 'all_assets':
+            all_assets = [asset['name'] for asset in gazu.asset.all_asset_types_for_project(self.project)]
+            return all_assets
+        if select == 'task_type_for_assets':
+            self.dict_check(self.asset, 'no_asset')
+            all_task_types = [task_type['name'] for task_type in gazu.task.all_task_types_for_asset(self.asset)]
+            return all_task_types
+        if select == 'all_sequences':
+            all_seqs = [seq['name'] for seq in gazu.shot.all_sequences_for_project(self.project)]
+            return all_seqs
+        self.dict_check(self.sequence, 'no_sequence')
+        if select == 'all_shots':
+            all_shots = [shot['name'] for shot in gazu.shot.all_shots_for_sequence(self.sequence)]
+            return all_shots
+        self.dict_check(self.shot, 'no_shot')
+        if select == 'casted_assets_for_shot':
+            all_casted_assets = [(asset['asset_type_name'] + ':' + asset['asset_name'])
+                                 for asset in gazu.casting.get_shot_casting(self.shot)]
+            return all_casted_assets
 
     # -----------Unused methods----------
 
