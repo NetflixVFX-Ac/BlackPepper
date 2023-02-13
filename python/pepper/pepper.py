@@ -2,7 +2,6 @@ import gazu
 
 
 class Houpub:
-    _id = None
     _project = None
     _sequence = None
     _shot = None
@@ -10,12 +9,12 @@ class Houpub:
     _entity = None
 
     def __init__(self):
-        pass
+        self.identif = None
 
     def login(self, host, identify, password):
         gazu.client.set_host(host)
         gazu.log_in(identify, password)
-        self._id = identify
+        self.identif = identify
 
     @property
     def project(self):
@@ -66,11 +65,13 @@ class Houpub:
     @entity.setter
     def entity(self, ent):
         if ent == 'asset':
-            self.dict_check(self.asset, 'none')
+            self.dict_check(self.asset, 'no_asset')
             self._entity = self._asset
         if ent == 'shot':
-            self.dict_check(self.shot, 'none')
+            self.dict_check(self.shot, 'no_')
             self._entity = self._shot
+        else:
+            self.error('not_asset_shot')
 
     def set_file_tree(self, mount_point, root):
         file_tree = {
@@ -158,8 +159,7 @@ class Houpub:
         """
         self.args_str_check(task_type_name, output_type_name, comments)
         task_type, task = self.get_task(task_type_name)
-        self.dict_check(task, 'no task')
-        self.dict_check(task_type, 'no task_type')
+        self.dict_check(task_type, 'no_task_type')
         work_file = gazu.files.get_last_working_file_revision(task)
         self.dict_check(work_file, 'no_work_file')
         output_type = gazu.files.get_output_type_by_name(output_type_name)
@@ -186,9 +186,8 @@ class Houpub:
         """
         self.args_str_check(task_type_name, software_name)
         _, task = self.get_task(task_type_name)
-        self.dict_check(task, 'no task')
         software = self.get_software(software_name)
-        revision_max = gazu.files.get_last_working_file_revision(task)['revision']
+        revision_max = gazu.files.get_last_working_file_revision(task).get('revision', self.error('no_work_file'))
         # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음
         revision_num = self.get_revision_num(revision_max, input_num)
         path = gazu.files.build_working_file_path(task, software=software, revision=revision_num)
@@ -211,7 +210,7 @@ class Houpub:
         """
         self.args_str_check(task_type_name)
         _, task = self.get_task(task_type_name)
-        self.dict_check(task, 'no task')
+        self.dict_check(task, 'no_task_in_entity')
         revision_max = gazu.files.get_last_working_file_revision(task)['revision']
         # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음
         path = gazu.files.build_working_file_path(task, revision=revision_max + 1)
@@ -396,6 +395,8 @@ class Houpub:
         if code == 'no_work_file':
             raise NameError("")
         if code == 'no_output_file':
+            raise NameError("")
+        if code == 'not_asset_shot':
             raise NameError("")
         if 'no_task_type' in code:
             raise NameError(f"There's no task type named '{code[11:]}")
