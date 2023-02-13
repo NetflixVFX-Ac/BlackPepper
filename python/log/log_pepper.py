@@ -2,6 +2,18 @@ import logging
 
 
 def make_logger(name):
+    """ 지정된 이름의 로거를 반환하고, 이름을 지정하지 않으면 루트 로거를 반환합니다.
+    Return a logger with the specified name, creating it if necessary.
+    If no name is specified, return the root logger.
+    스트림(콘솔)에 로그를 찍기 위해 logging 을 사용
+
+
+    Args:
+        name(str):
+
+    Returns:
+        logger
+    """
     name = str(name)
 
     # 1 logger instance를 만든다.
@@ -15,7 +27,7 @@ def make_logger(name):
 
     # 4 handler instance 생성
     console = logging.StreamHandler()
-    file_handler = logging.FileHandler(filename="test.log")
+    file_handler = logging.FileHandler(filename="pepper.log")
 
     # 5 handler 별로 다른 level 설정
     console.setLevel(logging.INFO)
