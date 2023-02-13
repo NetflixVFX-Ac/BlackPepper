@@ -237,7 +237,7 @@ class Houpub:
 도
         """
         task_type = gazu.task.get_task_type_by_name(task_type_name)
-        self.dict_check(task_type, 'no_task_type')
+        self.dict_check(task_type, f'no_task_type_{task_type_name}')
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         self.dict_check(output_type, 'no_output_type')
         revision_max = gazu.files.get_last_entity_output_revision(self.entity, output_type, task_type, name='main')
@@ -265,7 +265,7 @@ class Houpub:
 
         """
         task_type = gazu.task.get_task_type_by_name(task_type_name)
-        self.dict_check(task_type, 'no_task_type')
+        self.dict_check(task_type, f'no_task_type_{task_type_name}')
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         self.dict_check(output_type, 'no_output_type')
         revision_max = gazu.files.get_last_entity_output_revision(self.entity, output_type, task_type, name='main')
@@ -310,7 +310,7 @@ class Houpub:
 
         """
         task_type = gazu.task.get_task_type_by_name(task_type_name)
-        self.dict_check(task_type, 'no_task_type')
+        self.dict_check(task_type, f'no_task_type_{task_type_name}')
         task = gazu.task.get_task_by_name(self.entity, task_type)
         self.dict_check(task, 'no_task')
         return task_type, task
@@ -385,14 +385,14 @@ class Houpub:
             raise NameError("No shot is assigned.")
         if code == 'no_asset':
             raise NameError("No asset is assigned.")
-        if code == 'no_task_type':
-            raise NameError("")
-        if code == 'no_output_type':
-            raise NameError("")
         if code == 'no_work_file':
             raise NameError("")
         if code == 'no_output_file':
             raise NameError("")
+        if 'no_task_type' in code:
+            raise NameError(f"There's no task type named '{code[11:]}")
+        if 'no_output_type' in code:
+            raise NameError(f"There's no output type named '{code[11:]}")
 
     # -----------Unused methods----------
 
