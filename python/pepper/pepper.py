@@ -141,7 +141,7 @@ class Houpub:
         software = self.get_software(software_name)
         gazu.files.new_working_file(task, software=software)
         logger = make_logger()
-        logger.debug("publish_working_file , revision up")
+        logger.debug("publish working file , last revision up")
 
 
     def publish_output_file(self, task_type_name, output_type_name, comments):
@@ -170,6 +170,8 @@ class Houpub:
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         gazu.files.new_entity_output_file(self.entity, output_type, task_type, working_file=work_file,
                                           representation=output_type['short_name'], comment=comments)
+        logger = make_logger()
+        logger.debug("publish output file , last revision up")
 
     def working_file_path(self, task_type_name, software_name, input_num):
         """revision = (intput_num < last revision) \n
