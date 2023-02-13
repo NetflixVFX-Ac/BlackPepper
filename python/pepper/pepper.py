@@ -66,10 +66,10 @@ class Houpub:
     @entity.setter
     def entity(self, ent):
         if ent == 'asset':
-            self.dict_check(self.asset, 'none')
+            self.dict_check(self.asset, 'no_asset')
             self._entity = self._asset
         if ent == 'shot':
-            self.dict_check(self.shot, 'none')
+            self.dict_check(self.shot, 'no_shot')
             self._entity = self._shot
 
     def set_file_tree(self, mount_point, root):
@@ -158,8 +158,8 @@ class Houpub:
         """
         self.args_str_check(task_type_name, output_type_name, comments)
         task_type, task = self.get_task(task_type_name)
-        self.dict_check(task, 'no task')
-        self.dict_check(task_type, 'no task_type')
+        self.dict_check(task, 'no_task')
+        self.dict_check(task_type, 'no_task_type')
         work_file = gazu.files.get_last_working_file_revision(task)
         self.dict_check(work_file, 'no_work_file')
         output_type = gazu.files.get_output_type_by_name(output_type_name)
@@ -186,7 +186,7 @@ class Houpub:
         """
         self.args_str_check(task_type_name, software_name)
         _, task = self.get_task(task_type_name)
-        self.dict_check(task, 'no task')
+        self.dict_check(task, 'no_task')
         software = self.get_software(software_name)
         revision_max = gazu.files.get_last_working_file_revision(task)['revision']
         # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음
@@ -211,7 +211,7 @@ class Houpub:
         """
         self.args_str_check(task_type_name)
         _, task = self.get_task(task_type_name)
-        self.dict_check(task, 'no task')
+        self.dict_check(task, 'no_task')
         revision_max = gazu.files.get_last_working_file_revision(task)['revision']
         # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음
         path = gazu.files.build_working_file_path(task, revision=revision_max + 1)
@@ -241,7 +241,7 @@ class Houpub:
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         self.dict_check(output_type, 'no_output_type')
         revision_max = gazu.files.get_last_entity_output_revision(self.entity, output_type, task_type, name='main')
-        # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음도
+        # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음
         revision_num = self.get_revision_num(revision_max, input_num)
         path = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type, revision=revision_num)
         ext = output_type['short_name']
@@ -310,9 +310,9 @@ class Houpub:
 
         """
         task_type = gazu.task.get_task_type_by_name(task_type_name)
-        self.dict_check(task_type, 'no_task')
+        self.dict_check(task_type, 'no_task_type')
         task = gazu.task.get_task_by_name(self.entity, task_type)
-        self.dict_check(task, 'no_task_in_entity')
+        self.dict_check(task, 'no_task')
         return task_type, task
 
     def get_software(self, software_name):
@@ -376,9 +376,23 @@ class Houpub:
         if code == 'hou':
             raise ValueError("Software input must be hou, hounc, or houlc.")
         if code == 'no_task':
-            raise ValueError
+            raise ValueError("There's no task in entity.")
         if code == 'no_project':
-            raise ValueError
+            raise NameError("No project is assigned.")
+        if code == 'no_sequence':
+            raise NameError("No sequence is assigned.")
+        if code == 'no_shot':
+            raise NameError("No shot is assigned.")
+        if code == 'no_asset':
+            raise NameError("No asset is assigned.")
+        if code == 'no_task_type':
+            raise NameError("")
+        if code == 'no_output_type':
+            raise NameError("")
+        if code == 'no_work_file':
+            raise NameError("")
+        if code == 'no_output_file':
+            raise NameError("")
 
     # -----------Unused methods----------
 
