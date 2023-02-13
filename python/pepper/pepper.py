@@ -11,6 +11,7 @@ class Houpub:
 
     def __init__(self):
         self.identif = None
+        self.mylog = None
         pass
 
     def login(self, host, identify, password):
@@ -21,7 +22,7 @@ class Houpub:
 
         Args:
             host
-            identification
+            identify
             password
 
         """
@@ -392,33 +393,27 @@ class Houpub:
             self.error('hou')
 
     def get_casting_path_for_asset(self):  # 에러핸들링 해야함
-        """output file path revision +1 된 path 를 리턴한다. \n
-        Call up 'output_type_name', 'task_type_name'. A file path combined with 'ext' is created with last
-        'revision_num' specified 'entity'.
+        """asset이 casting된 shot들의 layout과 FX task를 모두 리턴한다. \n
 
         Example:
-            make_next_output_path('Movie_file', 'FX') \n
-            need self parameter : project,asset,entity or project,seq,shot,entity
+            get_casting_path_for_asset()
 
         Args:
-            output_type_name(str):
-            task_type_name(str):
 
         Returns:
-            output file revision +1 된  path
+            Generated working file path for given task (without extension).
         """
+        # software = self.get_software(software_name)
+        casted_shots = gazu.casting.get_asset_cast_in(self.asset)
+        layout_task_type = gazu.task.get_task_type_by_name('Layout')
+        fx_task_type = gazu.task.get_task_type_by_name('FX')
+        tasks = []
+        for shot in casted_shots:
+            layout_task = gazu.task.get_task_by_name(shot, layout_task_type)
+            fx_task = gazu.task.get_task_by_name(shot, fx_task_type)
+            tasks.append((shot, layout_task, fx_task))
+        return tasks
 
-        cast_in = gazu.casting.get_asset_cast_in(self.asset)
-        for shot in cast_in:
-            print(f'sequence name  : {shot.get("sequence_name")} \n'
-                  f'shot name      : {shot.get("shot_name")}')
-            tasks = gazu.task.all_tasks_for_shot(shot.get('shot_id'))
-            for task in tasks:
-                last_revision = gazu.files.get_last_working_file_revision(task)
-                print(last_revision)
-                if last_revision is None:
-                    print("None")
-                    
     def dict_check(self, test_dict, code):
         """ 테스트 하게 되는 dict 가 아무 것도 없으면 error 코드 발생 시킨다.
         Example:
