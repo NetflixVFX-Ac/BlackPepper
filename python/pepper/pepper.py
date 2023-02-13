@@ -9,13 +9,13 @@ class Houpub:
     _entity = None
 
     def __init__(self):
-        # self._id = None
+        self.identif = None
         pass
 
     def login(self, host, identify, password):
         gazu.client.set_host(host)
         gazu.log_in(identify, password)
-        # self.identif = identify
+        self.identif = identify
 
     @property
     def project(self):
