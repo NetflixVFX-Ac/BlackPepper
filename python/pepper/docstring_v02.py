@@ -16,46 +16,47 @@ class Houpub:
     def login(self, host, identify, password):
         """ 지정된 호스트를 setting 해주고, 이메일 (identification) 과 password 를 이용해 로그인 하는 방식.
 
-        Examples:
-            login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+           Examples:
+               login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
 
-        Args:
-            host
-            identification
-            password
+           Args:
+               host
+               identification
+               password
 
         """
+        Returns: host, email, password
         gazu.client.set_host(host)
         gazu.log_in(identify, password)
         self.identif = identify
-        self.mylog = make_logger(self.identif)
 
-    @property
-    def project(self):
-        return self._project
+   @property
+def project(self):
+       return self._project
 
-    @project.setter
-    def project(self, proj_name):
-        """사용자가 제시한 프로 젝트의 이름을 불러 온다.
+   @project.setter
+   def project(self, proj_name):
+       """사용자가 제시한 프로 젝트의 이름을 불러 온다.
 
-        Examples : project("Houchu")
-        need self parameter : project
-        Args:
-            proj_name(str): 사용자가 설정한 project name
+            Examples : project("Houchu")
+            need self parameter : project
+            Args:
+                proj_name(str): 사용자가 설정한 project name
 
-        Returns: 이름과 일치 하는 프로 젝트
+            Returns: 이름과 일치 하는 프로 젝트
         """
-        self.args_str_check(proj_name)
-        self._project = gazu.project.get_project_by_name(proj_name)
-        self.dict_check(self.project, 'none')
 
-    @property
-    def sequence(self):
-        return self._sequence
+       self.args_str_check(proj_name)
+       self._project = gazu.project.get_project_by_name(proj_name)
+       self.dict_check(self.project, 'none')
 
-    @sequence.setter
-    def sequence(self, seq_name):
-        """ sequence 를 name 으로 불러 온다. 딕셔너리 형태인지, string인지, 확인.
+   @property
+   def sequence(self):
+       return self._sequence
+
+   @sequence.setter
+   def sequence(self, seq_name):
+       """ sequence 를 name 으로 불러 온다. 딕셔너리 형태인지, string인지, 확인.
 
         Examples : sequence("SQ0010")
         need self parameter : project,seq
@@ -66,117 +67,127 @@ class Houpub:
         Returns: 이름과 일치 하는 sequence
 
         """
-        self.dict_check(self.project, 'no_project')
-        self.args_str_check(seq_name)
-        self._sequence = gazu.shot.get_sequence_by_name(self.project, seq_name)
-        self.dict_check(self.sequence, 'none')
+       self.dict_check(self.project, 'no_project')
+       self.args_str_check(seq_name)
+       self._sequence = gazu.shot.get_sequence_by_name(self.project, seq_name)
+       self.dict_check(self.sequence, 'none')
 
-    @property
-    def shot(self):
-        return self._shot
+   @property
+   def shot(self):
+       return self._shot
 
-    @shot.setter
-    def shot(self, shot_name):
-        """shot 을 name 으로 불러 온다. 딕셔너리 형태인지, string인지, 확인.
+   @shot.setter
+   def shot(self, shot_name):
+       """shot 을 name 으로 불러 온다. 딕셔너리 형태인지, string인지, 확인.
 
-        need self parameter : seq,shot
+         need self parameter : seq,shot
 
-        Args:
-            shot_name(str):Name of claimed shot.
-            need self parameter : seq,shot
+         Args:
+             shot_name(str):Name of claimed shot.
+             need self parameter : seq,shot
 
-        Returns(dict): 이름과 일치 하는 shot
+         Returns(dict): 이름과 일치 하는 shot
+
+         """
+       self.dict_check(self.sequence, 'no_sequence')
+       self.args_str_check(shot_name)
+       self._shot = gazu.shot.get_shot_by_name(self.sequence, shot_name)
+       self.dict_check(self.shot, 'none')
+
+   @property
+   def asset(self):
+       return self._asset
+
+   @asset.setter
+   def asset(self, asset_name):
+       """asset 을 name 으로 불러온다. 딕셔너리 형태인지 확인.
+
+           need self parameter : project, asset
+           Args:
+               asset_name(str)
+
+           Returns(dict) :Asset matching given name for given project and asset type.
+
+           """
+       self.dict_check(self.project, 'no_project')
+       self._asset = gazu.asset.get_asset_by_name(self.project, asset_name)
+       self.dict_check(self.asset, 'none')
+
+   @property
+   def entity(self):
+       return self._entity
+
+   @entity.setter
+   def entity(self, ent):
+       """ 만약 entity 가 asset 일 때 shot 일 때 상황을 적용해서 self.dict_check 을 통해
+        self.asset 에러 체크를 하고 통과가 되었 다면 self.entity = asset. shot 도 동일하게 적용.
+
+        need self parameter : project, asset
+
+        Examples: entity(asset) or entity(shot)
+
+        Returns: entity
 
         """
-        self.dict_check(self.sequence, 'no_sequence')
-        self.args_str_check(shot_name)
-        self._shot = gazu.shot.get_shot_by_name(self.sequence, shot_name)
-        self.dict_check(self.shot, 'none')
+       if ent == 'asset':
+           self.dict_check(self.asset, 'no_asset')
+           self._entity = self._asset
+       if ent == 'shot':
+           self.dict_check(self.shot, 'no_')
+           self._entity = self._shot
+       else:
+           self.error('not_asset_shot')
 
-    @property
-    def asset(self):
-        return self._asset
+   def set_file_tree(self, mount_point, root):
+       file_tree = {
+           "working": {
+               "mountpoint": mount_point,
+               "root": root,
+               "folder_path": {
+                   "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/working/v<Revision>",
+                   "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/working/v<Revision>",
+                   "style": "lowercase"
+               },
+               "file_name": {
+                   "shot": "<Project>_<Sequence>_<Shot>_<TaskType>_<Revision>",
+                   "asset": "<Project>_<AssetType>_<Asset>_<TaskType>_<Revision>",
+                   "style": "lowercase"
+               }
+           },
+           "output": {
+               "mountpoint": mount_point,
+               "root": root,
+               "folder_path": {
+                   "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/output/<OutputType>/v<Revision>",
+                   "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/output/<OutputType>/v<Revision>",
+                   "style": "lowercase"
+               },
+               "file_name": {
+                   "shot": "<Project>_<Sequence>_<Shot>_<OutputType>_v<Revision>",
+                   "asset": "<Project>_<AssetType>_<Asset>_<OutputType>_v<Revision>",
+                   "style": "lowercase"
+               }
+           },
+           "preview": {
+               "mountpoint": mount_point,
+               "root": root,
+               "folder_path": {
+                   "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/output/<OutputType>/v<Revision>/preview",
+                   "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/output/<OutputType>/v<Revision>/preview",
+                   "style": "lowercase"
+               },
+               "file_name": {
+                   "shot": "<Project>_<Sequence>_<Shot>_<OutputType>_v<Revision>",
+                   "asset": "<Project>_<AssetType>_<Asset>_<OutputType>_v<Revision>",
+                   "style": "lowercase"
+               }
+           }
+       }
+       self.dict_check(self.project, 'no_project')
+       gazu.files.update_project_file_tree(self.project, file_tree)
 
-    @asset.setter
-    def asset(self, asset_name):
-        """사용자가 제시한 프로 젝트의 이름을 불러 온다.
-
-        Examples : project("Houchu")
-        need self parameter : project
-        Args:
-        proj_name(str): 사용자가 설정한 project name
-
-        Returns: 이름과 일치 하는 프로 젝트
-        """
-        self.dict_check(self.project, 'no_project')
-        self._asset = gazu.asset.get_asset_by_name(self.project, asset_name)
-        self.dict_check(self.asset, 'none')
-
-    @property
-    def entity(self):
-        return self._entity
-
-    @entity.setter
-    def entity(self, ent):
-        if ent == 'asset':
-            self.dict_check(self.asset, 'no_asset')
-            self._entity = self._asset
-        if ent == 'shot':
-            self.dict_check(self.shot, 'no_')
-            self._entity = self._shot
-        else:
-            self.error('not_asset_shot')
-
-    def set_file_tree(self, mount_point, root):
-        file_tree = {
-            "working": {
-                "mountpoint": mount_point,
-                "root": root,
-                "folder_path": {
-                    "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/working/v<Revision>",
-                    "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/working/v<Revision>",
-                    "style": "lowercase"
-                },
-                "file_name": {
-                    "shot": "<Project>_<Sequence>_<Shot>_<TaskType>_<Revision>",
-                    "asset": "<Project>_<AssetType>_<Asset>_<TaskType>_<Revision>",
-                    "style": "lowercase"
-                }
-            },
-            "output": {
-                "mountpoint": mount_point,
-                "root": root,
-                "folder_path": {
-                    "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/output/<OutputType>/v<Revision>",
-                    "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/output/<OutputType>/v<Revision>",
-                    "style": "lowercase"
-                },
-                "file_name": {
-                    "shot": "<Project>_<Sequence>_<Shot>_<OutputType>_v<Revision>",
-                    "asset": "<Project>_<AssetType>_<Asset>_<OutputType>_v<Revision>",
-                    "style": "lowercase"
-                }
-            },
-            "preview": {
-                "mountpoint": mount_point,
-                "root": root,
-                "folder_path": {
-                    "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/output/<OutputType>/v<Revision>/preview",
-                    "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/output/<OutputType>/v<Revision>/preview",
-                    "style": "lowercase"
-                },
-                "file_name": {
-                    "shot": "<Project>_<Sequence>_<Shot>_<OutputType>_v<Revision>",
-                    "asset": "<Project>_<AssetType>_<Asset>_<OutputType>_v<Revision>",
-                    "style": "lowercase"
-                }
-            }
-        }
-        self.dict_check(self.project, 'no_project')
-        gazu.files.update_project_file_tree(self.project, file_tree)
-
-    def publish_working_file(self, task_type_name, software_name):
-        """get_task 함수로 task_type(dict) 과 task(dict) 중 task를 받고
+   def publish_working_file(self, task_type_name, software_name):
+       """get_task 함수로 task_type(dict) 과 task(dict) 중 task를 받고
         software(dict)도 사용하여  새로운 working file(revision +1) 을 만든다. \n
         Create a new 'working file' with 'task_type' and 'task' corresponding to
         the specified entity and the selected software name.
@@ -193,7 +204,9 @@ class Houpub:
         _, task = self.get_task(task_type_name)
         software = self.get_software(software_name)
         gazu.files.new_working_file(task, software=software)
-        self.mylog.debug("publish working file , last revision up")
+        logger = make_logger()
+        logger.debug("publish working file , last revision up")
+
 
     def publish_output_file(self, task_type_name, output_type_name, comments):
         """
@@ -220,7 +233,8 @@ class Houpub:
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         gazu.files.new_entity_output_file(self.entity, output_type, task_type, working_file=work_file,
                                           representation=output_type['short_name'], comment=comments)
-        self.mylog.debug("publish output file , last revision up")
+        logger = make_logger()
+        logger.debug("publish output file , last revision up")
 
     def working_file_path(self, task_type_name, software_name, input_num):
         """revision = (intput_num < last revision) \n
@@ -243,7 +257,8 @@ class Houpub:
         self.args_str_check(task_type_name, software_name)
         _, task = self.get_task(task_type_name)
         software = self.get_software(software_name)
-        revision_max = self.get_working_revision_max(task)
+        revision_max = gazu.files.get_last_working_file_revision(task).get('revision', self.error('no_work_file'))
+        # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음
         revision_num = self.get_revision_num(revision_max, input_num)
         path = gazu.files.build_working_file_path(task, software=software, revision=revision_num)
         ext = software['file_extension']
@@ -266,12 +281,13 @@ class Houpub:
         self.args_str_check(task_type_name)
         _, task = self.get_task(task_type_name)
         self.dict_check(task, 'no_task_in_entity')
-        revision_max = self.get_working_revision_max(task)
+        revision_max = gazu.files.get_last_working_file_revision(task)['revision']
+        # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음
         path = gazu.files.build_working_file_path(task, revision=revision_max + 1)
         return path
 
     def output_file_path(self, output_type_name, task_type_name, input_num):
-        """revision = (intput_num < last revision) \n
+       """revision = (intput_num < last revision) \n
         input num 이 크면 last revision 을 반환, 작으면 input_num 반환 \n
         Call up 'output_type_name', 'task_type_name', 'input_num'. A file path combined with 'ext' is created with
         'revision_num' to local path that matches 'input_num' on the specified 'entity'.
@@ -287,13 +303,14 @@ class Houpub:
 
         Returns:
             working file path(str)
-
+도
         """
         task_type = gazu.task.get_task_type_by_name(task_type_name)
-        self.dict_check(task_type, f'no_task_type{task_type_name}_')
+        self.dict_check(task_type, 'no_task_type')
         output_type = gazu.files.get_output_type_by_name(output_type_name)
-        self.dict_check(output_type, f'no_output_type{output_type_name}')
+        self.dict_check(output_type, 'no_output_type')
         revision_max = gazu.files.get_last_entity_output_revision(self.entity, output_type, task_type, name='main')
+        # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음도
         revision_num = self.get_revision_num(revision_max, input_num)
         path = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type, revision=revision_num)
         ext = output_type['short_name']
@@ -317,20 +334,14 @@ class Houpub:
 
         """
         task_type = gazu.task.get_task_type_by_name(task_type_name)
-        self.dict_check(task_type, f'no_task_type{task_type_name}')
+        self.dict_check(task_type, 'no_task_type')
         output_type = gazu.files.get_output_type_by_name(output_type_name)
-        self.dict_check(output_type, f'no_output_type{output_type_name}')
+        self.dict_check(output_type, 'no_output_type')
         revision_max = gazu.files.get_last_entity_output_revision(self.entity, output_type, task_type, name='main')
         # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음도
         path = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type, revision=revision_max + 1)
         ext = output_type['short_name']
         return path + '.' + ext
-
-    def get_working_revision_max(self, task):
-        last_working_file = gazu.files.get_last_working_file_revision(task)
-        if last_working_file is None:
-            self.error("no_work_file")
-        return last_working_file['revision']
 
     def get_revision_num(self, revision_max, input_num):
         """
@@ -393,20 +404,21 @@ class Houpub:
 
     def get_casting_path_for_asset(self):  # 에러핸들링 해야함
         """output file path revision +1 된 path 를 리턴한다. \n
-        Call up 'output_type_name', 'task_type_name'. A file path combined with 'ext' is created with last
-        'revision_num' specified 'entity'.
+                Call up 'output_type_name', 'task_type_name'. A file path combined with 'ext' is created with last
+                'revision_num' specified 'entity'.
 
-        Example:
-            make_next_output_path('Movie_file', 'FX') \n
-            need self parameter : project,asset,entity or project,seq,shot,entity
+                Example:
+                    make_next_output_path('Movie_file', 'FX') \n
+                    need self parameter : project,asset,entity or project,seq,shot,entity
 
-        Args:
-            output_type_name(str):
-            task_type_name(str):
+                Args:
+                    output_type_name(str):
+                    task_type_name(str):
 
-        Returns:
-            output file revision +1 된  path
-        """
+                Returns:
+                    output file revision +1 된  path
+
+                """
 
         cast_in = gazu.casting.get_asset_cast_in(self.asset)
         for shot in cast_in:
@@ -420,15 +432,6 @@ class Houpub:
                     print("None")
                     
     def dict_check(self, test_dict, code):
-        """ 테스트 하게 되는 dict 가 아무 것도 없으면 error 코드 발생 시킨다.
-        Example:
-            self.dict_check(self.sequence, 'no_sequence')
-            need self parameter : self.error
-
-        Returns:
-            error tested functions
-
-        """
         if test_dict is None:
             self.error(code)
         else:
@@ -459,33 +462,33 @@ class Houpub:
     @staticmethod
     def error(code):
         if code == 'not_string':
-            raise Exception("Input must be string")
+            raise ValueError("Input must be string")
         if code == 'not_int':
-            raise Exception("Input must be integer.")
+            raise ValueError("Input must be integer.")
         if code == 'none':
-            raise Exception("There is no dict")
+            raise ValueError("There is no dict")
         if code == 'hou':
-            raise Exception("Software input must be hou, hounc, or houlc.")
+            raise ValueError("Software input must be hou, hounc, or houlc.")
         if code == 'no_task':
-            raise Exception("There's no task in entity.")
+            raise ValueError("There's no task in entity.")
         if code == 'no_project':
-            raise Exception("No project is assigned.")
+            raise NameError("No project is assigned.")
         if code == 'no_sequence':
-            raise Exception("No sequence is assigned.")
+            raise NameError("No sequence is assigned.")
         if code == 'no_shot':
-            raise Exception("No shot is assigned.")
+            raise NameError("No shot is assigned.")
         if code == 'no_asset':
-            raise Exception("No asset is assigned.")
+            raise NameError("No asset is assigned.")
         if code == 'no_work_file':
-            raise Exception("No working file found.")
+            raise NameError("")
         if code == 'no_output_file':
-            raise Exception("No output file found.")
+            raise NameError("")
         if code == 'not_asset_shot':
-            raise Exception("No shot or asset is assigned.")
+            raise NameError("")
         if 'no_task_type' in code:
-            raise Exception(f"There's no task type named '{code[11:]}")
+            raise NameError(f"There's no task type named '{code[11:]}")
         if 'no_output_type' in code:
-            raise Exception(f"There's no output type named '{code[13:]}")
+            raise NameError(f"There's no output type named '{code[11:]}")
             
     def print_get_all_info(self, select):
         if select == 'project' and self.project is not None:
@@ -525,7 +528,6 @@ class Houpub:
             print('[Select from the list below]')
             for element in list_element:
                 print(f"'{element}'")
-
     # -----------Unused methods----------
 
     # -----Login-----
