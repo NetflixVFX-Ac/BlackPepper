@@ -14,6 +14,17 @@ class Houpub:
         pass
 
     def login(self, host, identify, password):
+        """ 지정된 호스트를 setting 해주고, 이메일 (identification) 과 password 를 이용해 로그인 하는 방식.
+
+        Examples:
+            login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+
+        Args:
+            host
+            identification
+            password
+
+        """
         gazu.client.set_host(host)
         gazu.log_in(identify, password)
         self.identif = identify
@@ -25,6 +36,15 @@ class Houpub:
 
     @project.setter
     def project(self, proj_name):
+        """사용자가 제시한 프로 젝트의 이름을 불러 온다.
+
+        Examples : project("Houchu")
+        need self parameter : project
+        Args:
+            proj_name(str): 사용자가 설정한 project name
+
+        Returns: 이름과 일치 하는 프로 젝트
+        """
         self.args_str_check(proj_name)
         self._project = gazu.project.get_project_by_name(proj_name)
         self.dict_check(self.project, 'none')
@@ -35,6 +55,17 @@ class Houpub:
 
     @sequence.setter
     def sequence(self, seq_name):
+        """ sequence 를 name 으로 불러 온다. 딕셔너리 형태인지, string인지, 확인.
+
+        Examples : sequence("SQ0010")
+        need self parameter : project,seq
+
+        Args:
+            seq_name(str)
+
+        Returns: 이름과 일치 하는 sequence
+
+        """
         self.dict_check(self.project, 'no_project')
         self.args_str_check(seq_name)
         self._sequence = gazu.shot.get_sequence_by_name(self.project, seq_name)
@@ -46,6 +77,17 @@ class Houpub:
 
     @shot.setter
     def shot(self, shot_name):
+        """shot 을 name 으로 불러 온다. 딕셔너리 형태인지, string인지, 확인.
+
+        need self parameter : seq,shot
+
+        Args:
+            shot_name(str):Name of claimed shot.
+            need self parameter : seq,shot
+
+        Returns(dict): 이름과 일치 하는 shot
+
+        """
         self.dict_check(self.sequence, 'no_sequence')
         self.args_str_check(shot_name)
         self._shot = gazu.shot.get_shot_by_name(self.sequence, shot_name)
@@ -57,6 +99,15 @@ class Houpub:
 
     @asset.setter
     def asset(self, asset_name):
+        """사용자가 제시한 프로 젝트의 이름을 불러 온다.
+
+        Examples : project("Houchu")
+        need self parameter : project
+        Args:
+        proj_name(str): 사용자가 설정한 project name
+
+        Returns: 이름과 일치 하는 프로 젝트
+        """
         self.dict_check(self.project, 'no_project')
         self._asset = gazu.asset.get_asset_by_name(self.project, asset_name)
         self.dict_check(self.asset, 'none')
@@ -236,7 +287,7 @@ class Houpub:
 
         Returns:
             working file path(str)
-도
+
         """
         task_type = gazu.task.get_task_type_by_name(task_type_name)
         self.dict_check(task_type, f'no_task_type{task_type_name}_')
@@ -341,6 +392,22 @@ class Houpub:
             self.error('hou')
 
     def get_casting_path_for_asset(self):  # 에러핸들링 해야함
+        """output file path revision +1 된 path 를 리턴한다. \n
+        Call up 'output_type_name', 'task_type_name'. A file path combined with 'ext' is created with last
+        'revision_num' specified 'entity'.
+
+        Example:
+            make_next_output_path('Movie_file', 'FX') \n
+            need self parameter : project,asset,entity or project,seq,shot,entity
+
+        Args:
+            output_type_name(str):
+            task_type_name(str):
+
+        Returns:
+            output file revision +1 된  path
+        """
+
         cast_in = gazu.casting.get_asset_cast_in(self.asset)
         for shot in cast_in:
             print(f'sequence name  : {shot.get("sequence_name")} \n'
@@ -353,6 +420,15 @@ class Houpub:
                     print("None")
                     
     def dict_check(self, test_dict, code):
+        """ 테스트 하게 되는 dict 가 아무 것도 없으면 error 코드 발생 시킨다.
+        Example:
+            self.dict_check(self.sequence, 'no_sequence')
+            need self parameter : self.error
+
+        Returns:
+            error tested functions
+
+        """
         if test_dict is None:
             self.error(code)
         else:
@@ -405,7 +481,7 @@ class Houpub:
         if code == 'no_output_file':
             raise Exception("No output file found.")
         if code == 'not_asset_shot':
-            raise Exception("No shot or asset is assignedl.")
+            raise Exception("No shot or asset is assigned.")
         if 'no_task_type' in code:
             raise Exception(f"There's no task type named '{code[11:]}")
         if 'no_output_type' in code:
