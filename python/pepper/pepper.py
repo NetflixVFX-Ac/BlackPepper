@@ -384,9 +384,23 @@ class Houpub:
         if code == 'hou':
             raise ValueError("Software input must be hou, hounc, or houlc.")
         if code == 'no_task':
-            raise ValueError
+            raise ValueError("There's no task in entity.")
         if code == 'no_project':
-            raise ValueError
+            raise NameError("No project is assigned.")
+        if code == 'no_sequence':
+            raise NameError("No sequence is assigned.")
+        if code == 'no_shot':
+            raise NameError("No shot is assigned.")
+        if code == 'no_asset':
+            raise NameError("No asset is assigned.")
+        if code == 'no_work_file':
+            raise NameError("")
+        if code == 'no_output_file':
+            raise NameError("")
+        if 'no_task_type' in code:
+            raise NameError(f"There's no task type named '{code[11:]}")
+        if 'no_output_type' in code:
+            raise NameError(f"There's no output type named '{code[11:]}")
 
     # -----------Unused methods----------
 
