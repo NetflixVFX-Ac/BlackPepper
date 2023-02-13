@@ -1,7 +1,11 @@
 import logging
 # from hook.python.pepper.pepper import Houpub
 
-def make_logger(name=None):
+def make_logger(name):
+    name = str(name)
+    # aw = Houpub()
+    # name = aw.identif
+
     #1 logger instance를 만든다.
     logger = logging.getLogger(name)
 
@@ -28,7 +32,10 @@ def make_logger(name=None):
     logger.addHandler(file_handler)
 
     return logger
-#
+
+# a = make_logger()
+# print(a.name)
+
 # LOG_FORMAT = "[%(asctime)-10s] (줄 번호: %(lineno)d) %(name)s:%(levelname)s - %(message)s"
 # logging.basicConfig(format=LOG_FORMAT)
 # logger = logging.getLogger("setting")
