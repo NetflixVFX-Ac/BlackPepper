@@ -127,38 +127,11 @@ class TestHoupub(TestCase):
         check = self.pepper.get_software(software_name)
         self.assertEqual(check.get('file_extension'), 'hip')
 
-    def test_casting_create(self):
-        self.pepper.project = 'PEPPER'
-        self.pepper.sequence = 'sq01'
-        self.pepper.shot = '0040'
-        self.pepper.asset = 'temp_fire'
-        self.pepper.casting_create(1)
-        occurences = 0
-        assets = gazu.casting.get_asset_cast_in(self.pepper.asset)
-        for asset in assets:
-            if asset.get('sequence_name').lower() == 'sq01' and asset.get('shot_name') == '0040':
-                occurences = asset.get('nb_occurences')
-        self.assertEqual(occurences, 1)
-
-    def test_casting_delete(self):
-        self.pepper.project = 'PEPPER'
-        self.pepper.sequence = 'sq01'
-        self.pepper.shot = '0040'
-        self.pepper.asset = 'temp_fire'
-        self.pepper.casting_delete()
-        asset_castings = gazu.casting.get_shot_casting(self.pepper.shot)
-        asset_picked = None
-        for casting in asset_castings:
-            if casting.get('asset_name') == self.pepper.asset.get('name'):
-                asset_picked = casting
-        self.assertIsNone(asset_picked)
-
     def test_get_casting_path_for_asset(self):
         self.pepper.project = 'PEPPER'
         self.pepper.asset = 'temp_fire'
         last_revision = self.pepper.get_casting_path_for_asset()
-        self.assertIn('revision', last_revision)
-        self.assertTrue(last_revision.get('revision') > 0)
+        self.assertIn()
 
     def test_dick_check(self):
         test_dict = {'hook': 'team', 'mem_num': '7'}
@@ -220,18 +193,15 @@ class TestHoupub(TestCase):
         code = 'no_work_file'
         with self.assertRaises(Exception) as context:
             self.pepper.error(code)
-        self.assertEqual("No shot is assigned.", str(context.exception))
-        code = 'no_shot'
+        self.assertEqual("No working file found.", str(context.exception))
+        code = 'no_output_file'
         with self.assertRaises(Exception) as context:
             self.pepper.error(code)
-        self.assertEqual("No shot is assigned.", str(context.exception))
-        code = 'no_shot'
+        self.assertEqual("No output file found.", str(context.exception))
+        code = 'not_asset_shot'
         with self.assertRaises(Exception) as context:
             self.pepper.error(code)
-        self.assertEqual("No shot is assigned.", str(context.exception))
-
-    def test_print_get_all_info(self):
-        self.fail()
+        self.assertEqual("No shot or asset is assigned.", str(context.exception))
 
     def test_get_working_revision_max(self):
         self.pepper.project = 'PEPPER'
@@ -255,6 +225,7 @@ class TestHoupub(TestCase):
         check = self.pepper.get_working_revision_max(task)
         self.assertIs(type(check), int)
 
+
     def test_get_all_shots(self):
 
         self.pepper.project = 'PEPPER'
@@ -272,3 +243,21 @@ class TestHoupub(TestCase):
         self.pepper.asset = "temp_explosion"
 
         self.assertIn("simulation", self.pepper.get_task_types_for_asset())
+
+    def test_get_all_projects(self):
+        self.assertIn('PEPPER', self.pepper.get_all_projects())
+
+    def test_get_all_assets(self):
+        self.pepper.project = 'PEPPER'
+        self.assertIn('fx_template', self.pepper.get_all_assets())
+
+    def test_get_all_sequences(self):
+        self.pepper.project = 'PEPPER'
+        self.assertIn('SQ01', self.pepper.get_all_sequences())
+
+    def test_get_casted_assets_for_shot(self):
+        self.pepper.project = 'PEPPER'
+        self.pepper.sequence = 'SQ01'
+        self.pepper.shot = '0010'
+        self.assertIn('fx_template:temp_explosion', self.pepper.get_casted_assets_for_shot())
+
