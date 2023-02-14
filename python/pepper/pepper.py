@@ -1,7 +1,5 @@
 import gazu
 from log.log_pepper import make_logger
-
-
 """
  이 모듈은 kitsu에 올라간 정보를 gazu를 통해서 path를 추출한다. 그 정보는 local에 저장된 houdini template에 working file path로 
 지정한 경로에서 cam, asset 파일을 기존 working hip파일에 적용한다. 부가적으로 shots마다 cating된 template를 확인 할 수 있다.
@@ -34,6 +32,8 @@ class Houpub:
             identify(str): user id
             password(str): user password
 
+        Raises:
+            Host
         """
         gazu.client.set_host(host)
         gazu.log_in(identify, password)
@@ -46,14 +46,16 @@ class Houpub:
 
     @project.setter
     def project(self, proj_name):
-        """사용자가 제시한 프로 젝트의 이름을 불러 온다.
+        """입력한 프로젝트 이름과 동일한 이름을 가진 프로젝트의 딕셔너리를 반환한다.
 
-        Examples : project("Houchu")
-        need self parameter : project
+        Examples:
+            self.project = 'pepper'
+
         Args:
-            proj_name(str): 사용자가 설정한 project name
+            proj_name(str): Project name
 
-        Returns: 이름과 일치 하는 프로 젝트
+        Returns:
+            Project dict
         """
         self.args_str_check(proj_name)
         self._project = gazu.project.get_project_by_name(proj_name)
@@ -66,16 +68,17 @@ class Houpub:
 
     @sequence.setter
     def sequence(self, seq_name):
-        """ sequence 를 name 으로 불러 온다. 딕셔너리 형태인지, string인지, 확인.
+        """입력한 시퀀스 이름과 동일한 이름을 가진 시퀀스의 딕셔너리를 반환한다. \n
+        self.project가 없을 시 작동하지 않는다.
 
-        Examples : sequence("SQ0010")
-        need self parameter : project,seq
+        Examples:
+            self.sequence = "SQ01"
 
         Args:
-            seq_name(str)
+            seq_name(str) : Sequence name
 
-        Returns: 이름과 일치 하는 sequence
-
+        Returns:
+            Sequence dict
         """
         self.dict_check(self.project, 'no_project')
         self.args_str_check(seq_name)
@@ -89,16 +92,17 @@ class Houpub:
 
     @shot.setter
     def shot(self, shot_name):
-        """shot 을 name 으로 불러 온다. 딕셔너리 형태인지, string인지, 확인.
+        """입력한 샷 이름과 동일한 이름을 가진 샷의 딕셔너리를 반환한다. \n
+        self.project와 self.sequence가 없을 시 작동하지 않는다.
 
-        need self parameter : seq,shot
+        Examples:
+            self.shot = '0010'
 
         Args:
-            shot_name(str):Name of claimed shot.
-            need self parameter : seq,shot
+            shot_name(str): Shot name
 
-        Returns(dict): 이름과 일치 하는 shot
-
+        Returns(dict):
+            Shot dict
         """
         self.dict_check(self.sequence, 'no_sequence')
         self.args_str_check(shot_name)
@@ -112,14 +116,17 @@ class Houpub:
 
     @asset.setter
     def asset(self, asset_name):
-        """사용자가 제시한 프로 젝트의 이름을 불러 온다.
+        """입력한 어셋 이름과 동일한 이름을 가진 어셋의 딕셔너리를 반환한다. \n
+        self.project가 없을 시 작동하지 않는다.
 
-        Examples : project("Houchu")
-        need self parameter : project
+        Examples:
+            self.asset = 'temp_fire'
+
         Args:
-        proj_name(str): 사용자가 설정한 project name
+            asset_name(str): Asset name
 
-        Returns: 이름과 일치 하는 프로 젝트
+        Returns:
+
         """
         self.dict_check(self.project, 'no_project')
         self._asset = gazu.asset.get_asset_by_name(self.project, asset_name)
@@ -503,6 +510,16 @@ class Houpub:
 
     @staticmethod
     def error(code):
+        """string으로 code를 적어주면 해당되는 에러 메시지를 띄운다.
+
+        Examples:
+            error('not_string')
+
+        Args:
+            code(str): error code message
+
+        Returns: 예외 메시지
+        """
         if code == 'not_string':
             raise Exception("Input must be string")
         if code == 'not_int':
