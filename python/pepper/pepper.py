@@ -497,15 +497,19 @@ class Houpub:
 
     def args_str_check(self, *args):
         """
-        받는 인자들이 tuple인 경우 string으로 변경시켜주고, 변경되지 않은 경우 error 코드를 발생 시킨다.
+        체크할 인자들이 tuple인 경우 self.str_check으로 타입을 str으로 변경해주고, 체크해주어 str으로 변경된 경우 변경 된 str 값을 리턴해준다.
+        아니면 str_check의 에러코드를 리턴해준다.
+        만약 체크할 인자들이 string인 경우 받은 값 그대로 리턴해준다.
 
         Example:
             self.args_str_check(task_type_name)
-            need self paramter : self.str_check
+
         Args:
             args : 여러가지 인자들을 받을 수 있다
         Returns:
-            error tested functions
+            str_confirms: tuple 이면 인자들을 ','로 구분하여 스트링값으로 리턴
+            args : 스트링인 경우 받은 값 그대로 리턴
+
 
         """
         if type(args) is tuple:
@@ -522,7 +526,6 @@ class Houpub:
         받은 인자값이 str인지 체크해준다. \n인자값이 string인 경우 인자값을 그대로 뱉어주고, 아닌경우  error 코드를 발생 시킨다.
         Args:
             strn: string type check
-            need self paramter : self.error
 
         Returns:
             string
@@ -534,6 +537,16 @@ class Houpub:
             return strn
 
     def int_check(self, num):
+        """
+        체크할 인자값이 int인지 체크해준다. int가 아닌 경우 self.error으로 에러 코드를 발생 시킨다.int인 경우 받은 값 그대로 리턴해준다.
+        Args:
+            num: type이 int인지 체크하고 싶은 인자값
+            
+        Example:
+            int_check(input_num)
+        Returns:
+            num
+        """
         if type(num) is not int:
             self.error('not_int')
         else:
@@ -620,6 +633,15 @@ class Houpub:
         return [shot['name'] for shot in gazu.shot.all_shots_for_sequence(self.sequence)]
 
     def get_task_types_for_asset(self):
+        """
+        해당 asset의 모든 task(딕셔너리) 타입을 불러온다. 딕셔너리가 형태가 없는 경우  no_asset이라는 error 코드를 발생 시킨다.
+
+        Examples :
+            get_task_types_for_asset(asset
+        Returns: 
+            asset의 task(dict)
+
+        """
         self.dict_check(self.asset, 'no_asset')
         return [task_type['name'] for task_type in gazu.task.all_task_types_for_asset(self.asset)]
 
