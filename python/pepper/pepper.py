@@ -188,6 +188,7 @@ class Houpub:
         }
         self.dict_check(self.project, 'no_project')
         gazu.files.update_project_file_tree(self.project, file_tree)
+        self.mylog.debug(self.project, "File tree updated")
 
     def publish_working_file(self, task_type_name, software_name):
         """get_task 함수로 task_type(dict) 과 task(dict) 중 task를 받고
