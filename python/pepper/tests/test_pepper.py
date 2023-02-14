@@ -130,8 +130,14 @@ class TestHoupub(TestCase):
     def test_get_casting_path_for_asset(self):
         self.pepper.project = 'PEPPER'
         self.pepper.asset = 'temp_fire'
+        self.pepper.sequence = 'SQ01'
+        self.pepper.shot = '0010'
         last_revision = self.pepper.get_casting_path_for_asset()
-        self.assertIn()
+        shot_dict = None
+        for i in range(len(last_revision)):
+            if last_revision[i][0].get('shot_name') == self.pepper.shot.get('name'):
+                shot_dict = last_revision[i][0]
+        self.assertIsNotNone(shot_dict)
 
     def test_dick_check(self):
         test_dict = {'hook': 'team', 'mem_num': '7'}
@@ -225,9 +231,7 @@ class TestHoupub(TestCase):
         check = self.pepper.get_working_revision_max(task)
         self.assertIs(type(check), int)
 
-
     def test_get_all_shots(self):
-
         self.pepper.project = 'PEPPER'
         self.pepper.sequence = 'SQ01'
         self.assertIn('0010', self.pepper.get_all_shots())
@@ -236,12 +240,9 @@ class TestHoupub(TestCase):
         self.assertIn('0040', self.pepper.get_all_shots())
         self.assertIn('0050', self.pepper.get_all_shots())
 
-
     def test_get_task_types_for_asset(self):
-
         self.pepper.project = "PEPPER"
         self.pepper.asset = "temp_explosion"
-
         self.assertIn("simulation", self.pepper.get_task_types_for_asset())
 
     def test_get_all_projects(self):
