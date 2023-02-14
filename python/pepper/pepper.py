@@ -25,7 +25,7 @@ class Houpub:
         유저 id는 self.identif에 저장해 로깅이 가능하게 한다.
 
         Examples:
-            login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+            pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
 
         Args:
             host(str): host url
@@ -33,7 +33,9 @@ class Houpub:
             password(str): user password
 
         Raises:
-            Host
+            ConnectionError: Host ip에 다른 값이 있을 때
+            ServerErrorException: Host의 주소가 맞지 않을 때
+            AuthFailedException: id나 password가 맞지 않을 때
         """
         gazu.client.set_host(host)
         gazu.log_in(identify, password)
@@ -49,13 +51,13 @@ class Houpub:
         """입력한 프로젝트 이름과 동일한 이름을 가진 프로젝트의 딕셔너리를 반환한다.
 
         Examples:
-            self.project = 'pepper'
+            pepper.project = 'pepper'
 
         Args:
             proj_name(str): Project name
 
-        Returns:
-            Project dict
+        Raises:
+            Exception: If input is not string, or if there is no dict named 'project name'
         """
         self.args_str_check(proj_name)
         self._project = gazu.project.get_project_by_name(proj_name)
@@ -72,13 +74,14 @@ class Houpub:
         self.project가 없을 시 작동하지 않는다.
 
         Examples:
-            self.sequence = "SQ01"
+            pepper.sequence = "SQ01"
 
         Args:
             seq_name(str) : Sequence name
 
-        Returns:
-            Sequence dict
+        Raises:
+            Exception: If self.project don't exist, if input is not string,
+                and if there is no dict named 'sequence name'
         """
         self.dict_check(self.project, 'no_project')
         self.args_str_check(seq_name)
@@ -96,13 +99,14 @@ class Houpub:
         self.project와 self.sequence가 없을 시 작동하지 않는다.
 
         Examples:
-            self.shot = '0010'
+            pepper.shot = '0010'
 
         Args:
             shot_name(str): Shot name
 
-        Returns(dict):
-            Shot dict
+        Raises:
+            Exception: If self.project or self.sequence don't exist, if input is not string,
+                or if there is no dict named 'shot name'
         """
         self.dict_check(self.sequence, 'no_sequence')
         self.args_str_check(shot_name)
@@ -120,13 +124,13 @@ class Houpub:
         self.project가 없을 시 작동하지 않는다.
 
         Examples:
-            self.asset = 'temp_fire'
+            pepper.asset = 'temp_fire'
 
         Args:
             asset_name(str): Asset name
 
-        Returns:
-
+        Raises:
+            Exception: If self.project don't exist, if input is not string, and if there is no dict named 'asset name'
         """
         self.dict_check(self.project, 'no_project')
         self._asset = gazu.asset.get_asset_by_name(self.project, asset_name)
@@ -151,17 +155,18 @@ class Houpub:
 
     def set_file_tree(self, mount_point, root):
         """
-        file tree를 업데이트 해준다. \n 만약 프로젝트가 없는 경우 no_project라는 error 코드를 발생 시킨다.
-
-        Args:
-            mount_point(str):
-            root(str):
+        self.project의 File tree를 업데이트 해준 뒤 File tree 변경 로그를 저장한다. \n
+        self.project가 없을 시 작동하지 않는다.
 
         Examples:
+            pepper.set_file_tree('mnt/projects', 'hook')
 
+        Args:
+            mount_point(str): Local mountpoint path
+            root(str): Root directory for local kitsu path
 
-        Returns:
-            dict: Modified project.
+        Raises:
+            Exception: If self.project don't exist, and if input is not string that leads to local path
         """
         file_tree = {
             "working": {
@@ -510,6 +515,17 @@ class Houpub:
 
     @staticmethod
     def error(code):
+        """string으로 code를 적어주면 해당되는 에러 메시지를 띄운다.
+
+        Examples:
+            error('not_string')
+
+        Args:
+            code(str): error code message
+
+        Returns:
+            예외 메시지
+        """
         if code == 'not_string':
             raise Exception("Input must be string")
         if code == 'not_int':
