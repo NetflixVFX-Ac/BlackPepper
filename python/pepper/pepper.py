@@ -390,7 +390,7 @@ class Houpub:
             need self parameter : project,asset,entity or project,seq,shot,entity
 
         Args:
-            task_type_name: string
+            task_type_name(str)
 
         Returns:
             task_type, task
@@ -534,10 +534,28 @@ class Houpub:
         return [asset['name'] for asset in gazu.asset.all_asset_types_for_project(self.project)]
 
     def get_all_sequences(self):
+        """project 를 위한 sequence 들을 dict_check 로 에러 검토 후
+           shot 에서 이름 으로 모두 불러 온다.
+
+        Example:
+            get_all_assets(project_name)
+
+        Returns:
+            seq
+        """
         self.dict_check(self.project, 'no_project')
         return [seq['name'] for seq in gazu.shot.all_sequences_for_project(self.project)]
 
     def get_all_shots(self):
+        """Sequence 를 위한 모든 shot 들을 불러온다. dict_check 로 에러 검토 후
+        모든 shot 들을 불러 온다.
+
+        Example :
+            get_all_shots(sequence_name)
+
+        Returns: shot name.
+
+        """
         self.dict_check(self.project, 'no_project')
         self.dict_check(self.sequence, 'no_sequence')
         return [shot['name'] for shot in gazu.shot.all_shots_for_sequence(self.sequence)]
