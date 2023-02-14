@@ -115,8 +115,8 @@ class Houpub:
         """사용자가 제시한 프로 젝트의 이름을 불러 온다.
 
         Examples : project("Houchu")
-        need self parameter : project
-        Args:
+        need self parameter : project, asset
+        Args: asset_name(str)
         proj_name(str): 사용자가 설정한 project name
 
         Returns: 이름과 일치 하는 프로 젝트
@@ -132,6 +132,17 @@ class Houpub:
 
     @entity.setter
     def entity(self, ent):
+        """ 만약 entity 가 asset 일 때 shot 일 때 상황을 적용해서 self.dict_check 을 통해
+        self.asset 에러 체크를 하고 통과가 되었 다면 self.entity = asset. shot 도 동일하게 적용.
+
+        need self parameter : project, asset
+
+        Examples: entity(asset) or entity(shot)
+        Args : ent(str)
+
+        Returns: entity
+
+        """
         if ent == 'asset':
             self.dict_check(self.asset, 'no_asset')
             self._entity = self._asset
@@ -392,7 +403,7 @@ class Houpub:
             need self parameter : project,asset,entity or project,seq,shot,entity
 
         Args:
-            task_type_name: string
+            task_type_name(str)
 
         Returns:
             task_type, task
@@ -406,6 +417,9 @@ class Houpub:
 
     def get_software(self, software_name):
         """houdini 관련 3가지 software 만 받고 뱉어준다.
+        Example:
+            get_software(houdini)
+            need self parameter : error
 
         Args:
             software_name(str):
@@ -427,6 +441,12 @@ class Houpub:
 
         Example:
             get_casting_path_for_asset()
+            need self parameter : self.asset
+
+        Args :
+             layout_task (str / dict) : The task type dict or ID.
+             shot(str / dict) : The shot dict or ID.
+             fx_task (str / dict) : The task type dict or ID.
 
         Returns:
             Generated working file path for given task (without extension).
@@ -447,6 +467,10 @@ class Houpub:
         Example:
             self.dict_check(self.sequence, 'no_sequence')
             need self parameter : self.error
+
+        Args :
+            code (str)
+            test_dict(str)
 
         Returns:
             error tested functions
@@ -545,10 +569,28 @@ class Houpub:
         return [asset['name'] for asset in gazu.asset.all_asset_types_for_project(self.project)]
 
     def get_all_sequences(self):
+        """project 를 위한 sequence 들을 dict_check 로 에러 검토 후
+           shot 에서 이름 으로 모두 불러 온다.
+
+        Example:
+            get_all_assets(project_name)
+
+        Returns:
+            seq
+        """
         self.dict_check(self.project, 'no_project')
         return [seq['name'] for seq in gazu.shot.all_sequences_for_project(self.project)]
 
     def get_all_shots(self):
+        """Sequence 를 위한 모든 shot 들을 불러온다. dict_check 로 에러 검토 후
+        모든 shot 들을 불러 온다.
+
+        Example :
+            get_all_shots(sequence_name)
+
+        Returns: shot name.
+
+        """
         self.dict_check(self.project, 'no_project')
         self.dict_check(self.sequence, 'no_sequence')
         return [shot['name'] for shot in gazu.shot.all_shots_for_sequence(self.sequence)]
