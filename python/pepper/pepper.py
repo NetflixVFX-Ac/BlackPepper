@@ -419,7 +419,7 @@ class Houpub:
             need self parameter : project,asset,entity or project,seq,shot,entity
 
         Args:
-            task_type_name(str)
+            task_type_name: string
 
         Returns:
             task_type, task
@@ -433,9 +433,6 @@ class Houpub:
 
     def get_software(self, software_name):
         """houdini 관련 3가지 software 만 받고 뱉어준다.
-        Example:
-            get_software(houdini)
-            need self parameter : error
 
         Args:
             software_name(str):
@@ -457,12 +454,6 @@ class Houpub:
 
         Example:
             get_casting_path_for_asset()
-            need self parameter : self.asset
-
-        Args :
-             layout_task (str / dict) : The task type dict or ID.
-             shot(str / dict) : The shot dict or ID.
-             fx_task (str / dict) : The task type dict or ID.
 
         Returns:
             Generated working file path for given task (without extension).
@@ -482,10 +473,6 @@ class Houpub:
         """ 테스트 하게 되는 dict 가 아무 것도 없으면 error 코드 발생 시킨다.
         Example:
             self.dict_check(self.sequence, 'no_sequence')
-
-        Args :
-            code (str)
-            test_dict(str)
 
         Returns:
             error tested functions
@@ -588,9 +575,25 @@ class Houpub:
 
     @staticmethod
     def get_all_projects():
+        """
+        host에 입력된 전체 project를 볼 수 있다.
+
+        Returns:
+            host in all projects
+
+        """
         return [proj['name'] for proj in gazu.project.all_open_projects()]
 
     def get_all_assets(self):
+        """
+        self.project에 dict에 해당하는 assets을 볼 수 있다.
+
+        Raises:
+            "No project is assigned."
+
+        Returns:
+            Asset of the selected project
+        """
         self.dict_check(self.project, 'no_project')
         return [asset['name'] for asset in gazu.asset.all_asset_types_for_project(self.project)]
 
