@@ -2,7 +2,7 @@ import logging
 
 
 def make_logger(name):
-    """ 1. logger instance를 만든다.\n2. logger의 level을 가장 낮은 수준인 DEBUG(자세한정보)로 설정\n3. formatter 지정
+    """1. logger instance를 만든다.\n2. logger의 level을 가장 낮은 수준인 DEBUG(자세한정보)로 설정\n3. formatter 지정
     asctime - name - levelname - message
     \n4. handler instance (StreamHandler,FileHandler)생성
     \n5. StramHandler:INFO,FileHandler:DEBUG 으로 level 설정

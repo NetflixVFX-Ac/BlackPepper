@@ -28,4 +28,3 @@ Netflix Academy 1st class Team Hook
 This API was created in the first season of the Netflix Academy \n
 and was created during the team project period by the Hook team.
 """
- 
