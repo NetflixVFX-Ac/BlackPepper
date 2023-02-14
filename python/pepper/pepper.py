@@ -57,6 +57,7 @@ class Houpub:
         self.args_str_check(proj_name)
         self._project = gazu.project.get_project_by_name(proj_name)
         self.dict_check(self.project, 'none')
+        return
 
     @property
     def sequence(self):
@@ -79,6 +80,7 @@ class Houpub:
         self.args_str_check(seq_name)
         self._sequence = gazu.shot.get_sequence_by_name(self.project, seq_name)
         self.dict_check(self.sequence, 'none')
+        return
 
     @property
     def shot(self):
@@ -101,6 +103,7 @@ class Houpub:
         self.args_str_check(shot_name)
         self._shot = gazu.shot.get_shot_by_name(self.sequence, shot_name)
         self.dict_check(self.shot, 'none')
+        return
 
     @property
     def asset(self):
@@ -120,6 +123,7 @@ class Houpub:
         self.dict_check(self.project, 'no_project')
         self._asset = gazu.asset.get_asset_by_name(self.project, asset_name)
         self.dict_check(self.asset, 'none')
+        return
 
     @property
     def entity(self):
@@ -130,11 +134,12 @@ class Houpub:
         if ent == 'asset':
             self.dict_check(self.asset, 'no_asset')
             self._entity = self._asset
+            return
         if ent == 'shot':
-            self.dict_check(self.shot, 'no_')
+            self.dict_check(self.shot, 'no_shot')
             self._entity = self._shot
-        else:
-            self.error('not_asset_shot')
+            return
+        self.error('not_asset_shot')
 
     def set_file_tree(self, mount_point, root):
         file_tree = {
@@ -203,7 +208,7 @@ class Houpub:
         _, task = self.get_task(task_type_name)
         software = self.get_software(software_name)
         gazu.files.new_working_file(task, software=software)
-        self.mylog.debug("publish working file , last revision up")
+        self.mylog.debug("publish working file, last revision up")
 
     def publish_output_file(self, task_type_name, output_type_name, comments):
         """
@@ -225,13 +230,14 @@ class Houpub:
         """
         self.args_str_check(task_type_name, output_type_name, comments)
         task_type, task = self.get_task(task_type_name)
-        self.dict_check(task_type, 'no_task_type')
+        self.dict_check(task_type, f'no_task_type{task_type_name}')
         work_file = gazu.files.get_last_working_file_revision(task)
         self.dict_check(work_file, 'no_work_file')
         output_type = gazu.files.get_output_type_by_name(output_type_name)
+        self.dict_check(task_type, f'no_task_type{output_type_name}')
         gazu.files.new_entity_output_file(self.entity, output_type, task_type, working_file=work_file,
                                           representation=output_type['short_name'], comment=comments)
-        self.mylog.debug("publish output file , last revision up")
+        self.mylog.debug("publish output file, last revision up")
 
     def working_file_path(self, task_type_name, software_name, input_num):
         """revision = (intput_num < last revision) \n
@@ -332,7 +338,6 @@ class Houpub:
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         self.dict_check(output_type, f'no_output_type{output_type_name}')
         revision_max = gazu.files.get_last_entity_output_revision(self.entity, output_type, task_type, name='main')
-        # 여기서 working file revision이 없을 경우의 에러핸들링 필요함. 메소드를 수정해야 할 수도 있음도
         path = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type, revision=revision_max + 1)
         ext = output_type['short_name']
         return path + '.' + ext
@@ -408,13 +413,6 @@ class Houpub:
         Example:
             get_casting_path_for_asset()
 
-        Args:
-<<<<<<< HEAD
-            # output_type_name(str):
-            # task_type_name(str):
-=======
-
-
         Returns:
             Generated working file path for given task (without extension).
         """
@@ -478,6 +476,8 @@ class Houpub:
             raise Exception("Software input must be hou, hounc, or houlc.")
         if code == 'no_task':
             raise Exception("There's no task in entity.")
+        if code == 'no_task_in_entity':
+            raise Exception("There's no task in entity")
         if code == 'no_project':
             raise Exception("No project is assigned.")
         if code == 'no_sequence':
@@ -590,7 +590,6 @@ class Houpub:
     #     output_type = gazu.files.get_output_type_by_name(output_type)
     # gazu.entity.get_entity_by_name(shot)
     # a = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type)
-    # print(a)
 
     # @staticmethod
     # def make_dirs(dir_path):
