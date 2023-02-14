@@ -545,6 +545,7 @@ class Houpub:
 
         Example:
             int_check(input_num)
+
         Returns:
             num
         """
@@ -601,56 +602,63 @@ class Houpub:
 
     @staticmethod
     def get_all_projects():
-        """
-        host에 입력된 전체 project를 볼 수 있다.
+        """Host DB 안의 모든 project들을 반환한다.
+
+        Examples:
+            pepper.get_all_projects()
 
         Returns:
-            host in all projects
-
+            ['pepper', 'chopsticks', ...]
         """
         return [proj['name'] for proj in gazu.project.all_open_projects()]
 
     def get_all_assets(self):
-        """
-        self.project에 dict에 해당하는 assets을 볼 수 있다.
+        """self.project안의 모든 asset들을 반환한다. \n
+        self.project가 없을 시 작동하지 않는다.
 
-        Raises:
+        Example:
+            pepper.get_all_assets()
 
         Returns:
-            Asset of the selected project
+            ['temp_fire', 'temp_waterfall', ...]
+
+        Raises:
+            Exception: if self.project doesn't exist.
         """
         self.dict_check(self.project, 'no_project')
         return [asset['name'] for asset in gazu.asset.all_asset_types_for_project(self.project)]
 
     def get_all_sequences(self):
-        """project 를 위한 sequence 들을 dict_check 로 에러 검토 후
-           shot 에서 이름 으로 모두 불러 온다.
+        """self.project 안의 모든 sequence들을 반환한다. \n
+        self.project가 없을 시 작동하지 않는다.
 
         Example:
-            get_all_assets()
+            pepper.get_all_sequences()
 
         Raises:
             Exception: if input is not exists, "No project is assigned."
 
         Returns:
-            seq name(list).
+            ['sq01', 'sq02', ...]
+
+        Raises:
+            Exception: if self.project doesn't exist.
         """
         self.dict_check(self.project, 'no_project')
         return [seq['name'] for seq in gazu.shot.all_sequences_for_project(self.project)]
 
     def get_all_shots(self):
-        """Sequence 를 위한 프로 젝트의 모든 shot 들을 dict_check 에러 검토 이후 이름 으로 불러 온다.
+        """self.sequence 안의 모든 shot들을 반환한다. \n
+        self.project와 self.sequence가 없을 시 작동하지 않는다.
 
         Example :
-            get_all_shots()
-
-        Raises :
-            Exception: if input(project) is not exists, "No project is assigned."
-                       if input(sequence) is not exists, "No sequence is assigned."
+            pepper.get_all_shots()
 
         Returns:
-            shot name(list).
+            ['0010', '0020, ...]
 
+        Raises :
+            Exception: If self.project doesn't exist, and if self.sequence doesn't exist.
         """
         self.dict_check(self.project, 'no_project')
         self.dict_check(self.sequence, 'no_sequence')
@@ -658,27 +666,34 @@ class Houpub:
 
     def get_task_types_for_asset(self):
         """
-        해당 asset의 모든 task type을 불러오고 해당 task의 이름을 리턴한다. 만약 딕셔너리가 없는 경우 no_asset이라는 error 코드를 발생시킨다.
+        self.asset의 의 모든 task들에 대한 task type을 반환한다.
+        self.project가 없을 시 작동하지 않는다.
 
-        Examples :
-            get_task_types_for_asset(asset_name)
+        Examples:
+            pepper.get_task_types_for_asset()
 
         Returns:
-            사용자가 적은 asset의 task name
+            ['simulation', 'FX', ...]
 
+        Raises:
+            Exception: If self.project doesn't exist, and if self.asset doesn't exist.
         """
         self.dict_check(self.asset, 'no_asset')
         return [task_type['name'] for task_type in gazu.task.all_task_types_for_asset(self.asset)]
 
     def get_casted_assets_for_shot(self):
         """
-        해당 샷에 캐스팅 된 모든 에셋을 가져 온다.
+        self.shot에 캐스팅 된 모든 asset의 type name과 asset name을 dict로 반환해준다. \n
+        self.project, self.sequence, self.shot이 없을 시 작동하지 않는다.
 
-        Examples :
-            get_casted_assets_for_shot(shot_name)
+        Examples:
+            pepper.get_casted_assets_for_shot()
 
         Returns:
-            asset_type_name : asset_name
+            [(asset_type_name: asset_name), (asset_type_name_2: asset_name_2), ...]
+
+        Raises:
+            Exception: If self.project doesn't exist, if self.sequenece doesn't exist, and if self.shot don't exist.
         """
         self.dict_check(self.project, 'no_project')
         self.dict_check(self.sequence, 'no_sequence')
