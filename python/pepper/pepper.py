@@ -469,7 +469,6 @@ class Houpub:
         """ 테스트 하게 되는 dict 가 아무 것도 없으면 error 코드 발생 시킨다.
         Example:
             self.dict_check(self.sequence, 'no_sequence')
-            need self parameter : self.error
 
         Returns:
             error tested functions
@@ -599,22 +598,29 @@ class Houpub:
            shot 에서 이름 으로 모두 불러 온다.
 
         Example:
-            get_all_assets(project_name)
+            get_all_assets()
+
+        Raises:
+            Exception: if input is not exists, "No project is assigned."
 
         Returns:
-            seq
+            seq name(list).
         """
         self.dict_check(self.project, 'no_project')
         return [seq['name'] for seq in gazu.shot.all_sequences_for_project(self.project)]
 
     def get_all_shots(self):
-        """Sequence 를 위한 모든 shot 들을 불러온다. dict_check 로 에러 검토 후
-        모든 shot 들을 불러 온다.
+        """Sequence 를 위한 프로 젝트의 모든 shot 들을 dict_check 에러 검토 이후 이름 으로 불러 온다.
 
         Example :
-            get_all_shots(sequence_name)
+            get_all_shots()
 
-        Returns: shot name.
+        Raises :
+            Exception: if input(project) is not exists, "No project is assigned."
+                       if input(sequence) "No sequence is assigned."
+
+        Returns:
+            shot name(list).
 
         """
         self.dict_check(self.project, 'no_project')
