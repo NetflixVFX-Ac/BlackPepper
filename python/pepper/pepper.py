@@ -1,7 +1,5 @@
 import gazu
 from log.log_pepper import make_logger
-
-
 """
  이 모듈은 kitsu에 올라간 정보를 gazu를 통해서 path를 추출한다. 그 정보는 local에 저장된 houdini template에 working file path로 
 지정한 경로에서 cam, asset 파일을 기존 working hip파일에 적용한다. 부가적으로 shots마다 cating된 template를 확인 할 수 있다.
@@ -27,13 +25,17 @@ class Houpub:
         유저 id는 self.identif에 저장해 로깅이 가능하게 한다.
 
         Examples:
-            login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+            pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
 
         Args:
             host(str): host url
             identify(str): user id
             password(str): user password
 
+        Raises:
+            ConnectionError: Host ip에 다른 값이 있을 때
+            ServerErrorException: Host의 주소가 맞지 않을 때
+            AuthFailedException: id나 password가 맞지 않을 때
         """
         gazu.client.set_host(host)
         gazu.log_in(identify, password)
@@ -46,14 +48,16 @@ class Houpub:
 
     @project.setter
     def project(self, proj_name):
-        """사용자가 제시한 프로 젝트의 이름을 불러 온다.
+        """입력한 프로젝트 이름과 동일한 이름을 가진 프로젝트의 딕셔너리를 반환한다.
 
-        Examples : project("Houchu")
-        need self parameter : project
+        Examples:
+            pepper.project = 'pepper'
+
         Args:
-            proj_name(str): 사용자가 설정한 project name
+            proj_name(str): Project name
 
-        Returns: 이름과 일치 하는 프로 젝트
+        Raises:
+            Exception: If input is not string, or if there is no dict named 'project name'
         """
         self.args_str_check(proj_name)
         self._project = gazu.project.get_project_by_name(proj_name)
@@ -66,16 +70,18 @@ class Houpub:
 
     @sequence.setter
     def sequence(self, seq_name):
-        """ sequence 를 name 으로 불러 온다. 딕셔너리 형태인지, string인지, 확인.
+        """입력한 시퀀스 이름과 동일한 이름을 가진 시퀀스의 딕셔너리를 반환한다. \n
+        self.project가 없을 시 작동하지 않는다.
 
-        Examples : sequence("SQ0010")
-        need self parameter : project,seq
+        Examples:
+            pepper.sequence = "SQ01"
 
         Args:
-            seq_name(str)
+            seq_name(str) : Sequence name
 
-        Returns: 이름과 일치 하는 sequence
-
+        Raises:
+            Exception: If self.project don't exist, if input is not string,
+                and if there is no dict named 'sequence name'
         """
         self.dict_check(self.project, 'no_project')
         self.args_str_check(seq_name)
@@ -89,16 +95,18 @@ class Houpub:
 
     @shot.setter
     def shot(self, shot_name):
-        """shot 을 name 으로 불러 온다. 딕셔너리 형태인지, string인지, 확인.
+        """입력한 샷 이름과 동일한 이름을 가진 샷의 딕셔너리를 반환한다. \n
+        self.project와 self.sequence가 없을 시 작동하지 않는다.
 
-        need self parameter : seq,shot
+        Examples:
+            pepper.shot = '0010'
 
         Args:
-            shot_name(str):Name of claimed shot.
-            need self parameter : seq,shot
+            shot_name(str): Shot name
 
-        Returns(dict): 이름과 일치 하는 shot
-
+        Raises:
+            Exception: If self.project or self.sequence don't exist, if input is not string,
+                or if there is no dict named 'shot name'
         """
         self.dict_check(self.sequence, 'no_sequence')
         self.args_str_check(shot_name)
@@ -112,14 +120,17 @@ class Houpub:
 
     @asset.setter
     def asset(self, asset_name):
-        """사용자가 제시한 프로 젝트의 이름을 불러 온다.
+        """입력한 어셋 이름과 동일한 이름을 가진 어셋의 딕셔너리를 반환한다. \n
+        self.project가 없을 시 작동하지 않는다.
 
-        Examples : project("Houchu")
-        need self parameter : project, asset
-        Args: asset_name(str)
-        proj_name(str): 사용자가 설정한 project name
+        Examples:
+            pepper.asset = 'temp_fire'
 
-        Returns: 이름과 일치 하는 프로 젝트
+        Args:
+            asset_name(str): Asset name
+
+        Raises:
+            Exception: If self.project don't exist, if input is not string, and if there is no dict named 'asset name'
         """
         self.dict_check(self.project, 'no_project')
         self._asset = gazu.asset.get_asset_by_name(self.project, asset_name)
@@ -154,6 +165,20 @@ class Houpub:
         self.error('not_asset_shot')
 
     def set_file_tree(self, mount_point, root):
+        """
+        self.project의 File tree를 업데이트 해준 뒤 File tree 변경 로그를 저장한다. \n
+        self.project가 없을 시 작동하지 않는다.
+
+        Examples:
+            pepper.set_file_tree('mnt/projects', 'hook')
+
+        Args:
+            mount_point(str): Local mountpoint path
+            root(str): Root directory for local kitsu path
+
+        Raises:
+            Exception: If self.project don't exist, and if input is not string that leads to local path
+        """
         file_tree = {
             "working": {
                 "mountpoint": mount_point,
@@ -444,8 +469,8 @@ class Houpub:
         fx_task_type = gazu.task.get_task_type_by_name('FX')
         tasks = []
         for shot in casted_shots:
-            layout_task = gazu.task.get_task_by_name(shot, layout_task_type)
-            fx_task = gazu.task.get_task_by_name(shot, fx_task_type)
+            layout_task = gazu.task.get_task_by_name(shot['shot_id'], layout_task_type)
+            fx_task = gazu.task.get_task_by_name(shot['shot_id'], fx_task_type)
             tasks.append((shot, layout_task, fx_task))
         return tasks
 
@@ -468,6 +493,18 @@ class Houpub:
             return test_dict
 
     def args_str_check(self, *args):
+        """
+        받는 인자들이 tuple인 경우 string으로 변경시켜주고, 변경되지 않은 경우 error 코드를 발생 시킨다.
+
+        Example:
+            self.args_str_check(task_type_name)
+            need self paramter : self.str_check
+        Args:
+            args : 여러가지 인자들을 받을 수 있다
+        Returns:
+            error tested functions
+
+        """
         if type(args) is tuple:
             str_confirms = ','.join(args)
             for str_confirm in str_confirms:
@@ -478,6 +515,16 @@ class Houpub:
             return args
 
     def str_check(self, strn):
+        """
+        받은 인자값이 str인지 체크해준다. \n인자값이 string인 경우 인자값을 그대로 뱉어주고, 아닌경우  error 코드를 발생 시킨다.
+        Args:
+            strn: string type check
+            need self paramter : self.error
+
+        Returns:
+            string
+
+        """
         if type(strn) is not str:
             self.error("not_string")
         else:
@@ -491,6 +538,17 @@ class Houpub:
 
     @staticmethod
     def error(code):
+        """string으로 code를 적어주면 해당되는 에러 메시지를 띄운다.
+
+        Examples:
+            error('not_string')
+
+        Args:
+            code(str): error code message
+
+        Returns:
+            예외 메시지
+        """
         if code == 'not_string':
             raise Exception("Input must be string")
         if code == 'not_int':
