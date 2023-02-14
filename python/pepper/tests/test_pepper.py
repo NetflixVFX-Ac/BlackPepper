@@ -1,5 +1,5 @@
 from unittest import TestCase
-from pepper.pepper import Houpub
+from pepper import Houpub
 import gazu
 import pprint
 
