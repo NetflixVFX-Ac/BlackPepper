@@ -541,7 +541,8 @@ class Houpub:
 
     @staticmethod
     def error(code):
-        """string으로 code를 적어주면 해당되는 에러 메시지를 띄운다.
+        """
+        string으로 code를 적어주면 해당되는 에러 메시지를 띄운다.
 
         Examples:
             error('not_string')
@@ -549,7 +550,8 @@ class Houpub:
         Args:
             code(str): error code message
 
-        Returns: 예외 메시지
+        Returns:
+            error message function
         """
         if code == 'not_string':
             raise Exception("Input must be string")
@@ -586,9 +588,25 @@ class Houpub:
 
     @staticmethod
     def get_all_projects():
+        """
+        host에 입력된 전체 project를 볼 수 있다.
+
+        Returns:
+            host in all projects
+
+        """
         return [proj['name'] for proj in gazu.project.all_open_projects()]
 
     def get_all_assets(self):
+        """
+
+
+        Raises:
+            "No project is assigned."
+
+        Returns:
+            Asset of the selected project
+        """
         self.dict_check(self.project, 'no_project')
         return [asset['name'] for asset in gazu.asset.all_asset_types_for_project(self.project)]
 
