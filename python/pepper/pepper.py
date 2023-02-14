@@ -142,6 +142,19 @@ class Houpub:
         self.error('not_asset_shot')
 
     def set_file_tree(self, mount_point, root):
+        """
+        file tree를 업데이트 해준다. \n 만약 프로젝트가 없는 경우 no_project라는 error 코드를 발생 시킨다.
+
+        Args:
+            project (str / dict): The project dict or ID.
+            file_tree (dict): The file tree template to set on project.
+
+        Examples:
+            self.set_file_tree(project, hook)
+
+        Returns:
+            dict: Modified project.
+        """
         file_tree = {
             "working": {
                 "mountpoint": mount_point,
@@ -443,6 +456,18 @@ class Houpub:
             return test_dict
 
     def args_str_check(self, *args):
+        """
+        받는 인자들이 tuple인 경우 string으로 변경시켜주고, 변경되지 않은 경우 error 코드를 발생 시킨다.
+
+        Example:
+            self.args_str_check(task_type_name)
+            need self paramter : self.str_check
+        Args:
+            args : 여러가지 인자들을 받을 수 있다
+        Returns:
+            error tested functions
+
+        """
         if type(args) is tuple:
             str_confirms = ','.join(args)
             for str_confirm in str_confirms:
@@ -453,6 +478,16 @@ class Houpub:
             return args
 
     def str_check(self, strn):
+        """
+        받은 인자값이 str인지 체크해준다. \n인자값이 string인 경우 인자값을 그대로 뱉어주고, 아닌경우  error 코드를 발생 시킨다.
+        Args:
+            strn: string type check
+            need self paramter : self.error
+
+        Returns:
+            string
+
+        """
         if type(strn) is not str:
             self.error("not_string")
         else:
