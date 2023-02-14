@@ -485,15 +485,19 @@ class Houpub:
 
     def args_str_check(self, *args):
         """
-        받는 인자들이 tuple인 경우 string으로 변경시켜주고, 변경되지 않은 경우 error 코드를 발생 시킨다.
+        체크할 인자들이 tuple인 경우 self.str_check으로 타입을 str으로 변경해주고, 체크해주어 str으로 변경된 경우 변경 된 str 값을 리턴해준다.
+        아니면 str_check의 에러코드를 리턴해준다.
+        만약 체크할 인자들이 string인 경우 받은 값 그대로 리턴해준다.
 
         Example:
             self.args_str_check(task_type_name)
-            need self paramter : self.str_check
+
         Args:
             args : 여러가지 인자들을 받을 수 있다
         Returns:
-            error tested functions
+            str_confirms: tuple 이면 인자들을 ','로 구분하여 스트링값으로 리턴
+            args : 스트링인 경우 받은 값 그대로 리턴
+
 
         """
         if type(args) is tuple:
@@ -510,7 +514,6 @@ class Houpub:
         받은 인자값이 str인지 체크해준다. \n인자값이 string인 경우 인자값을 그대로 뱉어주고, 아닌경우  error 코드를 발생 시킨다.
         Args:
             strn: string type check
-            need self paramter : self.error
 
         Returns:
             string
@@ -522,6 +525,16 @@ class Houpub:
             return strn
 
     def int_check(self, num):
+        """
+        체크할 인자값이 int인지 체크해준다. int가 아닌 경우 self.error으로 에러 코드를 발생 시킨다.int인 경우 받은 값 그대로 리턴해준다.
+        Args:
+            num: type이 int인지 체크하고 싶은 인자값
+            
+        Example:
+            int_check(input_num)
+        Returns:
+            num
+        """
         if type(num) is not int:
             self.error('not_int')
         else:
@@ -604,38 +617,64 @@ class Houpub:
         Example:
             get_all_assets()
 
+        Returns:
+            seq name(list).
+
         Raises:
             Exception: if input is not exists, "No project is assigned."
 
-        Returns:
-            seq name(list).
         """
         self.dict_check(self.project, 'no_project')
         return [seq['name'] for seq in gazu.shot.all_sequences_for_project(self.project)]
 
     def get_all_shots(self):
-        """Sequence 를 위한 프로 젝트의 모든 shot 들을 dict_check 에러 검토 이후 이름 으로 불러 온다.
+        """self.sequence 안의 모든 shot들을 반환한다. \n
+        self.project가 없을 시 작동하지 않는다.
 
         Example :
-            get_all_shots()
-
-        Raises :
-            Exception: if input(project) is not exists, "No project is assigned."
-                       if input(sequence) is not exists, "No sequence is assigned."
+            pepper.get_all_shots()
 
         Returns:
-            shot name(list).
+            ['0010', '0020, ...]
 
+        Raises :
+            Exception: If self.project doesn't exist, and if self.sequence doesn't exist.
         """
         self.dict_check(self.project, 'no_project')
         self.dict_check(self.sequence, 'no_sequence')
         return [shot['name'] for shot in gazu.shot.all_shots_for_sequence(self.sequence)]
 
     def get_task_types_for_asset(self):
+        """
+        self.asset의 의 모든 task들에 대한 task type을 반환한다.
+        self.project가 없을 시 작동하지 않는다.
+
+        Examples:
+            pepper.get_task_types_for_asset()
+
+        Returns:
+            ['simulation', 'FX', ...]
+
+        Raises:
+            Exception: If self.project doesn't exist, and if self.asset doesn't exist.
+        """
         self.dict_check(self.asset, 'no_asset')
         return [task_type['name'] for task_type in gazu.task.all_task_types_for_asset(self.asset)]
 
     def get_casted_assets_for_shot(self):
+        """
+        self.shot에 캐스팅 된 모든 asset의 type name과 asset name을 dict로 반환해준다. \n
+        self.project, self.sequence, self.shot이 없을 시 작동하지 않는다.
+
+        Examples:
+            pepper.get_casted_assets_for_shot()
+
+        Returns:
+            [(asset_type_name: asset_name), (asset_type_name_2: asset_name_2), ...]
+
+        Raises:
+            Exception: If self.project doesn't exist, if self.sequenece doesn't exist, and if self.shot don't exist.
+        """
         self.dict_check(self.project, 'no_project')
         self.dict_check(self.sequence, 'no_sequence')
         self.dict_check(self.shot, 'no_shot')
