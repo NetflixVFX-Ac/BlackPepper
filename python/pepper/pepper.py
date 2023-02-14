@@ -22,16 +22,16 @@ class Houpub:
         pass
 
     def login(self, host, identify, password):
-        """ 지정된 호스트를 setting 해주고, 이메일 (identification) 과 password 를 이용해 로그인 하는 방식.
-        \n사용자(identify)를 log_pepper(logging모듈) make_logger(name)으로 지정하고 self.mylog로 설정
+        """호스트를 지정해주고, identify와 password 를 이용해 로그인 하는 방식. \n
+        유저 id는 self.identif에 저장해 로깅이 가능하게 한다.
 
         Examples:
             login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
 
         Args:
-            host
-            identify
-            password
+            host(str): host url
+            identify(str): user id
+            password(str): user password
 
         """
         gazu.client.set_host(host)
