@@ -1,14 +1,14 @@
 import gazu
 from log.log_pepper import make_logger
-"""
- 이 모듈은 kitsu에 올라간 정보를 gazu를 통해서 path를 추출한다. 그 정보는 local에 저장된 houdini template에 working file path로 
-지정한 경로에서 cam, asset 파일을 기존 working hip파일에 적용한다. 부가적으로 shots마다 cating된 template를 확인 할 수 있다.
- 예를 들어, test_01.hip의 working file template에 cam, asset을 적용해서 새로운 exr, hip, mov를 outputfile로 만든다. 
-hip파일의 경우는 test_02.hip이라는 형식으로 outputfile이자 새로운 revision의 working file을 만든다.
-"""
 
 
 class Houpub:
+    """
+     이 모듈은 kitsu에 올라간 정보를 gazu를 통해서 path를 추출한다. 그 정보는 local에 저장된 houdini template에 working file path로
+    지정한 경로에서 cam, asset 파일을 기존 working hip파일에 적용한다. 부가적으로 shots마다 cating된 template를 확인 할 수 있다.
+     예를 들어, test_01.hip의 working file template에 cam, asset을 적용해서 새로운 exr, hip, mov를 outputfile로 만든다.
+    hip파일의 경우는 test_02.hip이라는 형식으로 outputfile이자 새로운 revision의 working file을 만든다.
+    """
     _project = None
     _sequence = None
     _shot = None
