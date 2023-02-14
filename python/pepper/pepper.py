@@ -241,6 +241,10 @@ class Houpub:
         Args:
             task_type_name(str):
             software_name(str):
+
+        Raises:
+            Exception: If task_typename and software_name is not string, "Input must be string"
+
         """
         self.args_str_check(task_type_name, software_name)
         _, task = self.get_task(task_type_name)
