@@ -50,7 +50,6 @@ class Houpub:
     def project(self, proj_name):
         """입력한 프로젝트 이름과 동일한 이름을 가진 프로젝트의 딕셔너리를 반환한다.
 
-
         Examples:
             pepper.project = 'pepper'
 
@@ -123,7 +122,6 @@ class Houpub:
     def asset(self, asset_name):
         """입력한 어셋 이름과 동일한 이름을 가진 어셋의 딕셔너리를 반환한다. \n
         self.project가 없을 시 작동하지 않는다.
-
 
         Examples:
             pepper.asset = 'temp_fire'
