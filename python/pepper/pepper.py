@@ -628,17 +628,28 @@ class Houpub:
 
         Example:
             get_all_assets()
+<<<<<<< HEAD
 
         Raises:
             Exception: if input is not exists, "No project is assigned."
 
         Returns:
             seq name(list).
+=======
+
+        Returns:
+            seq name(list).
+
+        Raises:
+            Exception: if input is not exists, "No project is assigned."
+
+>>>>>>> 3b56f16398252c01dbadfad13d007d1eb8f15d53
         """
         self.dict_check(self.project, 'no_project')
         return [seq['name'] for seq in gazu.shot.all_sequences_for_project(self.project)]
 
     def get_all_shots(self):
+<<<<<<< HEAD
         """Sequence 를 위한 프로 젝트의 모든 shot 들을 dict_check 에러 검토 이후 이름 으로 불러 온다.
 
         Example :
@@ -650,7 +661,19 @@ class Houpub:
 
         Returns:
             shot name(list).
+=======
+        """self.sequence 안의 모든 shot들을 반환한다. \n
+        self.project가 없을 시 작동하지 않는다.
 
+        Example :
+            pepper.get_all_shots()
+
+        Returns:
+            ['0010', '0020, ...]
+>>>>>>> 3b56f16398252c01dbadfad13d007d1eb8f15d53
+
+        Raises :
+            Exception: If self.project doesn't exist, and if self.sequence doesn't exist.
         """
         self.dict_check(self.project, 'no_project')
         self.dict_check(self.sequence, 'no_sequence')
@@ -658,6 +681,7 @@ class Houpub:
 
     def get_task_types_for_asset(self):
         """
+<<<<<<< HEAD
         해당 asset의 모든 task type을 불러오고 해당 task의 이름을 리턴한다. 만약 딕셔너리가 없는 경우 no_asset이라는 error 코드를 발생시킨다.
 
         Examples :
@@ -666,12 +690,26 @@ class Houpub:
         Returns: 
             사용자가 적은 asset의 task name
 
+=======
+        self.asset의 의 모든 task들에 대한 task type을 반환한다.
+        self.project가 없을 시 작동하지 않는다.
+
+        Examples:
+            pepper.get_task_types_for_asset()
+
+        Returns:
+            ['simulation', 'FX', ...]
+
+        Raises:
+            Exception: If self.project doesn't exist, and if self.asset doesn't exist.
+>>>>>>> 3b56f16398252c01dbadfad13d007d1eb8f15d53
         """
         self.dict_check(self.asset, 'no_asset')
         return [task_type['name'] for task_type in gazu.task.all_task_types_for_asset(self.asset)]
 
     def get_casted_assets_for_shot(self):
         """
+<<<<<<< HEAD
         해당 샷에 캐스팅 된 모든 에셋을 가져 온다.
 
         Examples :
@@ -679,6 +717,19 @@ class Houpub:
 
         Returns:
             asset_type_name : asset_name
+=======
+        self.shot에 캐스팅 된 모든 asset의 type name과 asset name을 dict로 반환해준다. \n
+        self.project, self.sequence, self.shot이 없을 시 작동하지 않는다.
+
+        Examples:
+            pepper.get_casted_assets_for_shot()
+
+        Returns:
+            [(asset_type_name: asset_name), (asset_type_name_2: asset_name_2), ...]
+
+        Raises:
+            Exception: If self.project doesn't exist, if self.sequenece doesn't exist, and if self.shot don't exist.
+>>>>>>> 3b56f16398252c01dbadfad13d007d1eb8f15d53
         """
         self.dict_check(self.project, 'no_project')
         self.dict_check(self.sequence, 'no_sequence')
