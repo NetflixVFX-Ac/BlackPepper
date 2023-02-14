@@ -147,11 +147,11 @@ class Houpub:
         file tree를 업데이트 해준다. \n 만약 프로젝트가 없는 경우 no_project라는 error 코드를 발생 시킨다.
 
         Args:
-            project (str / dict): The project dict or ID.
-            file_tree (dict): The file tree template to set on project.
+            mount_point(str):
+            root(str):
 
         Examples:
-            self.set_file_tree(project, hook)
+
 
         Returns:
             dict: Modified project.
@@ -437,8 +437,8 @@ class Houpub:
         fx_task_type = gazu.task.get_task_type_by_name('FX')
         tasks = []
         for shot in casted_shots:
-            layout_task = gazu.task.get_task_by_name(shot, layout_task_type)
-            fx_task = gazu.task.get_task_by_name(shot, fx_task_type)
+            layout_task = gazu.task.get_task_by_name(shot['shot_id'], layout_task_type)
+            fx_task = gazu.task.get_task_by_name(shot['shot_id'], fx_task_type)
             tasks.append((shot, layout_task, fx_task))
         return tasks
 
