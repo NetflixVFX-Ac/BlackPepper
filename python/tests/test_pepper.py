@@ -254,3 +254,21 @@ class TestHoupub(TestCase):
 
         check = self.pepper.get_working_revision_max(task)
         self.assertIs(type(check), int)
+
+    def test_get_all_shots(self):
+
+        self.pepper.project = 'PEPPER'
+        self.pepper.sequence = 'SQ01'
+        self.assertIn('0010', self.pepper.get_all_shots())
+        self.assertIn('0020', self.pepper.get_all_shots())
+        self.assertIn('0030', self.pepper.get_all_shots())
+        self.assertIn('0040', self.pepper.get_all_shots())
+        self.assertIn('0050', self.pepper.get_all_shots())
+
+
+    def test_get_task_types_for_asset(self):
+
+        self.pepper.project = "PEPPER"
+        self.pepper.asset = "temp_explosion"
+
+        self.assertIn("simulation", self.pepper.get_task_types_for_asset())
