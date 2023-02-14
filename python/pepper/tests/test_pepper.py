@@ -6,6 +6,7 @@ import pprint
 
 class TestHoupub(TestCase):
 
+
     def setUp(self):
         self.pepper = Houpub()
         self.pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
