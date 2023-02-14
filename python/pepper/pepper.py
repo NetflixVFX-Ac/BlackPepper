@@ -230,8 +230,8 @@ class Houpub:
         self.dict_check(task_type, f'no_task_type{task_type_name}')
         work_file = gazu.files.get_last_working_file_revision(task)
         self.dict_check(work_file, 'no_work_file')
-        self.dict_check(task_type, f'no_task_type{output_type_name}')
         output_type = gazu.files.get_output_type_by_name(output_type_name)
+        self.dict_check(task_type, f'no_task_type{output_type_name}')
         gazu.files.new_entity_output_file(self.entity, output_type, task_type, working_file=work_file,
                                           representation=output_type['short_name'], comment=comments)
         self.mylog.debug("publish output file, last revision up")
