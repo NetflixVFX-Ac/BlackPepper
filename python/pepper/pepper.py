@@ -298,7 +298,7 @@ class Houpub:
 
         """
         task_type = gazu.task.get_task_type_by_name(task_type_name)
-        self.dict_check(task_type, f'no_task_type{task_type_name}_')
+        self.dict_check(task_type, f'no_task_type{task_type_name}')
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         self.dict_check(output_type, f'no_output_type{output_type_name}')
         revision_max = gazu.files.get_last_entity_output_revision(self.entity, output_type, task_type, name='main')
@@ -400,32 +400,31 @@ class Houpub:
             self.error('hou')
 
     def get_casting_path_for_asset(self):  # 에러핸들링 해야함
-        """output file path revision +1 된 path 를 리턴한다. \n
-        Call up 'output_type_name', 'task_type_name'. A file path combined with 'ext' is created with last
-        'revision_num' specified 'entity'.
+        """asset이 casting된 shot들의 layout과 FX task를 모두 리턴한다. \n
 
         Example:
-            make_next_output_path('Movie_file', 'FX') \n
-            need self parameter : project,asset,entity or project,seq,shot,entity
+            get_casting_path_for_asset()
 
         Args:
+<<<<<<< HEAD
             # output_type_name(str):
             # task_type_name(str):
+=======
+
 
         Returns:
-            output file revision +1 된  path
+            Generated working file path for given task (without extension).
         """
-
-        cast_in = gazu.casting.get_asset_cast_in(self.asset)
-        for shot in cast_in:
-            print(f'sequence name  : {shot.get("sequence_name")} \n'
-                  f'shot name      : {shot.get("shot_name")}')
-            tasks = gazu.task.all_tasks_for_shot(shot.get('shot_id'))
-            for task in tasks:
-                last_revision = gazu.files.get_last_working_file_revision(task)
-                print(last_revision)
-                if last_revision is None:
-                    print("None")
+        # software = self.get_software(software_name)
+        casted_shots = gazu.casting.get_asset_cast_in(self.asset)
+        layout_task_type = gazu.task.get_task_type_by_name('Layout')
+        fx_task_type = gazu.task.get_task_type_by_name('FX')
+        tasks = []
+        for shot in casted_shots:
+            layout_task = gazu.task.get_task_by_name(shot, layout_task_type)
+            fx_task = gazu.task.get_task_by_name(shot, fx_task_type)
+            tasks.append((shot, layout_task, fx_task))
+        return tasks
 
     def dict_check(self, test_dict, code):
         """ 테스트 하게 되는 dict 가 아무 것도 없으면 error 코드 발생 시킨다.
@@ -494,45 +493,36 @@ class Houpub:
             raise Exception(f"There's no task type named '{code[11:]}")
         if 'no_output_type' in code:
             raise Exception(f"There's no output type named '{code[13:]}")
+        else:
+            raise Exception("NO ERROR CODE")
 
-    def print_get_all_info(self, select):
-        if select == 'project' and self.project is not None:
-            print(self.project['name'])
-        if select == 'project' and self.project is None:
-            for proj in gazu.project.all_open_projects():
-                print(proj['name'])
-        if select == 'sequence' and self.sequence is not None:
-            print(self.sequence['name'])
-        if select == 'sequence' and self.sequence is None:
-            for seq in gazu.shot.all_sequences_for_project(self.project):
-                print(seq['name'])
-        if select == 'shot' and self.shot is not None:
-            print(self.shot['name'])
-        if select == 'shot' and self.shot is None:
-            for st in gazu.shot.all_shots_for_sequence(self.sequence):
-                print(st['name'])
-        if select == 'asset' and self.asset is not None:
-            print(self.asset['name'])
-        if select == 'asset' and self.asset is None:
-            for asse in gazu.asset.all_asset_types_for_project(self.project):
-                print(asse['name'])
-        if select == 'asset_task_type' and self.asset is not None:
-            for task_type in gazu.task.all_task_types_for_asset(self.asset):
-                print(task_type['name'])
-        if select == 'shot_task_type' and self.shot is not None:
-            for task_type in gazu.task.all_task_types_for_shot(self.shot):
-                print(task_type['name'])
-        if select == 'casting' and self.shot is not None:
-            casting = gazu.casting.get_shot_casting(self.shot)
-            for cast in casting:
-                print(cast['asset_type_name'] + " : " + cast['asset_name'])
-        if type(select) != str:
-            raise ValueError('Write down as string')
-        list_element = ['project', 'sequence', 'shot', 'asset', 'asset_task_type', 'shot_task_type', 'casting']
-        if select not in list_element:
-            print('[Select from the list below]')
-            for element in list_element:
-                print(f"'{element}'")
+    @staticmethod
+    def get_all_projects():
+        return [proj['name'] for proj in gazu.project.all_open_projects()]
+
+    def get_all_assets(self):
+        self.dict_check(self.project, 'no_project')
+        return [asset['name'] for asset in gazu.asset.all_asset_types_for_project(self.project)]
+
+    def get_all_sequences(self):
+        self.dict_check(self.project, 'no_project')
+        return [seq['name'] for seq in gazu.shot.all_sequences_for_project(self.project)]
+
+    def get_all_shots(self):
+        self.dict_check(self.project, 'no_project')
+        self.dict_check(self.sequence, 'no_sequence')
+        return [shot['name'] for shot in gazu.shot.all_shots_for_sequence(self.sequence)]
+
+    def get_task_types_for_asset(self):
+        self.dict_check(self.asset, 'no_asset')
+        return [task_type['name'] for task_type in gazu.task.all_task_types_for_asset(self.asset)]
+
+    def get_casted_assets_for_shot(self):
+        self.dict_check(self.project, 'no_project')
+        self.dict_check(self.sequence, 'no_sequence')
+        self.dict_check(self.shot, 'no_shot')
+        return [(asset['asset_type_name'] + ':' + asset['asset_name'])
+                for asset in gazu.casting.get_shot_casting(self.shot)]
 
     # -----------Unused methods----------
 
@@ -704,29 +694,3 @@ class Houpub:
     #             working = gazu.files.get_last_working_file_revision(task)
     #             paths.append(working['path'] + '.' + ext)
     #     return paths
-
-# a = Houpub()
-# a.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
-# a.project = 'pepper'
-# a.project = 'hoon'
-# a.project = 'pepper'
-# b = a.get_all_tasks('FX Template')
-# for i in b:
-#     print(i)
-# c = b[0]['task_status_id']
-# d = gazu.task.get_task_status(c)
-# print(d)
-# a.set_file_tree('/mnt/project', 'hook')
-# a.sequence = 'SQ01'
-# a.shot = '0010'
-# a.asset = 'GROOT'
-# a.entity = 'asset'
-# a.casting_create(1)
-# a.casting_delete()
-# a.get_casting_path_for_asset()
-# a.sequence = 'SQ01'
-# a.shot = '0030'
-# a.entity = 'shot'
-# a.get_casting_path_for_shot()
-# a.working_file_path('FX', 'fx_template', 'fx_temp_precomp', 'houdini')
-# a.output_file_path()
