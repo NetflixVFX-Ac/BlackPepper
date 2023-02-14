@@ -143,6 +143,17 @@ class Houpub:
 
     @entity.setter
     def entity(self, ent):
+        """ 만약 entity 가 asset 일 때 shot 일 때 상황을 적용해서 self.dict_check 을 통해
+        self.asset 에러 체크를 하고 통과가 되었 다면 self.entity = asset. shot 도 동일하게 적용.
+
+        need self parameter : project, asset
+
+        Examples: entity(asset) or entity(shot)
+        Args : ent(str)
+
+        Returns: entity
+
+        """
         if ent == 'asset':
             self.dict_check(self.asset, 'no_asset')
             self._entity = self._asset
@@ -230,6 +241,10 @@ class Houpub:
         Args:
             task_type_name(str):
             software_name(str):
+
+        Raises:
+            Exception: If task_typename and software_name is not string, "Input must be string"
+
         """
         self.args_str_check(task_type_name, software_name)
         _, task = self.get_task(task_type_name)
@@ -458,7 +473,6 @@ class Houpub:
         """ 테스트 하게 되는 dict 가 아무 것도 없으면 error 코드 발생 시킨다.
         Example:
             self.dict_check(self.sequence, 'no_sequence')
-            need self parameter : self.error
 
         Returns:
             error tested functions
@@ -471,15 +485,19 @@ class Houpub:
 
     def args_str_check(self, *args):
         """
-        받는 인자들이 tuple인 경우 string으로 변경시켜주고, 변경되지 않은 경우 error 코드를 발생 시킨다.
+        체크할 인자들이 tuple인 경우 self.str_check으로 타입을 str으로 변경해주고, 체크해주어 str으로 변경된 경우 변경 된 str 값을 리턴해준다.
+        아니면 str_check의 에러코드를 리턴해준다.
+        만약 체크할 인자들이 string인 경우 받은 값 그대로 리턴해준다.
 
         Example:
             self.args_str_check(task_type_name)
-            need self paramter : self.str_check
+
         Args:
             args : 여러가지 인자들을 받을 수 있다
         Returns:
-            error tested functions
+            str_confirms: tuple 이면 인자들을 ','로 구분하여 스트링값으로 리턴
+            args : 스트링인 경우 받은 값 그대로 리턴
+
 
         """
         if type(args) is tuple:
@@ -496,7 +514,6 @@ class Houpub:
         받은 인자값이 str인지 체크해준다. \n인자값이 string인 경우 인자값을 그대로 뱉어주고, 아닌경우  error 코드를 발생 시킨다.
         Args:
             strn: string type check
-            need self paramter : self.error
 
         Returns:
             string
@@ -508,6 +525,16 @@ class Houpub:
             return strn
 
     def int_check(self, num):
+        """
+        체크할 인자값이 int인지 체크해준다. int가 아닌 경우 self.error으로 에러 코드를 발생 시킨다.int인 경우 받은 값 그대로 리턴해준다.
+        Args:
+            num: type이 int인지 체크하고 싶은 인자값
+            
+        Example:
+            int_check(input_num)
+        Returns:
+            num
+        """
         if type(num) is not int:
             self.error('not_int')
         else:
@@ -561,26 +588,86 @@ class Houpub:
 
     @staticmethod
     def get_all_projects():
+        """
+        host에 입력된 전체 project를 볼 수 있다.
+
+        Returns:
+            host in all projects
+
+        """
         return [proj['name'] for proj in gazu.project.all_open_projects()]
 
     def get_all_assets(self):
+        """
+        self.project에 dict에 해당하는 assets을 볼 수 있다.
+
+        Raises:
+            "No project is assigned."
+
+        Returns:
+            Asset of the selected project
+        """
         self.dict_check(self.project, 'no_project')
         return [asset['name'] for asset in gazu.asset.all_asset_types_for_project(self.project)]
 
     def get_all_sequences(self):
+        """project 를 위한 sequence 들을 dict_check 로 에러 검토 후
+           shot 에서 이름 으로 모두 불러 온다.
+
+        Example:
+            get_all_assets()
+
+        Raises:
+            Exception: if input is not exists, "No project is assigned."
+
+        Returns:
+            seq name(list).
+        """
         self.dict_check(self.project, 'no_project')
         return [seq['name'] for seq in gazu.shot.all_sequences_for_project(self.project)]
 
     def get_all_shots(self):
+        """Sequence 를 위한 프로 젝트의 모든 shot 들을 dict_check 에러 검토 이후 이름 으로 불러 온다.
+
+        Example :
+            get_all_shots()
+
+        Raises :
+            Exception: if input(project) is not exists, "No project is assigned."
+                       if input(sequence) is not exists, "No sequence is assigned."
+
+        Returns:
+            shot name(list).
+
+        """
         self.dict_check(self.project, 'no_project')
         self.dict_check(self.sequence, 'no_sequence')
         return [shot['name'] for shot in gazu.shot.all_shots_for_sequence(self.sequence)]
 
     def get_task_types_for_asset(self):
+        """
+        해당 asset의 모든 task type을 불러오고 해당 task의 이름을 리턴한다. 만약 딕셔너리가 없는 경우 no_asset이라는 error 코드를 발생시킨다.
+
+        Examples :
+            get_task_types_for_asset(asset_name)
+
+        Returns: 
+            사용자가 적은 asset의 task name
+
+        """
         self.dict_check(self.asset, 'no_asset')
         return [task_type['name'] for task_type in gazu.task.all_task_types_for_asset(self.asset)]
 
     def get_casted_assets_for_shot(self):
+        """
+        해당 샷에 캐스팅 된 모든 에셋을 가져 온다.
+
+        Examples :
+            get_casted_assets_for_shot(shot_name)
+
+        Returns:
+            asset_type_name : asset_name
+        """
         self.dict_check(self.project, 'no_project')
         self.dict_check(self.sequence, 'no_sequence')
         self.dict_check(self.shot, 'no_shot')
