@@ -367,6 +367,11 @@ class Houpub:
             make_next_output_path('Movie_file', 'FX') \n
             need self parameter : project,asset,entity or project,seq,shot,entity
 
+        Raises:
+            Exception: if input(task_type) is not exists, "There's no task type named."
+
+                        if input(output_type) is not exists, "There's no output type named."
+
         Args:
             output_type_name(str):
             task_type_name(str):
@@ -385,6 +390,14 @@ class Houpub:
         return path + '.' + ext
 
     def get_working_revision_max(self, task):
+        """
+
+        Args:
+            task:
+
+        Returns:
+
+        """
         last_working_file = gazu.files.get_last_working_file_revision(task)
         if last_working_file is None:
             self.error("no_work_file")
@@ -602,7 +615,6 @@ class Houpub:
         self.project에 dict에 해당하는 assets을 볼 수 있다.
 
         Raises:
-            "No project is assigned."
 
         Returns:
             Asset of the selected project
