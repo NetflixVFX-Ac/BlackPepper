@@ -636,18 +636,28 @@ class Houpub:
 
     def get_task_types_for_asset(self):
         """
-        해당 asset의 모든 task(딕셔너리) 타입을 불러온다. 딕셔너리가 형태가 없는 경우  no_asset이라는 error 코드를 발생 시킨다.
+        해당 asset의 모든 task type을 불러오고 해당 task의 이름을 리턴한다. 만약 딕셔너리가 없는 경우 no_asset이라는 error 코드를 발생시킨다.
 
         Examples :
-            get_task_types_for_asset(asset
+            get_task_types_for_asset(asset_name)
+
         Returns: 
-            asset의 task(dict)
+            사용자가 적은 asset의 task name
 
         """
         self.dict_check(self.asset, 'no_asset')
         return [task_type['name'] for task_type in gazu.task.all_task_types_for_asset(self.asset)]
 
     def get_casted_assets_for_shot(self):
+        """
+        해당 샷에 캐스팅 된 모든 에셋을 가져 온다.
+
+        Examples :
+            get_casted_assets_for_shot(shot_name)
+
+        Returns:
+            asset_type_name : asset_name
+        """
         self.dict_check(self.project, 'no_project')
         self.dict_check(self.sequence, 'no_sequence')
         self.dict_check(self.shot, 'no_shot')
