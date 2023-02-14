@@ -1,6 +1,7 @@
 import gazu
 from log.log_pepper import make_logger
 
+
 """
  이 모듈은 kitsu에 올라간 정보를 gazu를 통해서 path를 추출한다. 그 정보는 local에 저장된 houdini template에 working file path로 
 지정한 경로에서 cam, asset 파일을 기존 working hip파일에 적용한다. 부가적으로 shots마다 cating된 template를 확인 할 수 있다.
@@ -22,16 +23,16 @@ class Houpub:
         pass
 
     def login(self, host, identify, password):
-        """ 지정된 호스트를 setting 해주고, 이메일 (identification) 과 password 를 이용해 로그인 하는 방식.
-        \n사용자(identify)를 log_pepper(logging모듈) make_logger(name)으로 지정하고 self.mylog로 설정
+        """호스트를 지정해주고, identify와 password 를 이용해 로그인 하는 방식. \n
+        유저 id는 self.identif에 저장해 로깅이 가능하게 한다.
 
         Examples:
             login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
 
         Args:
-            host
-            identify
-            password
+            host(str): host url
+            identify(str): user id
+            password(str): user password
 
         """
         gazu.client.set_host(host)
@@ -199,6 +200,7 @@ class Houpub:
         }
         self.dict_check(self.project, 'no_project')
         gazu.files.update_project_file_tree(self.project, file_tree)
+        self.mylog.debug(self.project, "File tree updated")
 
     def publish_working_file(self, task_type_name, software_name):
         """get_task 함수로 task_type(dict) 과 task(dict) 중 task를 받고
