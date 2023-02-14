@@ -2,14 +2,24 @@ import logging
 
 
 def make_logger(name):
-    """ 지정된 이름의 로거를 반환하고, 이름을 지정하지 않으면 루트 로거를 반환합니다.
-    Return a logger with the specified name, creating it if necessary.
-    If no name is specified, return the root logger.
-    스트림(콘솔)에 로그를 찍기 위해 logging 을 사용
+    """ 1. logger instance를 만든다.\n2. logger의 level을 가장 낮은 수준인 DEBUG(자세한정보)로 설정\n3. formatter 지정
+    asctime - name - levelname - message
+    \n4. handler instance (StreamHandler,FileHandler)생성
+    \n5. StramHandler:INFO,FileHandler:DEBUG 으로 level 설정
+    \n6. handler 출력 format 지정 \n7. logger에 handler 추가
 
+        지정된 name 의 로거를 반환하고, 이름을 지정하지 않으면 root 로거를 반환합니다.
+    Return a logger with the specified name, creating it if necessary.
+    If no name is specified, return the root logger.\n\n
+
+    \n Logger : 어플리케이션 코드가 직접 사용할 수 있는 인터페이스를 제공함.
+    \n Handler : logger 에 의해 만들어진 log 기록들을 적합한 위치로 보냄
+    \n StreamHandler : 콘솔창에 로그 메시지 출력\n
+    \n FileHandler : 로깅 메세지를 파일로 저장 filename="pepper.log"
+    \n Formatter : log 기록들의 최종 출력본의 레이아웃을 결정함
 
     Args:
-        name(str):
+        name(str): 이름을 지정 하지 않으면(None)  == root
 
     Returns:
         logger
