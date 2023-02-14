@@ -1,5 +1,6 @@
 import gazu
-from hook.python.log.log_pepper import make_logger
+from log.log_pepper import make_logger
+
 
 """
  이 모듈은 kitsu에 올라간 정보를 gazu를 통해서 path를 추출한다. 그 정보는 local에 저장된 houdini template에 working file path로 
