@@ -21,8 +21,8 @@ class Houpub:
         pass
 
     def login(self, host, identify, password):
-        """호스트를 지정해주고, identify와 password 를 이용해 로그인 하는 방식. \n
-        유저 id는 self.identif에 저장해 로깅이 가능하게 한다.
+        """Host를 지정해주고, identify와 password 를 이용해 로그인 하는 방식. \n
+        유저 id는 self.identif에 저장해 logging이 가능하게 한다.
 
         Examples:
             pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
@@ -48,7 +48,7 @@ class Houpub:
 
     @project.setter
     def project(self, proj_name):
-        """입력한 프로젝트 이름과 동일한 이름을 가진 프로젝트의 딕셔너리를 반환한다.
+        """입력한 project 이름과 동일한 이름을 가진 project의 dict를 반환한다.
 
         Examples:
             pepper.project = 'pepper'
@@ -70,7 +70,7 @@ class Houpub:
 
     @sequence.setter
     def sequence(self, seq_name):
-        """입력한 시퀀스 이름과 동일한 이름을 가진 시퀀스의 딕셔너리를 반환한다. \n
+        """입력한 sequence 이름과 동일한 이름을 가진 sequence의 dict를 반환한다. \n
         self.project가 없을 시 작동하지 않는다.
 
         Examples:
@@ -95,7 +95,7 @@ class Houpub:
 
     @shot.setter
     def shot(self, shot_name):
-        """입력한 샷 이름과 동일한 이름을 가진 샷의 딕셔너리를 반환한다. \n
+        """입력한 shot 이름과 동일한 이름을 가진 shot의 dict를 반환한다. \n
         self.project와 self.sequence가 없을 시 작동하지 않는다.
 
         Examples:
@@ -120,7 +120,7 @@ class Houpub:
 
     @asset.setter
     def asset(self, asset_name):
-        """입력한 어셋 이름과 동일한 이름을 가진 어셋의 딕셔너리를 반환한다. \n
+        """입력한 asset 이름과 동일한 이름을 가진 asset의 dict를 반환한다. \n
         self.project가 없을 시 작동하지 않는다.
 
         Examples:
@@ -143,16 +143,18 @@ class Houpub:
 
     @entity.setter
     def entity(self, ent):
-        """ 만약 entity 가 asset 일 때 shot 일 때 상황을 적용해서 self.dict_check 을 통해
-        self.asset 에러 체크를 하고 통과가 되었 다면 self.entity = asset. shot 도 동일하게 적용.
+        """사용할 entity가 self.asset이 될지, self.shot이 될지 지정한다. \n
+        asset 입력시 self.asset이 있어야 하고, shot 입력시 self.shot이 있어야 한다. 맞는 인자가 없을 시 작동하지 않는다.
 
-        need self parameter : project, asset
+        Examples:
+            pepper.entity('asset') or pepper.entity('shot')
 
-        Examples: entity(asset) or entity(shot)
-        Args : ent(str)
+        Args:
+            ent(str): 'asset' or 'shot'
 
-        Returns: entity
-
+        Raises:
+            Exception: If self.asset doesn't exist when ent is 'asset', if self.shot doesn't exist when ent is 'shot',
+                and if ent is not 'asset' or 'shot'
         """
         if ent == 'asset':
             self.dict_check(self.asset, 'no_asset')
@@ -165,8 +167,7 @@ class Houpub:
         self.error('not_asset_shot')
 
     def set_file_tree(self, mount_point, root):
-        """
-        self.project의 File tree를 업데이트 해준 뒤 File tree 변경 로그를 저장한다. \n
+        """self.project의 file tree를 업데이트 해준 뒤 file tree 변경 로그를 저장한다. \n
         self.project가 없을 시 작동하지 않는다.
 
         Examples:
@@ -228,23 +229,21 @@ class Houpub:
         self.mylog.debug(self.project, "File tree updated")
 
     def publish_working_file(self, task_type_name, software_name):
-        """get_task 함수로 task_type(dict) 과 task(dict) 중 task를 받고
-        software(dict)도 사용하여  새로운 working file(revision +1) 을 만든다. \n
-        Create a new 'working file' with 'task_type' and 'task' corresponding to
-        the specified entity and the selected software name.
-        \n 이 함수를 사용 할 때 마다 로그인한 사용자의 이름과 debug 메세지를 정해진 logger(log_pepper)에 따라 log기록을 한다.
+        """task_type_name과 self.entity를 통해 해당 entity의 입력된 task_type을 가진 task를 받아온다.\n
+        받아온 task에 software_name에 해당하는 software을 사용해 작업한 working file을 생성하고, publish 한다. \n
+        Publish가 될 때 마다 로그인한 유저의 id와 debug 메시지를 정해진 logger(log_pepper)에 따라 logging 한다. \n
+        self.entity가 지정되어있지 않으면 작동하지 않는다.
 
         Example:
-            publish_working_file("simulation", "hou") \n
-            need self parameter : project,asset,entity or project,seq,shot,entity
+            publish_working_file('simulation', 'hou')
 
         Args:
-            task_type_name(str):
-            software_name(str):
+            task_type_name(str): 'simulation', 'layout', ...
+            software_name(str): 'hou', 'hounc', 'houlc'
 
         Raises:
-            Exception: If task_typename and software_name is not string, "Input must be string"
-
+            Exception: If self.entity doesn't exist, if self.entity has no task,
+                if task_type_name and software_name is not string, and if task_type is None
         """
         self.args_str_check(task_type_name, software_name)
         _, task = self.get_task(task_type_name)
@@ -253,22 +252,22 @@ class Houpub:
         self.mylog.debug("publish working file, last revision up")
 
     def publish_output_file(self, task_type_name, output_type_name, comments):
-        """
-        Create a new 'outputfile' in kitzu with 'task_type', 'task' and 'output_type'
-        corresponding to the specified entity.
-        \n 이 함수를 사용 할 때 마다 로그인한 사용자의 이름과 debug 메세지를 정해진 logger(log_pepper)에 따라 log기록을 한다.
+        """task_type_name과 output_type_name, self.entity를 통해 해당 entity의 입력된 task_type을 가진 task를 받아온다.\n
+        받아온 task에 output_type_name에 맞는 output_type로 output file을 publish 한다. \n
+        Publish가 될 때 마다 로그인한 유저의 id와 debug 메시지를 정해진 logger(log_pepper)에 따라 logging 한다. \n
+        self.entity가 지정되어있지 않으면 작동하지 않는다.
 
         Example:
-            publish_output_file('FX', 'Movie_file', "test") \n
-            need self parameter : project,asset,entity or project,seq,shot,entity \n
-            task_type_name 으로  task_type(dict),task(dict)를 get \n
-            last working file(dict) get \n
-            output_type_name 으로 output type을 가져온다
+            publish_output_file('FX', 'Movie_file', "first_output")
 
         Args:
-            task_type_name(str):
-            output_type_name(str):
-            comments(str):
+            task_type_name(str): 'FX', 'layout', ...
+            output_type_name(str): 'Movie_file', 'mpeg-4', 'jpeg', ...
+            comments(str): Short commetnt about output file
+
+        Raises:
+            Exception: If self.entity doesn't exist, if self.entity has no task, if self.entity has no working file,
+                if task_type_name or output_type_name is not string, and if task_type or output_type is None
         """
         self.args_str_check(task_type_name, output_type_name, comments)
         task_type, task = self.get_task(task_type_name)
@@ -282,22 +281,18 @@ class Houpub:
         self.mylog.debug("publish output file, last revision up")
 
     def working_file_path(self, task_type_name, software_name, input_num):
-        """revision = (intput_num < last revision) \n
-        input num 이 크면 last revision 을 반환, 작으면 input_num 반환 \n
-        The working file is created by adding 'ext' to the desired local path with the desired revision.
+        """self.entity에 해당된 task_type_name을 가진 task의 working file 중 input_num의 revision을 반환한다. \n
 
         Example:
-            working_file_path("simulation", "hou", 10) \n
-            need self parameter : project,asset,entity or project,seq,shot,entity
+            working_file_path("simulation", "hou", 10)
 
         Args:
-            task_type_name(str):
-            software_name(str):
-            input_num(int): 받고 싶은 path의 revision number
+            task_type_name(str): 'simulation', 'FX', ...
+            software_name(str): 'hou', 'hounc', 'houlc'
+            input_num(int): user's revision number
 
         Returns:
-            working file path(str)
-
+            working file path(revision=input_num)
         """
         self.args_str_check(task_type_name, software_name)
         _, task = self.get_task(task_type_name)
@@ -309,18 +304,21 @@ class Houpub:
         return path + '.' + ext
 
     def make_next_working_path(self, task_type_name):
-        """working file path revision +1 된 path 를 리턴한다. \n
-        Make the next version of the working file in the latest revision local path.
+        """self.entity에 해당된 task_type_name을 가진 task의 다음 working file path를 반환한다. \n
+        input_num이 revision_max보다 크다면 revision_max를 반환하고, 아닐 시 input_num을 반환한다. \n
+        input_num이 None일시 revision_max를 반환한다.
 
         Example:
-            make_next_working_path("simulation") \n
-            need self parameter : project,asset,entity or project,seq,shot,entity
+            make_next_working_path("simulation")
 
         Args:
-            task_type_name(str):
+            task_type_name(str): 'simulation', 'FX', ...
 
         Returns:
-            (path) working file revision +1 된 path
+            next working file path(revision + 1)
+
+        Raises:
+            Exception: If self.entity doesn't exist, if self.entity has no task. if task_type is None
         """
         self.args_str_check(task_type_name)
         _, task = self.get_task(task_type_name)
@@ -330,23 +328,24 @@ class Houpub:
         return path
 
     def output_file_path(self, output_type_name, task_type_name, input_num):
-        """revision = (intput_num < last revision) \n
-        input num 이 크면 last revision 을 반환, 작으면 input_num 반환 \n
-        Call up 'output_type_name', 'task_type_name', 'input_num'. A file path combined with 'ext' is created with
-        'revision_num' to local path that matches 'input_num' on the specified 'entity'.
+        """self.entity에 해당된 task의 output_type중 output_type_name의 output file path 중 input_num의 revision을 반환한다.\n
+        input_num이 revision_max보다 크다면 revision_max를 반환하고, 아닐 시 input_num을 반환한다. \n
+        input_num이 None일시 revision_max를 반환한다.
 
         Example:
-            output_file_path('Movie_file', 'FX', 4) \n
-            need self parameter : project,asset,entity or project,seq,shot,entity
+            output_file_path('Movie_file', 'FX', 4)
 
         Args:
-            output_type_name(str):
-            task_type_name(str):
-            input_num(int): 받고 싶은 path의 revision number
+            output_type_name(str): 'Movie_file', 'mpeg-4', 'jpeg', ...
+            task_type_name(str): 'simulation', 'FX', ...
+            input_num(int): user's revision number
 
         Returns:
-            working file path(str)
+            output file path(revision=input_num)
 
+        Raises:
+            Exception: If self.entity doesn't exist, if self.entity has no task, if self.entity has no working file,
+                if task_type_name or output_type_name is not string, and if task_type or output_type is None
         """
         task_type = gazu.task.get_task_type_by_name(task_type_name)
         self.dict_check(task_type, f'no_task_type{task_type_name}')
@@ -359,26 +358,20 @@ class Houpub:
         return path + '.' + ext
 
     def make_next_output_path(self, output_type_name, task_type_name):
-        """output file path revision +1 된 path 를 리턴한다. \n
-        Call up 'output_type_name', 'task_type_name'. A file path combined with 'ext' is created with last
-        'revision_num' specified 'entity'.
+        """self.entity에 해당된 task_type의 output_type중 output_file_name의 output file path를 반환한다.
 
         Example:
-            make_next_output_path('Movie_file', 'FX') \n
-            need self parameter : project,asset,entity or project,seq,shot,entity
-
-        Raises:
-            Exception: if input(task_type) is not exists, "There's no task type named."
-
-                        if input(output_type) is not exists, "There's no output type named."
+            make_next_output_path("Movie_file")
 
         Args:
-            output_type_name(str):
-            task_type_name(str):
+            output_type_name(str): 'Movie_file', 'mpeg-4', 'jpeg', ...
+            task_type_name(str): 'simulation', 'FX', ...
 
         Returns:
-            output file revision +1 된  path
+            next output file path(revision + 1)
 
+        Raises:
+            Exception: If self.entity doesn't exist, if self.entity has no task. if task_type is None
         """
         task_type = gazu.task.get_task_type_by_name(task_type_name)
         self.dict_check(task_type, f'no_task_type{task_type_name}')
@@ -390,13 +383,16 @@ class Houpub:
         return path + '.' + ext
 
     def get_working_revision_max(self, task):
-        """
+        """해당 task의 마지막 working file의 revision을 반환한다.
 
         Args:
-            task:
+            task: task dict
 
         Returns:
+            last working file의 revision number(int)
 
+        Raises:
+            Exception: if task have no working file
         """
         last_working_file = gazu.files.get_last_working_file_revision(task)
         if last_working_file is None:
@@ -404,17 +400,19 @@ class Houpub:
         return last_working_file['revision']
 
     def get_revision_num(self, revision_max, input_num):
-        """
+        """working file이나 output file의 revision_max와 input_num을 비교한다. \n
+        input_num이 revision_max보다 크다면 revision_max를 반환하고, 아닐 시 input_num을 반환한다. \n
+        input_num이 None일시 revision_max를 반환한다.
+
         Example:
-            input_num이 None일시 revision_max, input_num이 정수가 아닐 시 raise, input_num이 revision_max보다 클 시
-            revision_max 반환, input_num이 revision_max보다 작을 시 input_num 반환
+            pepper.get_revision_num(revision_max, 10)
 
         Args:
-            revision_max(int):
-            input_num(int):
+            revision_max(int): max revision number of working file or output file
+            input_num(int): user's revision number
 
         Returns:
-            input num 이 크면 last revision 을 반환, 작으면 input_num 반환
+            revision_max if input_num is None or input_num > revision_max, input_num if input_num <= revision_max
         """
         if input_num is None:
             return revision_max
@@ -425,18 +423,22 @@ class Houpub:
             return input_num
 
     def get_task(self, task_type_name):
-        """task_type_name을 통해 task_type와 task를 받아온다.
+        """self.entity에 task_type_name의 task가 있다면, 그 task_type와 task의 dict를 반환한다.
+        self.entity가 없다면 작동하지 않는다. \n
+        메소드 내부에서만 사용되는 메소드다.
 
         Example:
-            get_task("FX")
-            need self parameter : project,asset,entity or project,seq,shot,entity
+            pepper.get_task("FX")
 
         Args:
-            task_type_name: string
+            task_type_name: 'simulation', 'layout', ...
 
         Returns:
             task_type, task
 
+        Raises:
+            Exception: If self.entity is None, if type(task_type_name) is not string, if task_type is None,
+                and if there's no task in self.entity.
         """
         task_type = gazu.task.get_task_type_by_name(task_type_name)
         self.dict_check(task_type, 'no_task')
@@ -445,13 +447,17 @@ class Houpub:
         return task_type, task
 
     def get_software(self, software_name):
-        """houdini 관련 3가지 software 만 받고 뱉어준다.
+        """houdini의 extension 타입별로 software dict를 반환해준다
 
         Args:
-            software_name(str):
+            software_name(str): 'hou', 'hounc', or 'houlc'ㄴ
 
         Returns:
-            (dict) Software object corresponding to given name.
+            Software dict
+
+        Raises:
+            Exception: If software_name is not hou, hounc, or houlc.
+
         """
         if software_name == 'hou':
             return gazu.files.get_software_by_name('houdini')
@@ -462,16 +468,20 @@ class Houpub:
         else:
             self.error('hou')
 
-    def get_casting_path_for_asset(self):  # 에러핸들링 해야함
-        """asset이 casting된 shot들의 layout과 FX task를 모두 리턴한다. \n
+    def get_casting_path_for_asset(self):
+        """asset이 casting된 shot과 그 shot의 layout과 FX task를 튜플로 묶어 모든 shot들을 리스트로 반환해준다.
+        self.asset이 없을시 작동하지 않는다.
 
         Example:
-            get_casting_path_for_asset()
+            pepper.get_casting_path_for_asset()
 
         Returns:
-            Generated working file path for given task (without extension).
+            [(shot_dict, layout_task_dict, fx_task_dict), (shot_2_dict, layout_2_task_dict, fx_2_task_dict), ...]
+
+        Raises:
+            Exception: If self.asset doesn't exist.
         """
-        # software = self.get_software(software_name)
+        self.dict_check(self.asset, 'no_asset')
         casted_shots = gazu.casting.get_asset_cast_in(self.asset)
         layout_task_type = gazu.task.get_task_type_by_name('Layout')
         fx_task_type = gazu.task.get_task_type_by_name('FX')
@@ -483,13 +493,16 @@ class Houpub:
         return tasks
 
     def dict_check(self, test_dict, code):
-        """ 테스트 하게 되는 dict 가 아무 것도 없으면 error 코드 발생 시킨다.
+        """다른 메소드를 통해 dict값을 받아오려 할 때, 잘못된 입력으로 None이 받아지지 않았는지 체크한다.
+
         Example:
-            self.dict_check(self.sequence, 'no_sequence')
+            pepper.dict_check(self.sequence, 'no_sequence')
 
         Returns:
-            error tested functions
+            test_dict(if test_dict is not None)
 
+        Raises:
+            Exception: If test_dict is None.
         """
         if test_dict is None:
             self.error(code)
@@ -497,21 +510,17 @@ class Houpub:
             return test_dict
 
     def args_str_check(self, *args):
-        """
-        체크할 인자들이 tuple인 경우 self.str_check으로 타입을 str으로 변경해주고, 체크해주어 str으로 변경된 경우 변경 된 str 값을 리턴해준다.
-        아니면 str_check의 에러코드를 리턴해준다.
-        만약 체크할 인자들이 string인 경우 받은 값 그대로 리턴해준다.
+        """args에 들어온 인자들을 str인지 체크할 수 있는 메소드로 보내준다. \n
+        메소드 내에서만 사용되는 메소드다.
 
         Example:
-            self.args_str_check(task_type_name)
+            pepper.args_str_check(task_type_name)
 
         Args:
             args : 여러가지 인자들을 받을 수 있다
+
         Returns:
-            str_confirms: tuple 이면 인자들을 ','로 구분하여 스트링값으로 리턴
-            args : 스트링인 경우 받은 값 그대로 리턴
-
-
+            받은 args들을 그대로 반환한다
         """
         if type(args) is tuple:
             str_confirms = ','.join(args)
@@ -523,14 +532,20 @@ class Houpub:
             return args
 
     def str_check(self, strn):
-        """
-        받은 인자값이 str인지 체크해준다. \n인자값이 string인 경우 인자값을 그대로 뱉어주고, 아닌경우  error 코드를 발생 시킨다.
+        """strn의 타입이 str인지 체크한다.\n
+        메소드 내에서만 사용되는 메소드다.
+
         Args:
-            strn: string type check
+            strn: type이 str인지 체크하고 싶은 인자값
+
+        Examples:
+            pepper.int_check(revision_num)
 
         Returns:
-            string
+            strn(if str)
 
+        Raises:
+            Exceptions: If type(strn) is not str
         """
         if type(strn) is not str:
             self.error("not_string")
@@ -538,16 +553,20 @@ class Houpub:
             return strn
 
     def int_check(self, num):
-        """
-        체크할 인자값이 int인지 체크해준다. int가 아닌 경우 self.error으로 에러 코드를 발생 시킨다.int인 경우 받은 값 그대로 리턴해준다.
+        """num의 타입이 정수인지 체크한다.\n
+        메소드 내에서만 사용되는 메소드다.
+
         Args:
             num: type이 int인지 체크하고 싶은 인자값
 
-        Example:
-            int_check(input_num)
+        Examples:
+            pepper.int_check(revision_num)
 
         Returns:
-            num
+            num(if int)
+
+        Raises:
+            Exceptions: If type(num) is not int
         """
         if type(num) is not int:
             self.error('not_int')
@@ -556,16 +575,16 @@ class Houpub:
 
     @staticmethod
     def error(code):
-        """string으로 code를 적어주면 해당되는 에러 메시지를 띄운다.
+        """에러 핸들링을 위한 메소드, code에 받은 값에 따라 다른 Exception을 raise해준다.
 
         Examples:
-            error('not_string')
+            pepper.error('not_string')
 
         Args:
-            code(str): error code message
+            code(str): Error code
 
         Returns:
-            예외 메시지
+            raise Exceptions
         """
         if code == 'not_string':
             raise Exception("Input must be string")
@@ -665,8 +684,7 @@ class Houpub:
         return [shot['name'] for shot in gazu.shot.all_shots_for_sequence(self.sequence)]
 
     def get_task_types_for_asset(self):
-        """
-        self.asset의 의 모든 task들에 대한 task type을 반환한다.
+        """self.asset의 의 모든 task들에 대한 task type을 반환한다. \n
         self.project가 없을 시 작동하지 않는다.
 
         Examples:
