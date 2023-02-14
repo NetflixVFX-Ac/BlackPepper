@@ -23,6 +23,7 @@ class Houpub:
 
     def login(self, host, identify, password):
         """ 지정된 호스트를 setting 해주고, 이메일 (identification) 과 password 를 이용해 로그인 하는 방식.
+        \n사용자(identify)를 log_pepper(logging모듈) make_logger(name)으로 지정하고 self.mylog로 설정
 
         Examples:
             login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
@@ -188,6 +189,7 @@ class Houpub:
         software(dict)도 사용하여  새로운 working file(revision +1) 을 만든다. \n
         Create a new 'working file' with 'task_type' and 'task' corresponding to
         the specified entity and the selected software name.
+        \n 이 함수를 사용 할 때 마다 로그인한 사용자의 이름과 debug 메세지를 정해진 logger(log_pepper)에 따라 log기록을 한다.
 
         Example:
             publish_working_file("simulation", "hou") \n
@@ -207,6 +209,7 @@ class Houpub:
         """
         Create a new 'outputfile' in kitzu with 'task_type', 'task' and 'output_type'
         corresponding to the specified entity.
+        \n 이 함수를 사용 할 때 마다 로그인한 사용자의 이름과 debug 메세지를 정해진 logger(log_pepper)에 따라 log기록을 한다.
 
         Example:
             publish_output_file('FX', 'Movie_file', "test") \n
