@@ -621,7 +621,7 @@ class Houpub:
 
         Raises :
             Exception: if input(project) is not exists, "No project is assigned."
-                       if input(sequence) "No sequence is assigned."
+                       if input(sequence) is not exists, "No sequence is assigned."
 
         Returns:
             shot name(list).
