@@ -4,3 +4,4 @@
 **.idea
 **pycache
 *.xml
+.idea/workspace.xml
