@@ -271,6 +271,8 @@ class TestHoupub(TestCase):
     def test_user_flow(self):
         """
         1. login unittest
+        소프트웨어 assign
+        self.pepper.software = 'hipnc'
         """
         host = 'http://192.168.3.116/api'
         identify = 'pepper@hook.com'
@@ -280,7 +282,7 @@ class TestHoupub(TestCase):
         self.assertIn('PEPPER', self.pepper.get_my_projects())
 
         """
-        2. my_projects unittest / pick project
+        2. my_projects unittest / 
         
         saved info
         -   self.pepper.project = project
@@ -361,6 +363,7 @@ class TestHoupub(TestCase):
         -   self.pepper.shot = shot.get('shot_name') = 0010
         """
         picked_shot = None
+        shot = '0010'
         for shot in casted_shots:
             if shot.get('shot_name') == '0010':
                 picked_shot = shot
@@ -369,7 +372,7 @@ class TestHoupub(TestCase):
         self.pepper.entity = 'shot'
 
         """
-        8. template + shot(layout)
+        8. template + shot(layout) 
 
         saved info
         -   self.pepper.project = project
@@ -380,9 +383,9 @@ class TestHoupub(TestCase):
         self.pepper.make_precomp_dict(picked_shot)
         pick_precomp = None
         for precomp in self.pepper.precomp_list:
-            if precomp.get('name') == 'PEPPER_temp_fire_SQ01_0010':
+            if precomp.get('name') == 'PEPPER_fire_SQ01_0010':
                 pick_precomp = precomp
-        self.assertEqual(pick_precomp.get('name'), 'PEPPER_temp_fire_SQ01_0010')
+        self.assertEqual(pick_precomp.get('name'), 'PEPPER_fire_SQ01_0010')
 
         """
         9. render button
@@ -398,3 +401,6 @@ class TestHoupub(TestCase):
         10. publish
         
         """
+        self.pepper.publish_precomp_working(pick_precomp)
+        nwp = self.pepper.make_next_working_path('FX')
+        pprint.pp(nwp)
