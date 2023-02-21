@@ -750,7 +750,7 @@ class Houpub:
         my_projects = [project['name'] for project in gazu.user.all_open_projects()]
         return my_projects
 
-    def make_precomp_dict(self, casted_shot):
+    def append_precomp_list(self, casted_shot):
         sequence_name = casted_shot['sequence_name']
         shot_name = casted_shot['shot_name']
         name = '_'.join([self.project['name'], self.asset['name'], sequence_name, shot_name])
