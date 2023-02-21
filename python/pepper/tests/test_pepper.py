@@ -270,7 +270,7 @@ class TestHoupub(TestCase):
 
     def test_user_flow(self):
         """
-        login unittest
+        1. login unittest
         """
         host = 'http://192.168.3.116/api'
         identify = 'pepper@hook.com'
@@ -280,7 +280,7 @@ class TestHoupub(TestCase):
         self.assertIn('PEPPER', self.pepper.get_my_projects())
 
         """
-        my_projects unittest
+        2. my_projects unittest / pick project
         
         saved info
         -   self.pepper.project = project
@@ -293,7 +293,7 @@ class TestHoupub(TestCase):
         self.assertEqual(project, 'PEPPER')
 
         """
-        template list unittest
+        3. template list unittest
         
         saved info
         -   self.pepper.project = project
@@ -308,35 +308,43 @@ class TestHoupub(TestCase):
         self.assertIn('temp_fire', assets)
 
         """
-        template tast_type working file path unittest
+        4. pick template
         
         saved info
         -   self.pepper.project = project = "PEPPER"
+        -   self.pepper.asset = 'temp_fire'
         """
-        task_type = None
-        self.pepper.software = 'hip'
-        for asset in gazu.asset.all_assets_for_project(self.pepper.project):
-            self.pepper.asset = asset.get('name')
-            self.pepper.entity = 'asset'
-            for t in gazu.task.all_task_types_for_asset(asset):
-                if t.get('name') == 'simulation':
-                    task_type = t
-                    path = self.pepper.working_file_path(task_type.get('name'))
-                    dir = os.path.dirname(path)
-                    self.assertEqual(dir[:-4], f'mnt/projects/hook/pepper/assets/fx_template/{asset.get("name")}'
-                                          f'/{task_type.get("name")}/working/')
+        pick_template = None
+        for asset in self.pepper.get_all_assets():
+            if asset == 'temp_fire':
+                pick_template = asset
+        self.pepper.asset = pick_template
+        self.assertEqual(self.pepper.asset.get('name'), 'temp_fire')
 
         """
-        pick template / casting shot unittest
+        5. template 'temp_fire' working file path unittest
+        
+        saved info
+        -   self.pepper.project = project = "PEPPER"
+        -   self.pepper.asset = 'temp_fire'
+        """
+        task_type = None
+        self.pepper.entity = 'asset'
+        self.pepper.software = 'hip'
+        for t in gazu.task.all_task_types_for_asset(self.pepper.asset):
+            if t.get('name') == 'simulation':
+                task_type = t
+                path = self.pepper.working_file_path(task_type.get('name'))
+                dir = os.path.dirname(path)
+        self.assertEqual(dir, 'mnt/projects/hook/pepper/assets/fx_template/temp_fire/simulation/working/v009')
+
+        """
+        6. casting shot unittest
         saved info
         -   self.pepper.project = project
         -   self.pepper.asset = 'temp_fire'
-        
-        
         """
         shots = []
-        picked_template = None
-        self.pepper.asset = 'temp_fire'
         casted_shots, layout_type, fx_tasks = self.pepper.get_casting_path_for_asset()
         for shot in casted_shots:
             shots.append(shot.get('shot_name'))
@@ -344,7 +352,7 @@ class TestHoupub(TestCase):
         self.assertIn('0030', shots)
 
         """
-        pick shot
+        7. pick shot
         
         saved info
         -   self.pepper.project = project
@@ -360,15 +368,33 @@ class TestHoupub(TestCase):
         self.pepper.shot = picked_shot.get('shot_name')
         self.pepper.entity = 'shot'
 
+        """
+        8. template + shot(layout)
+
+        saved info
+        -   self.pepper.project = project
+        -   self.pepper.asset = 'temp_fire'
+        -   self.pepper.sequence = shot.get('sequence_name') = SQ01
+        -   self.pepper.shot = shot.get('shot_name') = 0010        
+        """
+        self.pepper.make_precomp_dict(picked_shot)
+        pick_precomp = None
+        for precomp in self.pepper.precomp_list:
+            if precomp.get('name') == 'PEPPER_temp_fire_SQ01_0010':
+                pick_precomp = precomp
+        self.assertEqual(pick_precomp.get('name'), 'PEPPER_temp_fire_SQ01_0010')
 
         """
-        template + shot(layout)
+        9. render button
+        
+        saved info
+        -   self.pepper.project = project
+        -   self.pepper.asset = 'temp_fire'
+        -   self.pepper.sequence = shot.get('sequence_name') = SQ01
+        -   self.pepper.shot = shot.get('shot_name') = 0010        
         """
-        # pprint.pp(shots)
-        # for shot in casted_shots:
-        #     self.pepper.make_precomp_dict(shot)
 
         """
-        publish
+        10. publish
+        
         """
-
