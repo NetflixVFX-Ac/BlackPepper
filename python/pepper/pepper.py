@@ -176,6 +176,9 @@ class Houpub:
     def software(self, software_name):
         """houdini의 extension 타입별로 software dict를 반환해준다
 
+        Example:
+            pepper.software = 'hip'
+
         Args:
             software_name(str): 'hip', 'hipnc', or 'hiplc'
 
@@ -187,10 +190,13 @@ class Houpub:
         """
         if software_name == 'hip':
             self._software = gazu.files.get_software_by_name('houdini')
+            return
         if software_name == 'hipnc':
             self._software = gazu.files.get_software_by_name('houdininc')
+            return
         if software_name == 'hiplc':
             self._software = gazu.files.get_software_by_name('houdinilc')
+            return
         else:
             self.error('hou')
 
@@ -744,7 +750,7 @@ class Houpub:
         my_projects = [project['name'] for project in gazu.user.all_open_projects()]
         return my_projects
 
-    def append_precomp_list(self, casted_shot):
+    def make_precomp_dict(self, casted_shot):
         sequence_name = casted_shot['sequence_name']
         shot_name = casted_shot['shot_name']
         name = '_'.join([self.project['name'], self.asset['name'], sequence_name, shot_name])
@@ -756,8 +762,15 @@ class Houpub:
         layout_output_path = self.output_file_path('camera', 'layout')
         fx_working_path = self.make_next_working_path('FX')
         video_output_path = self.make_next_output_path('Movie_file', 'FX')
-        precomp = [name, temp_working_path, layout_output_path, fx_working_path, video_output_path]
-        self.precomp_list.append(precomp)
+        self.precomp_list.append({'name': name, 'temp_working_path': temp_working_path,
+                                  'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
+                                  'video_output_path': video_output_path})
+
+    # def publish_precomp(self, precomp):
+    #     split_name = precomp['name'].split('_')
+    #     project_name = split_name[0]
+    #     sequence_name = precomp['name']
+    #     shot_name = precomp['name']
 
     # -----------Unused methods----------
 
