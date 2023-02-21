@@ -6,7 +6,7 @@ class Houpub:
     """
      이 모듈은 kitsu에 올라간 정보를 gazu를 통해서 path를 추출한다. 그 정보는 local에 저장된 houdini template에 working file path로
     지정한 경로에서 cam, asset 파일을 기존 working hip파일에 적용한다. 부가적으로 shots마다 cating된 template를 확인 할 수 있다.
-     예를 들어, test_01.hip의 working file template에 cam, asset을 적용해서 새로운 jpg, hip, mov를 outputfile로 만든다.
+     예를 들어, test_01.hip의 working file template에 cam, asset을 적용해서 새로운 exr, hip, mov를 outputfile로 만든다.
     hip파일의 경우는 test_02.hip이라는 형식으로 outputfile이자 새로운 revision의 working file을 만든다.
     """
     _project = None
@@ -14,12 +14,10 @@ class Houpub:
     _shot = None
     _asset = None
     _entity = None
-    _software = None
 
     def __init__(self):
         self.identif = None
         self.mylog = None
-        self.precomp_list = []
         pass
 
     def login(self, host, identify, password):
@@ -494,8 +492,6 @@ class Houpub:
 
         Returns:
             casted_shots: [(shot_1_dict), (shot_2_dict), ...]
-            layout_tasks: [(shot_1_layout_task_dict), (shot_2_layout_task_dict), ...]
-            fx_tasks: [(shot_1_fx_task_dict), (shot_2_fx_task_dict), ...]
 
         Raises:
             Exception: If self.asset doesn't exist.
@@ -661,8 +657,6 @@ class Houpub:
         self.dict_check(self.project, 'no_project')
         return [asset['name'] for asset in gazu.asset.all_assets_for_project(self.project)]
 
-    # def check_assets_
-
     def get_all_sequences(self):
         """self.project 안의 모든 sequence들을 반환한다. \n
         self.project가 없을 시 작동하지 않는다.
@@ -785,14 +779,14 @@ class Houpub:
         # print(nwp)
 
 
-pepper = Houpub()
-pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
-pepper.software = 'hipnc'
-pepper.project = 'PEPPER'
-pepper.asset = 'temp_fire'
-casted_shots = pepper.get_casting_path_for_asset()
-for casted_shot in casted_shots:
-    gazu.task.all_tasks_for_shot()
+# pepper = Houpub()
+# pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+# pepper.software = 'hipnc'
+# pepper.project = 'PEPPER'
+# pepper.asset = 'temp_fire'
+# casted_shots = pepper.get_casting_path_for_asset()
+# for casted_shot in casted_shots:
+#     gazu.task.all_tasks_for_shot()
 # for casted_shot in casted_shots:
 #     pepper.make_precomp_dict(casted_shot)
 # print(pepper.precomp_list)
