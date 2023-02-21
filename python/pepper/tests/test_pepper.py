@@ -328,7 +328,6 @@ class TestHoupub(TestCase):
 
         """
         pick template / casting shot unittest
-        
         saved info
         -   self.pepper.project = project
         -   self.pepper.asset = 'temp_fire'
