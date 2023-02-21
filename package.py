@@ -2,9 +2,9 @@
 
 name = 'Hook'
 version = '0.0.1'
-authors = ['Sungwoo Park', 'Sunjun Park', '진광 박', '열훈 윤', '재혁 이', '원규 리', '수경 유']
+authors = ['Sunjun Park', 'Sungwoo Park', 'Jinkwang Park', 'Yeolhoon Yoon', 'Jaehyuk Lee', 'Wongyu Lee']
 requires = [
-    'python', 'gazu',
+    'python', 'gazu', 'hou'
 ]
 variants = [
     ['platform-linux', 'python'],
