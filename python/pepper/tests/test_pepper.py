@@ -331,6 +331,8 @@ class TestHoupub(TestCase):
         saved info
         -   self.pepper.project = project
         -   self.pepper.asset = 'temp_fire'
+        
+        
         """
         shots = []
         picked_template = None
