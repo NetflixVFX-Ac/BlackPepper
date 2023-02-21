@@ -6,7 +6,7 @@ class Houpub:
     """
      이 모듈은 kitsu에 올라간 정보를 gazu를 통해서 path를 추출한다. 그 정보는 local에 저장된 houdini template에 working file path로
     지정한 경로에서 cam, asset 파일을 기존 working hip파일에 적용한다. 부가적으로 shots마다 cating된 template를 확인 할 수 있다.
-     예를 들어, test_01.hip의 working file template에 cam, asset을 적용해서 새로운 exr, hip, mov를 outputfile로 만든다.
+     예를 들어, test_01.hip의 working file template에 cam, asset을 적용해서 새로운 jpg, hip, mov를 outputfile로 만든다.
     hip파일의 경우는 test_02.hip이라는 형식으로 outputfile이자 새로운 revision의 working file을 만든다.
     """
     _project = None
@@ -750,10 +750,10 @@ class Houpub:
         my_projects = [project['name'] for project in gazu.user.all_open_projects()]
         return my_projects
 
-    def append_precomp_list(self, casted_shot):
+    def make_precomp_dict(self, casted_shot):
         sequence_name = casted_shot['sequence_name']
         shot_name = casted_shot['shot_name']
-        name = '_'.join([self.project['name'], self.asset['name'], sequence_name, shot_name])
+        name = '_'.join([self.project['name'], self.asset['name'][5:], sequence_name, shot_name])
         self.entity = 'asset'
         temp_working_path = self.working_file_path('simulation')
         self.sequence = sequence_name
@@ -766,11 +766,41 @@ class Houpub:
                                   'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
                                   'video_output_path': video_output_path})
 
-    # def publish_precomp(self, precomp):
-    #     split_name = precomp['name'].split('_')
-    #     project_name = split_name[0]
-    #     sequence_name = precomp['name']
-    #     shot_name = precomp['name']
+    def publish_precomp_working(self, precomp):
+        split_name = precomp['name'].split('_')
+        self.project = split_name[0]
+        self.sequence = split_name[2]
+        self.shot = split_name[3]
+        self.entity = 'shot'
+        self.publish_working_file('FX')
+        # nwp = self.make_next_working_path('FX')
+        # print(nwp)
+
+    def publish_precomp_output(self, precomp):
+        split_name = precomp['name'].split('_')
+        self.project = split_name[0]
+        self.sequence = split_name[2]
+        self.shot = split_name[3]
+        self.entity = 'shot'
+        self.publish_output_file('FX', 'Movie_file', 'test_precomp')
+        self.make_next_output_path('Movie_file', 'FX')
+        # nwp = self.make_next_output_path('Movie_file', 'FX')
+        # print(nwp)
+
+
+# pepper = Houpub()
+# pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+# pepper.software = 'hipnc'
+# pepper.project = 'PEPPER'
+# pepper.asset = 'temp_fire'
+# casted_shots, _, _ = pepper.get_casting_path_for_asset()
+# for casted_shot in casted_shots:
+#     pepper.make_precomp_dict(casted_shot)
+# print(pepper.precomp_list)
+# for precomp in pepper.precomp_list:
+#     pepper.publish_precomp_working(precomp)
+# for precomp in pepper.precomp_list:
+#     pepper.publish_precomp_output(precomp)
 
     # -----------Unused methods----------
 
