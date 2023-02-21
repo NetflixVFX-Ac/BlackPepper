@@ -14,10 +14,12 @@ class Houpub:
     _shot = None
     _asset = None
     _entity = None
+    _software = None
 
     def __init__(self):
         self.identif = None
         self.mylog = None
+        self.precomp_list = []
         pass
 
     def login(self, host, identify, password):
