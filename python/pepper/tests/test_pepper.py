@@ -1,6 +1,7 @@
 from unittest import TestCase
 from pepper import Houpub
 import gazu
+import os
 import pprint
 
 
@@ -133,12 +134,16 @@ class TestHoupub(TestCase):
         self.pepper.asset = 'temp_fire'
         self.pepper.sequence = 'SQ01'
         self.pepper.shot = '0010'
-        last_revision = self.pepper.get_casting_path_for_asset()
-        shot_dict = None
-        for i in range(len(last_revision)):
-            if last_revision[i][0].get('shot_name') == self.pepper.shot.get('name'):
-                shot_dict = last_revision[i][0]
-        self.assertIsNotNone(shot_dict)
+        # last_revision = self.pepper.get_casting_path_for_asset()
+        # shot_dict = None
+        # for i in range(len(last_revision)):
+        #     if last_revision[i][0].get('shot_name') == self.pepper.shot.get('name'):
+        #         shot_dict = last_revision[i][0]
+        # self.assertIsNotNone(shot_dict)
+        casted_shots, layout_tasks, fx_tasks = self.pepper.get_casting_path_for_asset()
+        pprint.pp(casted_shots)
+        pprint.pp(layout_tasks)
+        pprint.pp(fx_tasks)
 
     def test_dick_check(self):
         test_dict = {'hook': 'team', 'mem_num': '7'}
@@ -263,3 +268,139 @@ class TestHoupub(TestCase):
         self.pepper.shot = '0010'
         self.assertIn('fx_template:temp_explosion', self.pepper.get_casted_assets_for_shot())
 
+    def test_user_flow(self):
+        """
+        1. login unittest
+        소프트웨어 assign
+        self.pepper.software = 'hipnc'
+        """
+        host = 'http://192.168.3.116/api'
+        identify = 'pepper@hook.com'
+        password = 'pepperpepper'
+        project = None
+        self.pepper.login(host, identify, password)
+        self.assertIn('PEPPER', self.pepper.get_my_projects())
+
+        """
+        2. my_projects unittest / 
+        
+        saved info
+        -   self.pepper.project = project
+        
+        """
+        for proj in self.pepper.get_my_projects():
+            if proj == 'PEPPER':
+                project = proj
+        self.pepper.project = project
+        self.assertEqual(project, 'PEPPER')
+
+        """
+        3. template list unittest
+        
+        saved info
+        -   self.pepper.project = project
+        
+        """
+        assets = []
+        for asset in self.pepper.get_all_assets():
+           assets.append(asset)
+        self.assertIn('temp_explosion', assets)
+        self.assertIn('temp_thunder', assets)
+        self.assertIn('temp_waterfall', assets)
+        self.assertIn('temp_fire', assets)
+
+        """
+        4. pick template
+        
+        saved info
+        -   self.pepper.project = project = "PEPPER"
+        -   self.pepper.asset = 'temp_fire'
+        """
+        pick_template = None
+        for asset in self.pepper.get_all_assets():
+            if asset == 'temp_fire':
+                pick_template = asset
+        self.pepper.asset = pick_template
+        self.assertEqual(self.pepper.asset.get('name'), 'temp_fire')
+
+        """
+        5. template 'temp_fire' working file path unittest
+        
+        saved info
+        -   self.pepper.project = project = "PEPPER"
+        -   self.pepper.asset = 'temp_fire'
+        """
+        task_type = None
+        self.pepper.entity = 'asset'
+        self.pepper.software = 'hip'
+        for t in gazu.task.all_task_types_for_asset(self.pepper.asset):
+            if t.get('name') == 'simulation':
+                task_type = t
+                path = self.pepper.working_file_path(task_type.get('name'))
+                dir = os.path.dirname(path)
+        self.assertEqual(dir, 'mnt/projects/hook/pepper/assets/fx_template/temp_fire/simulation/working/v009')
+
+        """
+        6. casting shot unittest
+        saved info
+        -   self.pepper.project = project
+        -   self.pepper.asset = 'temp_fire'
+        """
+        shots = []
+        casted_shots, layout_type, fx_tasks = self.pepper.get_casting_path_for_asset()
+        for shot in casted_shots:
+            shots.append(shot.get('shot_name'))
+        self.assertIn('0010', shots)
+        self.assertIn('0030', shots)
+
+        """
+        7. pick shot
+        
+        saved info
+        -   self.pepper.project = project
+        -   self.pepper.asset = 'temp_fire'
+        -   self.pepper.sequence = shot.get('sequence_name') = SQ01
+        -   self.pepper.shot = shot.get('shot_name') = 0010
+        """
+        picked_shot = None
+        shot = '0010'
+        for shot in casted_shots:
+            if shot.get('shot_name') == '0010':
+                picked_shot = shot
+        self.pepper.sequence = picked_shot.get('sequence_name')
+        self.pepper.shot = picked_shot.get('shot_name')
+        self.pepper.entity = 'shot'
+
+        """
+        8. template + shot(layout) 
+
+        saved info
+        -   self.pepper.project = project
+        -   self.pepper.asset = 'temp_fire'
+        -   self.pepper.sequence = shot.get('sequence_name') = SQ01
+        -   self.pepper.shot = shot.get('shot_name') = 0010        
+        """
+        self.pepper.make_precomp_dict(picked_shot)
+        pick_precomp = None
+        for precomp in self.pepper.precomp_list:
+            if precomp.get('name') == 'PEPPER_fire_SQ01_0010':
+                pick_precomp = precomp
+        self.assertEqual(pick_precomp.get('name'), 'PEPPER_fire_SQ01_0010')
+
+        """
+        9. render button
+        
+        saved info
+        -   self.pepper.project = project
+        -   self.pepper.asset = 'temp_fire'
+        -   self.pepper.sequence = shot.get('sequence_name') = SQ01
+        -   self.pepper.shot = shot.get('shot_name') = 0010        
+        """
+
+        """
+        10. publish
+        
+        """
+        self.pepper.publish_precomp_working(pick_precomp)
+        nwp = self.pepper.make_next_working_path('FX')
+        pprint.pp(nwp)
