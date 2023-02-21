@@ -263,3 +263,38 @@ class TestHoupub(TestCase):
         self.pepper.shot = '0010'
         self.assertIn('fx_template:temp_explosion', self.pepper.get_casted_assets_for_shot())
 
+    def test_user_flow(self):
+        host = 'http://192.168.3.116/api'
+        identify = 'pepper@hook.com'
+        password = 'pepperpepper'
+        project = None
+        assets = []
+        shots = []
+        self.pepper.login(host, identify, password)
+        self.assertIn('PEPPER', self.pepper.get_my_projects())
+
+        for proj in self.pepper.get_my_projects():
+            if proj == 'PEPPER':
+                project = proj
+        self.assertEqual(project, 'PEPPER')
+
+        self.pepper.project = project
+        # self.pepper.get_all_assets()
+        for asset in gazu.asset.all_assets_for_project(self.pepper.project):
+            assets.append(asset.get('name'))
+        self.assertIn('temp_explosion', assets)
+        self.assertIn('temp_thunder', assets)
+        self.assertIn('temp_waterfall', assets)
+        self.assertIn('temp_fire', assets)
+
+        self.pepper.asset = 'temp_fire'
+        # pprint.pp(self.pepper.get_casting_path_for_asset())
+        casting_shots = self.pepper.get_casting_path_for_asset()
+        for i in range(len(self.pepper.get_casting_path_for_asset())):
+            shots.append(casting_shots[i][1].get('shot_name'))
+        self.assertIn('0010', shots)
+        self.assertIn('0030', shots)
+
+        self.pepper.entity = 'shot'
+
+
