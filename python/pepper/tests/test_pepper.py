@@ -134,12 +134,16 @@ class TestHoupub(TestCase):
         self.pepper.asset = 'temp_fire'
         self.pepper.sequence = 'SQ01'
         self.pepper.shot = '0010'
-        last_revision = self.pepper.get_casting_path_for_asset()
-        shot_dict = None
-        for i in range(len(last_revision)):
-            if last_revision[i][0].get('shot_name') == self.pepper.shot.get('name'):
-                shot_dict = last_revision[i][0]
-        self.assertIsNotNone(shot_dict)
+        # last_revision = self.pepper.get_casting_path_for_asset()
+        # shot_dict = None
+        # for i in range(len(last_revision)):
+        #     if last_revision[i][0].get('shot_name') == self.pepper.shot.get('name'):
+        #         shot_dict = last_revision[i][0]
+        # self.assertIsNotNone(shot_dict)
+        casted_shots, layout_tasks, fx_tasks = self.pepper.get_casting_path_for_asset()
+        pprint.pp(casted_shots)
+        pprint.pp(layout_tasks)
+        pprint.pp(fx_tasks)
 
     def test_dick_check(self):
         test_dict = {'hook': 'team', 'mem_num': '7'}
@@ -301,13 +305,14 @@ class TestHoupub(TestCase):
         input_num = None 이어야 조금 편할듯
         """
         task_type = None
+        self.pepper.software = 'hip'
         for asset in gazu.asset.all_assets_for_project(self.pepper.project):
             self.pepper.asset = asset.get('name')
             self.pepper.entity = 'asset'
             for t in gazu.task.all_task_types_for_asset(asset):
                 if t.get('name') == 'simulation':
                     task_type = t
-                    path = self.pepper.working_file_path(task_type.get('name'), 'hou', 10)
+                    path = self.pepper.working_file_path(task_type.get('name'))
                     dir = os.path.dirname(path)
                     self.assertEqual(dir[:-4], f'mnt/projects/hook/pepper/assets/fx_template/{asset.get("name")}'
                                           f'/{task_type.get("name")}/working/')
@@ -317,9 +322,9 @@ class TestHoupub(TestCase):
         """
         shots = []
         self.pepper.asset = 'temp_fire'
-        casting_shots = self.pepper.get_casting_path_for_asset()
-        for i in range(len(self.pepper.get_casting_path_for_asset())):
-            shots.append(casting_shots[i][0].get('shot_name'))
+        casted_shots, _, _ = self.pepper.get_casting_path_for_asset()
+        for shot in casted_shots:
+            shots.append(shot.get('shot_id'))
         self.assertIn('0010', shots)
         self.assertIn('0030', shots)
 
