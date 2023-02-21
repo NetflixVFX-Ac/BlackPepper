@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="f74166d5-063f-4331-a3bc-6357bee8273c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/python/pepper/tests/test_pepper.py" beforeDir="false" afterPath="$PROJECT_DIR$/python/pepper/tests/test_pepper.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,7 +43,21 @@
       <recent name="$USER_HOME$/tmp" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python tests.Python tests for test_pepper.TestHoupub.test_user_flow">
+    <configuration name="Python tests for test_pepper.TestHoupub.test_get_casting_path_for_asset" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="hook" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/python/pepper/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_pepper.TestHoupub.test_get_casting_path_for_asset&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
     <configuration name="Python tests for test_pepper.TestHoupub.test_user_flow" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="hook" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -60,6 +75,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python tests.Python tests for test_pepper.TestHoupub.test_user_flow" />
+        <item itemvalue="Python tests.Python tests for test_pepper.TestHoupub.test_get_casting_path_for_asset" />
       </list>
     </recent_temporary>
   </component>
