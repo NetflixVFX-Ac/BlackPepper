@@ -281,20 +281,27 @@ class TestHoupub(TestCase):
 
         """
         my_projects unittest
+        
+        saved info
+        -   self.pepper.project = project
+        
         """
         for proj in self.pepper.get_my_projects():
             if proj == 'PEPPER':
                 project = proj
+        self.pepper.project = project
         self.assertEqual(project, 'PEPPER')
 
         """
         template list unittest
+        
+        saved info
+        -   self.pepper.project = project
+        
         """
         assets = []
-        self.pepper.project = project
-        # self.pepper.get_all_assets()
-        for asset in gazu.asset.all_assets_for_project(self.pepper.project):
-            assets.append(asset.get('name'))
+        for asset in self.pepper.get_all_assets():
+           assets.append(asset)
         self.assertIn('temp_explosion', assets)
         self.assertIn('temp_thunder', assets)
         self.assertIn('temp_waterfall', assets)
@@ -302,7 +309,9 @@ class TestHoupub(TestCase):
 
         """
         template tast_type working file path unittest
-        input_num = None 이어야 조금 편할듯
+        
+        saved info
+        -   self.pepper.project = project = "PEPPER"
         """
         task_type = None
         self.pepper.software = 'hip'
@@ -318,23 +327,45 @@ class TestHoupub(TestCase):
                                           f'/{task_type.get("name")}/working/')
 
         """
-        casting shot unittest
+        pick template / casting shot unittest
+        
+        saved info
+        -   self.pepper.project = project
+        -   self.pepper.asset = 'temp_fire'
         """
         shots = []
+        picked_template = None
         self.pepper.asset = 'temp_fire'
-        casted_shots, _, _ = self.pepper.get_casting_path_for_asset()
+        casted_shots, layout_type, fx_tasks = self.pepper.get_casting_path_for_asset()
         for shot in casted_shots:
-            shots.append(shot.get('shot_id'))
+            shots.append(shot.get('shot_name'))
         self.assertIn('0010', shots)
         self.assertIn('0030', shots)
 
         """
-        casting shot Layout working/output path
+        pick shot
+        
+        saved info
+        -   self.pepper.project = project
+        -   self.pepper.asset = 'temp_fire'
+        -   self.pepper.sequence = shot.get('sequence_name') = SQ01
+        -   self.pepper.shot = shot.get('shot_name') = 0010
         """
+        picked_shot = None
+        for shot in casted_shots:
+            if shot.get('shot_name') == '0010':
+                picked_shot = shot
+        self.pepper.sequence = picked_shot.get('sequence_name')
+        self.pepper.shot = picked_shot.get('shot_name')
+        self.pepper.entity = 'shot'
+
 
         """
         template + shot(layout)
         """
+        # pprint.pp(shots)
+        # for shot in casted_shots:
+        #     self.pepper.make_precomp_dict(shot)
 
         """
         publish
