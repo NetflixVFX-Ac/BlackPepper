@@ -1,6 +1,7 @@
 from unittest import TestCase
 from pepper import Houpub
 import gazu
+import os
 import pprint
 
 
@@ -264,20 +265,28 @@ class TestHoupub(TestCase):
         self.assertIn('fx_template:temp_explosion', self.pepper.get_casted_assets_for_shot())
 
     def test_user_flow(self):
+        """
+        login unittest
+        """
         host = 'http://192.168.3.116/api'
         identify = 'pepper@hook.com'
         password = 'pepperpepper'
         project = None
-        assets = []
-        shots = []
         self.pepper.login(host, identify, password)
         self.assertIn('PEPPER', self.pepper.get_my_projects())
 
+        """
+        my_projects unittest
+        """
         for proj in self.pepper.get_my_projects():
             if proj == 'PEPPER':
                 project = proj
         self.assertEqual(project, 'PEPPER')
 
+        """
+        template list unittest
+        """
+        assets = []
         self.pepper.project = project
         # self.pepper.get_all_assets()
         for asset in gazu.asset.all_assets_for_project(self.pepper.project):
@@ -287,14 +296,42 @@ class TestHoupub(TestCase):
         self.assertIn('temp_waterfall', assets)
         self.assertIn('temp_fire', assets)
 
+        """
+        template tast_type working file path unittest
+        input_num = None 이어야 조금 편할듯
+        """
+        task_type = None
+        for asset in gazu.asset.all_assets_for_project(self.pepper.project):
+            self.pepper.asset = asset.get('name')
+            self.pepper.entity = 'asset'
+            for t in gazu.task.all_task_types_for_asset(asset):
+                if t.get('name') == 'simulation':
+                    task_type = t
+                    path = self.pepper.working_file_path(task_type.get('name'), 'hou', 10)
+                    dir = os.path.dirname(path)
+                    self.assertEqual(dir[:-4], f'mnt/projects/hook/pepper/assets/fx_template/{asset.get("name")}'
+                                          f'/{task_type.get("name")}/working/')
+
+        """
+        casting shot unittest
+        """
+        shots = []
         self.pepper.asset = 'temp_fire'
-        # pprint.pp(self.pepper.get_casting_path_for_asset())
         casting_shots = self.pepper.get_casting_path_for_asset()
         for i in range(len(self.pepper.get_casting_path_for_asset())):
-            shots.append(casting_shots[i][1].get('shot_name'))
+            shots.append(casting_shots[i][0].get('shot_name'))
         self.assertIn('0010', shots)
         self.assertIn('0030', shots)
 
-        self.pepper.entity = 'shot'
+        """
+        casting shot Layout working/output path
+        """
 
+        """
+        template + shot(layout)
+        """
+
+        """
+        publish
+        """
 
