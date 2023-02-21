@@ -14,10 +14,12 @@ class Houpub:
     _shot = None
     _asset = None
     _entity = None
+    _software = None
 
     def __init__(self):
         self.identif = None
         self.mylog = None
+        self.precomp_list = []
         pass
 
     def login(self, host, identify, password):
@@ -166,6 +168,32 @@ class Houpub:
             return
         self.error('not_asset_shot')
 
+    @property
+    def software(self):
+        return self._software
+
+    @software.setter
+    def software(self, software_name):
+        """houdini의 extension 타입별로 software dict를 반환해준다
+
+        Args:
+            software_name(str): 'hip', 'hipnc', or 'hiplc'
+
+        Returns:
+            Software dict
+
+        Raises:
+            Exception: If software_name is not hip, hipnc, or hiplc.
+        """
+        if software_name == 'hip':
+            self._software = gazu.files.get_software_by_name('houdini')
+        if software_name == 'hipnc':
+            self._software = gazu.files.get_software_by_name('houdininc')
+        if software_name == 'hiplc':
+            self._software = gazu.files.get_software_by_name('houdinilc')
+        else:
+            self.error('hou')
+
     def set_file_tree(self, mount_point, root):
         """self.project의 file tree를 업데이트 해준 뒤 file tree 변경 로그를 저장한다. \n
         self.project가 없을 시 작동하지 않는다.
@@ -228,27 +256,25 @@ class Houpub:
         gazu.files.update_project_file_tree(self.project, file_tree)
         self.mylog.debug(self.project, "File tree updated")
 
-    def publish_working_file(self, task_type_name, software_name):
+    def publish_working_file(self, task_type_name):
         """task_type_name과 self.entity를 통해 해당 entity의 입력된 task_type을 가진 task를 받아온다.\n
         받아온 task에 software_name에 해당하는 software을 사용해 작업한 working file을 생성하고, publish 한다. \n
         Publish가 될 때 마다 로그인한 유저의 id와 debug 메시지를 정해진 logger(log_pepper)에 따라 logging 한다. \n
         self.entity가 지정되어있지 않으면 작동하지 않는다.
 
         Example:
-            publish_working_file('simulation', 'hou')
+            publish_working_file('simulation')
 
         Args:
             task_type_name(str): 'simulation', 'layout', ...
-            software_name(str): 'hou', 'hounc', 'houlc'
 
         Raises:
             Exception: If self.entity doesn't exist, if self.entity has no task,
                 if task_type_name and software_name is not string, and if task_type is None
         """
-        self.args_str_check(task_type_name, software_name)
+        self.args_str_check(task_type_name)
         _, task = self.get_task(task_type_name)
-        software = self.get_software(software_name)
-        gazu.files.new_working_file(task, software=software)
+        gazu.files.new_working_file(task, software=self.software)
         self.mylog.debug("publish working file, last revision up")
 
     def publish_output_file(self, task_type_name, output_type_name, comments):
@@ -280,27 +306,25 @@ class Houpub:
                                           representation=output_type['short_name'], comment=comments)
         self.mylog.debug("publish output file, last revision up")
 
-    def working_file_path(self, task_type_name, software_name, input_num):
+    def working_file_path(self, task_type_name, input_num=None):
         """self.entity에 해당된 task_type_name을 가진 task의 working file 중 input_num의 revision을 반환한다. \n
 
         Example:
-            working_file_path("simulation", "hou", 10)
+            pepper.working_file_path("simulation") or pepper.working_file_path('layout', input_num=12)
 
         Args:
             task_type_name(str): 'simulation', 'FX', ...
-            software_name(str): 'hou', 'hounc', 'houlc'
             input_num(int): user's revision number
 
         Returns:
             working file path(revision=input_num)
         """
-        self.args_str_check(task_type_name, software_name)
+        self.args_str_check(task_type_name)
         _, task = self.get_task(task_type_name)
-        software = self.get_software(software_name)
         revision_max = self.get_working_revision_max(task)
         revision_num = self.get_revision_num(revision_max, input_num)
-        path = gazu.files.build_working_file_path(task, software=software, revision=revision_num)
-        ext = software['file_extension']
+        path = gazu.files.build_working_file_path(task, software=self.software, revision=revision_num)
+        ext = self.software['file_extension']
         return path + '.' + ext
 
     def make_next_working_path(self, task_type_name):
@@ -327,7 +351,7 @@ class Houpub:
         path = gazu.files.build_working_file_path(task, revision=revision_max + 1)
         return path
 
-    def output_file_path(self, output_type_name, task_type_name, input_num):
+    def output_file_path(self, output_type_name, task_type_name, input_num=None):
         """self.entity에 해당된 task의 output_type중 output_type_name의 output file path 중 input_num의 revision을 반환한다.\n
         input_num이 revision_max보다 크다면 revision_max를 반환하고, 아닐 시 input_num을 반환한다. \n
         input_num이 None일시 revision_max를 반환한다.
@@ -347,10 +371,11 @@ class Houpub:
             Exception: If self.entity doesn't exist, if self.entity has no task, if self.entity has no working file,
                 if task_type_name or output_type_name is not string, and if task_type or output_type is None
         """
-        task_type = gazu.task.get_task_type_by_name(task_type_name)
+        task_type, _ = self.get_task(task_type_name)
         self.dict_check(task_type, f'no_task_type{task_type_name}')
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         self.dict_check(output_type, f'no_output_type{output_type_name}')
+        self.dict_check(self.entity, 'no_shot_asset')
         revision_max = gazu.files.get_last_entity_output_revision(self.entity, output_type, task_type, name='main')
         revision_num = self.get_revision_num(revision_max, input_num)
         path = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type, revision=revision_num)
@@ -373,7 +398,7 @@ class Houpub:
         Raises:
             Exception: If self.entity doesn't exist, if self.entity has no task. if task_type is None
         """
-        task_type = gazu.task.get_task_type_by_name(task_type_name)
+        task_type, _ = self.get_task(task_type_name)
         self.dict_check(task_type, f'no_task_type{task_type_name}')
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         self.dict_check(output_type, f'no_output_type{output_type_name}')
@@ -442,31 +467,10 @@ class Houpub:
         """
         task_type = gazu.task.get_task_type_by_name(task_type_name)
         self.dict_check(task_type, 'no_task')
+        self.dict_check(self.entity, 'entity_not_assigned')
         task = gazu.task.get_task_by_name(self.entity, task_type)
         self.dict_check(task, 'no_task_in_entity')
         return task_type, task
-
-    def get_software(self, software_name):
-        """houdini의 extension 타입별로 software dict를 반환해준다
-
-        Args:
-            software_name(str): 'hou', 'hounc', or 'houlc'ㄴ
-
-        Returns:
-            Software dict
-
-        Raises:
-            Exception: If software_name is not hou, hounc, or houlc.
-
-        """
-        if software_name == 'hou':
-            return gazu.files.get_software_by_name('houdini')
-        if software_name == 'hounc':
-            return gazu.files.get_software_by_name('houdininc')
-        if software_name == 'houlc':
-            return gazu.files.get_software_by_name('houdinilc')
-        else:
-            self.error('hou')
 
     def get_casting_path_for_asset(self):
         """asset이 casting된 shot과 그 shot의 layout과 FX task를 튜플로 묶어 모든 shot들을 리스트로 반환해준다.
@@ -476,7 +480,9 @@ class Houpub:
             pepper.get_casting_path_for_asset()
 
         Returns:
-            [(shot_dict, layout_task_dict, fx_task_dict), (shot_2_dict, layout_2_task_dict, fx_2_task_dict), ...]
+            casted_shots: [(shot_1_dict), (shot_2_dict), ...]
+            layout_tasks: [(shot_1_layout_task_dict), (shot_2_layout_task_dict), ...]
+            fx_tasks: [(shot_1_fx_task_dict), (shot_2_fx_task_dict), ...]
 
         Raises:
             Exception: If self.asset doesn't exist.
@@ -485,12 +491,17 @@ class Houpub:
         casted_shots = gazu.casting.get_asset_cast_in(self.asset)
         layout_task_type = gazu.task.get_task_type_by_name('Layout')
         fx_task_type = gazu.task.get_task_type_by_name('FX')
-        tasks = []
-        for shot in casted_shots:
-            layout_task = gazu.task.get_task_by_name(shot['shot_id'], layout_task_type)
-            fx_task = gazu.task.get_task_by_name(shot['shot_id'], fx_task_type)
-            tasks.append((shot, layout_task, fx_task))
-        return tasks
+
+        # tasks = []
+        # for shot in casted_shots:
+        #     layout_task = gazu.task.get_task_by_name(shot['shot_id'], layout_task_type)
+        #     fx_task = gazu.task.get_task_by_name(shot['shot_id'], fx_task_type)
+        #     tasks.append((shot, layout_task, fx_task))
+        # return tasks
+
+        layout_tasks = [gazu.task.get_task_by_name(shot['shot_id'], layout_task_type) for shot in casted_shots]
+        fx_tasks = [gazu.task.get_task_by_name(shot['shot_id'], fx_task_type) for shot in casted_shots]
+        return casted_shots, layout_tasks, fx_tasks
 
     def dict_check(self, test_dict, code):
         """다른 메소드를 통해 dict값을 받아오려 할 때, 잘못된 입력으로 None이 받아지지 않았는지 체크한다.
@@ -593,7 +604,7 @@ class Houpub:
         if code == 'none':
             raise Exception("There is no dict")
         if code == 'hou':
-            raise Exception("Software input must be hou, hounc, or houlc.")
+            raise Exception("Software input must be hip, hipnc, or hiplc.")
         if code == 'no_task':
             raise Exception("There's no task in entity.")
         if code == 'no_task_in_entity':
@@ -612,6 +623,8 @@ class Houpub:
             raise Exception("No output file found.")
         if code == 'not_asset_shot':
             raise Exception("No shot or asset is assigned.")
+        if code == 'entity_not_assigned':
+            raise Exception("Entity is not assigned")
         if 'no_task_type' in code:
             raise Exception(f"There's no task type named '{code[11:]}")
         if 'no_output_type' in code:
@@ -645,7 +658,7 @@ class Houpub:
             Exception: if self.project doesn't exist.
         """
         self.dict_check(self.project, 'no_project')
-        return [asset['name'] for asset in gazu.asset.all_asset_types_for_project(self.project)]
+        return [asset['name'] for asset in gazu.asset.all_assets_for_project(self.project)]
 
     def get_all_sequences(self):
         """self.project 안의 모든 sequence들을 반환한다. \n
@@ -730,6 +743,21 @@ class Houpub:
         """
         my_projects = [project['name'] for project in gazu.user.all_open_projects()]
         return my_projects
+
+    def append_precomp_list(self, casted_shot):
+        sequence_name = casted_shot['sequence_name']
+        shot_name = casted_shot['shot_name']
+        name = '_'.join([self.project['name'], self.asset['name'], sequence_name, shot_name])
+        self.entity = 'asset'
+        temp_working_path = self.working_file_path('simulation')
+        self.sequence = sequence_name
+        self.shot = shot_name
+        self.entity = 'shot'
+        layout_output_path = self.output_file_path('camera', 'layout')
+        fx_working_path = self.make_next_working_path('FX')
+        video_output_path = self.make_next_output_path('Movie_file', 'FX')
+        precomp = [name, temp_working_path, layout_output_path, fx_working_path, video_output_path]
+        self.precomp_list.append(precomp)
 
     # -----------Unused methods----------
 
@@ -900,3 +928,26 @@ class Houpub:
     #             working = gazu.files.get_last_working_file_revision(task)
     #             paths.append(working['path'] + '.' + ext)
     #     return paths
+
+    # ------------set software-------------
+    # def get_software(self, software_name):
+    #     """houdini의 extension 타입별로 software dict를 반환해준다
+    #
+    #     Args:
+    #         software_name(str): 'hip', 'hipnc', or 'hiplc'
+    #
+    #     Returns:
+    #         Software dict
+    #
+    #     Raises:
+    #         Exception: If software_name is not hip, hipnc, or hiplc.
+    #
+    #     """
+    #     if software_name == 'hip':
+    #         return gazu.files.get_software_by_name('houdini')
+    #     if software_name == 'hipnc':
+    #         return gazu.files.get_software_by_name('houdininc')
+    #     if software_name == 'hpilc':
+    #         return gazu.files.get_software_by_name('houdinilc')
+    #     else:
+    #         self.error('hou')
