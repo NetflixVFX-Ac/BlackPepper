@@ -478,6 +478,13 @@ class Houpub:
         self.dict_check(task, 'no_task_in_entity')
         return task_type, task
 
+    @staticmethod
+    def check_task_status(task):
+        task_status = gazu.task.get_task_status(task['task_status_id'])
+        if task_status['name'] == 'Done':
+            return task
+        return
+
     def get_casting_path_for_asset(self):
         """asset이 casting된 shot과 그 shot의 layout과 FX task를 튜플로 묶어 모든 shot들을 리스트로 반환해준다.
         self.asset이 없을시 작동하지 않는다.
@@ -495,19 +502,7 @@ class Houpub:
         """
         self.dict_check(self.asset, 'no_asset')
         casted_shots = gazu.casting.get_asset_cast_in(self.asset)
-        layout_task_type = gazu.task.get_task_type_by_name('Layout')
-        fx_task_type = gazu.task.get_task_type_by_name('FX')
-
-        # tasks = []
-        # for shot in casted_shots:
-        #     layout_task = gazu.task.get_task_by_name(shot['shot_id'], layout_task_type)
-        #     fx_task = gazu.task.get_task_by_name(shot['shot_id'], fx_task_type)
-        #     tasks.append((shot, layout_task, fx_task))
-        # return tasks
-
-        layout_tasks = [gazu.task.get_task_by_name(shot['shot_id'], layout_task_type) for shot in casted_shots]
-        fx_tasks = [gazu.task.get_task_by_name(shot['shot_id'], fx_task_type) for shot in casted_shots]
-        return casted_shots, layout_tasks, fx_tasks
+        return casted_shots
 
     def dict_check(self, test_dict, code):
         """다른 메소드를 통해 dict값을 받아오려 할 때, 잘못된 입력으로 None이 받아지지 않았는지 체크한다.
@@ -666,6 +661,8 @@ class Houpub:
         self.dict_check(self.project, 'no_project')
         return [asset['name'] for asset in gazu.asset.all_assets_for_project(self.project)]
 
+    # def check_assets_
+
     def get_all_sequences(self):
         """self.project 안의 모든 sequence들을 반환한다. \n
         self.project가 없을 시 작동하지 않는다.
@@ -788,12 +785,14 @@ class Houpub:
         # print(nwp)
 
 
-# pepper = Houpub()
-# pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
-# pepper.software = 'hipnc'
-# pepper.project = 'PEPPER'
-# pepper.asset = 'temp_fire'
-# casted_shots, _, _ = pepper.get_casting_path_for_asset()
+pepper = Houpub()
+pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+pepper.software = 'hipnc'
+pepper.project = 'PEPPER'
+pepper.asset = 'temp_fire'
+casted_shots = pepper.get_casting_path_for_asset()
+for casted_shot in casted_shots:
+    gazu.task.all_tasks_for_shot()
 # for casted_shot in casted_shots:
 #     pepper.make_precomp_dict(casted_shot)
 # print(pepper.precomp_list)
