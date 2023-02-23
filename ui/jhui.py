@@ -13,23 +13,29 @@ class pepper_login(QtWidgets.QMainWindow):
 
     def setup_ui(self):
         self.setCentralWidget(self.login_ui)
-        self.setWindowTitle("UI TEST")
+        self.setWindowTitle("pepper v0.0.1")
         self.show()
         self.login_ui.login_btn.clicked.connect(lambda: self.check_id())
 
     def check_id(self):
         user_id = self.login_ui.input_id.text()
         user_pw = self.login_ui.input_pw.text()
+        user_software = self.login_ui.hipbox.currentText()[1:]
         host = "http://192.168.3.116/api"
         pepper = Houpub()
         pepper.login(host, user_id, user_pw)
-        print(gazu.project.get_project_by_name("PEPPER"))
-        self.next_ui()
+        pepper.software = user_software
+        print(pepper.software)
+        self.open_main_ui()
 
-    def next_ui(self):
+    def open_main_ui(self):
         self.setCentralWidget(self.main_ui)
-        self.setWindowTitle("UI TEST")
+        self.setWindowTitle("pepper v0.0.1")
         self.show()
+        # self.run_main()
+
+    # def run_main(self):
+    #     self.main_ui.listwidget
 
 
 def main():
