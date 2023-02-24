@@ -47,7 +47,7 @@ class Pepi(QtWidgets.QWidget):
         self.project_list = pepper.get_my_projects()
         print(self.project_list)
         # self.ui.listWidget.setText(self.project_list)
-        self.listWidget.textSet(self.project_list)
+        # self.listWidget.textSet(self.project_list)
         # line_edit text 값 가져오기
         # self.ui.listWidget.setText(self.project_list)  # label에 text 설정하기
 
