@@ -8,14 +8,18 @@ id :
 pepper@hook.com
 pw :
 pepperpepper
+
+M V C class 로 나눠보기
+
 """
 
 
 
-class PepiLogin(QtWidgets.QWidget):
+class PepperModel(QtWidgets.QWidget):
 
-    def __init__(self):
+    def __init__(self, data):
         super().__init__()
+        self._data = data
 
         # path
         login_path = "/home/rapa/git/hook/ui_sw/login.ui"
@@ -34,6 +38,19 @@ class PepiLogin(QtWidgets.QWidget):
         self.setCentralWidget(self.login_ui)
         self.setWindowTitle("login_tset")
         self.show()
+
+class PepperVeiw(QtWidgets.QListView):
+
+
+
+
+
+
+
+class PepperController():
+
+
+
 
 
 def main():
