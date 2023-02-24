@@ -35,9 +35,31 @@ class pepper_login(QtWidgets.QMainWindow):
         self.show()
         self.run_main()
 
-    # def run_main(self):
-    #     all_projects = self.pepper.get_all_projects()
-    #     self.main_ui.listwidget
+    def run_main(self):
+        projects = self.pepper.get_all_projects()
+        print(projects)
+        self.main_ui.lwg_projects.clear()
+        self.main_ui.lwg_projects.addItems(projects)
+        self.main_ui.lwg_projects.itemClicked.connect(
+            lambda: self.assign_project(projects[self.main_ui.lwg_projects.currentRow()]))
+        self.main_ui.lwg_templates.itemClicked.connect(
+            lambda: self.castedshots_get(self.all_assets[self.main_ui.lwg_templates.currentRow()]))
+
+    def assign_project(self, project_name):
+        self.pepper.project = project_name
+        self.all_assets = self.pepper.get_all_assets()
+        print(self.all_assets)
+        self.main_ui.lwg_templates.clear()
+        self.main_ui.lwg_shots.clear()
+        self.main_ui.lwg_templates.addItems(self.all_assets)
+
+    def castedshots_get(self, template_name):
+        self.pepper.asset = template_name
+        all_shots, _, _ = self.pepper.get_casting_path_for_asset()
+        print(all_shots)
+        self.main_ui.lwg_shots.clear()
+        for shot in all_shots:
+            self.main_ui.lwg_shots.addItem(shot['shot_name'])
 
 
 def main():
