@@ -1,10 +1,12 @@
 import sys
 from PySide2 import QtWidgets, QtUiTools, QtCore
 from pepper import Houpub
-
-# id : pepper@hook.com
-# pw : pepperpepper
-
+"""
+id :
+pepper@hook.com
+pw :
+pepperpepper
+"""
 loader = QtUiTools.QUiLoader()
 host = "http://192.168.3.116/api"
 login_path = "/home/rapa/git/hook/ui_sw/login.ui"

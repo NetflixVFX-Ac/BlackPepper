@@ -3,8 +3,12 @@ import sys
 from PySide2 import QtWidgets, QtUiTools, QtCore
 # from pepper import Houpub
 
-# id : pepper@hook.com
-# pw : pepperpepper
+"""
+id :
+pepper@hook.com
+pw :
+pepperpepper
+"""
 
 
 
