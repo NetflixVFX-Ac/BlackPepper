@@ -25,12 +25,12 @@ class Pepi(QtWidgets.QWidget):
     def setup_ui(self):
         self.setWindowTitle("pepper v0.0.1 sw")
         self.show()
-        self.login_ui.pushButton.clicked.connect(self.set_login)
+        self.login_ui.login_btn.clicked.connect(self.set_login)
 
     def set_login(self):
 
-        email = self.login_ui.lineEdit.text()
-        pw = self.login_ui.lineEdit_2.text()
+        email = self.login_ui.input_id.text()
+        pw = self.login_ui.input_pw.text()
         sel_software = self.login_ui.hipbox.currentText()[1:]
 
         pepper = Houpub()
@@ -45,12 +45,12 @@ class Pepi(QtWidgets.QWidget):
         self.login_ui.show()
 
     def set_project(self):
-        self.listWidget = []
+        # self.listWidget = []
         pepper = Houpub()
         self.project_list = pepper.get_my_projects()
         print(self.project_list)
         # self.ui.listWidget.setText(self.project_list)
-        self.listWidget.textSet(self.project_list)
+        # self.listWidget.textSet(self.project_list)
         # line_edit text 값 가져오기
         # self.ui.listWidget.setText(self.project_list)  # label에 text 설정하기
 

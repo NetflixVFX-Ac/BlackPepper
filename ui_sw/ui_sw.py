@@ -39,24 +39,23 @@ class PepperModel(QtWidgets.QWidget):
         self.setWindowTitle("login_tset")
         self.show()
 
-class PepperVeiw(QtWidgets.QListView):
-
-
-
-
-
-
-
-class PepperController():
-
-
+# class PepperVeiw(QtWidgets.QListView):
+#
+#
+#
+#
+#
+#
+#
+# class PepperController():
+#     pass
 
 
 
 def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
     app = QtWidgets.QApplication()
-    a = PepiLogin()
+    a = PepperModel()
     a.openLogin()
     sys.exit(app.exec_())
 

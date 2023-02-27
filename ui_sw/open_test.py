@@ -23,14 +23,14 @@ class Pepi(QtWidgets.QWidget):
 
     def setup_ui(self):
         # self.ui.action_Quit.triggered.connect(app.quit)
-        self.ui.pushButton.clicked.connect(self.login_ui)
+        self.ui.login_btn.clicked.connect(self.login_ui)
         # self.ui.comboBox.clicked.connect(self.hipbox)
         # self.ui.listWidget.setText(self.project_list)
 
 
     def login_ui(self):
-        email = self.ui.lineEdit.text()
-        pw = self.ui.lineEdit_2.text()
+        email = self.ui.input_id.text()
+        pw = self.ui.input_pw.text()
         pepper = Houpub()
         pepper.login(host, email, pw)
         print("login 성공")
