@@ -38,7 +38,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Pepper v0.0.1_sw</string>
+        <string>Pepper v0.0.1 sw</string>
        </property>
       </widget>
      </item>
@@ -68,7 +68,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="input_id">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -109,7 +109,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_2">
+      <widget class="QLineEdit" name="input_pw">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -150,7 +150,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QComboBox" name="comboBox">
+        <widget class="QComboBox" name="hipbox">
          <property name="minimumSize">
           <size>
            <width>150</width>
@@ -191,7 +191,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="login_btn">
          <property name="minimumSize">
           <size>
            <width>150</width>
