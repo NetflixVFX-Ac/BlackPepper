@@ -478,6 +478,10 @@ class Houpub:
         self.dict_check(task, 'no_task_in_entity')
         return task_type, task
 
+# ---------------------------------------------
+# ----------- ui 작동에 필요한 메소드들 -----------
+# ---------------------------------------------
+
     def get_casting_path_for_asset(self):
         """asset이 casting된 shot과 그 shot의 layout과 FX task를 튜플로 묶어 모든 shot들을 리스트로 반환해준다.
         self.asset이 없을시 작동하지 않는다.
@@ -487,27 +491,198 @@ class Houpub:
 
         Returns:
             casted_shots: [(shot_1_dict), (shot_2_dict), ...]
-            layout_tasks: [(shot_1_layout_task_dict), (shot_2_layout_task_dict), ...]
-            fx_tasks: [(shot_1_fx_task_dict), (shot_2_fx_task_dict), ...]
 
         Raises:
             Exception: If self.asset doesn't exist.
         """
         self.dict_check(self.asset, 'no_asset')
         casted_shots = gazu.casting.get_asset_cast_in(self.asset)
-        layout_task_type = gazu.task.get_task_type_by_name('Layout')
-        fx_task_type = gazu.task.get_task_type_by_name('FX')
+        # layout_task_type = gazu.task.get_task_type_by_name('Layout')
+        # fx_task_type = gazu.task.get_task_type_by_name('FX')
+        # layout_tasks = [gazu.task.get_task_by_name(shot['shot_id'], layout_task_type) for shot in casted_shots]
+        # fx_tasks = [gazu.task.get_task_by_name(shot['shot_id'], fx_task_type) for shot in casted_shots]
+        return casted_shots
 
-        # tasks = []
-        # for shot in casted_shots:
-        #     layout_task = gazu.task.get_task_by_name(shot['shot_id'], layout_task_type)
-        #     fx_task = gazu.task.get_task_by_name(shot['shot_id'], fx_task_type)
-        #     tasks.append((shot, layout_task, fx_task))
-        # return tasks
+    def make_precomp_dict(self, casted_shot):
+        """shot 별로 houdini에서 필요한 path들을 딕셔너리로 만들어준다. \n
+        이 딕셔너리들은 self.precomp_list에 들어가며,
+        render list가 모두 정리된 뒤 self.precomp_list를 받아서 houdini에서 작업할 수 있다. \n
 
-        layout_tasks = [gazu.task.get_task_by_name(shot['shot_id'], layout_task_type) for shot in casted_shots]
-        fx_tasks = [gazu.task.get_task_by_name(shot['shot_id'], fx_task_type) for shot in casted_shots]
-        return casted_shots, layout_tasks, fx_tasks
+        Example:
+            for shot in render_shots:
+                pepper.make_precomp_dict(shot)
+            return pepper.precomp_dict
+
+        Args:
+            casted_shot(dict): shot dict
+        """
+        sequence_name = casted_shot['sequence_name']
+        shot_name = casted_shot['shot_name']
+        name = '_'.join([self.project['name'], self.asset['name'][5:], sequence_name, shot_name])
+        self.entity = 'asset'
+        temp_working_path = self.working_file_path('simulation')
+        self.sequence = sequence_name
+        self.shot = shot_name
+        self.entity = 'shot'
+        layout_output_path = self.output_file_path('camera', 'layout')
+        fx_working_path = self.make_next_working_path('FX')
+        video_output_path = self.make_next_output_path('Movie_file', 'FX')
+        self.precomp_list.append({'name': name, 'temp_working_path': temp_working_path,
+                                  'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
+                                  'video_output_path': video_output_path})
+
+    def publish_precomp_working(self, precomp):
+        """self.make_precomp_dict 의 정보들로 fx의 working file을 publish 해준다. \n
+        실제 hip 파일이 오류 없이 정상적으로 생성되었을 때 이 메소드를 작동해야 한다.
+
+        Example:
+            for precomp in pepper.precomp_dict:
+                pepper.publish_precomp_working(precomp)
+
+        Args:
+            precomp(dict): make_precomp_dict에서 만든 dict
+        """
+        split_name = precomp['name'].split('_')
+        self.project = split_name[0]
+        self.sequence = split_name[2]
+        self.shot = split_name[3]
+        self.entity = 'shot'
+        self.publish_working_file('FX')
+
+    def publish_precomp_output(self, precomp):
+        """self.make_precomp_dict 의 정보들로 fx의 output file을 publish 해준다. \n
+        실제 mov 파일이 오류 없이 정상적으로 생성되었을 때 이 메소드를 작동해야 한다.
+
+        Example:
+            for precomp in pepper.precomp_dict:
+                pepper.publish_precomp_output(precomp)
+
+        Args:
+            precomp(dict): make_precomp_dict에서 만든 dict
+        """
+        split_name = precomp['name'].split('_')
+        self.project = split_name[0]
+        self.sequence = split_name[2]
+        self.shot = split_name[3]
+        self.entity = 'shot'
+        self.publish_output_file('FX', 'Movie_file', 'test_precomp')
+
+# -------------------------------------------
+# ----------- get all 관련 메소드들 -----------
+# -------------------------------------------
+
+    @staticmethod
+    def get_all_projects():
+        """Host DB 안의 모든 project들을 반환한다.
+
+        Examples:
+            pepper.get_all_projects()
+
+        Returns:
+            ['pepper', 'chopsticks', ...]
+        """
+        return [proj['name'] for proj in gazu.project.all_open_projects()]
+
+    def get_all_assets(self):
+        """self.project안의 모든 asset들을 반환한다. \n
+        self.project가 없을 시 작동하지 않는다.
+
+        Example:
+            pepper.get_all_assets()
+
+        Returns:
+            ['temp_fire', 'temp_waterfall', ...]
+
+        Raises:
+            Exception: if self.project doesn't exist.
+        """
+        self.dict_check(self.project, 'no_project')
+        return [asset['name'] for asset in gazu.asset.all_assets_for_project(self.project)]
+
+    def get_all_sequences(self):
+        """self.project 안의 모든 sequence들을 반환한다. \n
+        self.project가 없을 시 작동하지 않는다.
+
+        Example:
+            pepper.get_all_sequences()
+
+        Returns:
+            ['sq01', 'sq02', ...]
+
+        Raises:
+            Exception: if self.project doesn't exist.
+        """
+        self.dict_check(self.project, 'no_project')
+        return [seq['name'] for seq in gazu.shot.all_sequences_for_project(self.project)]
+
+    def get_all_shots(self):
+        """self.sequence 안의 모든 shot들을 반환한다. \n
+        self.project와 self.sequence가 없을 시 작동하지 않는다.
+
+        Example :
+            pepper.get_all_shots()
+
+        Returns:
+            ['0010', '0020, ...]
+
+        Raises :
+            Exception: If self.project doesn't exist, and if self.sequence doesn't exist.
+        """
+        self.dict_check(self.project, 'no_project')
+        self.dict_check(self.sequence, 'no_sequence')
+        return [shot['name'] for shot in gazu.shot.all_shots_for_sequence(self.sequence)]
+
+    def get_task_types_for_asset(self):
+        """self.asset의 의 모든 task들에 대한 task type을 반환한다. \n
+        self.project가 없을 시 작동하지 않는다.
+
+        Examples:
+            pepper.get_task_types_for_asset()
+
+        Returns:
+            ['simulation', 'FX', ...]
+
+        Raises:
+            Exception: If self.project doesn't exist, and if self.asset doesn't exist.
+        """
+        self.dict_check(self.asset, 'no_asset')
+        return [task_type['name'] for task_type in gazu.task.all_task_types_for_asset(self.asset)]
+
+    def get_casted_assets_for_shot(self):
+        """self.shot에 캐스팅 된 모든 asset의 type name과 asset name을 dict로 반환해준다. \n
+        self.project, self.sequence, self.shot이 없을 시 작동하지 않는다.
+
+        Examples:
+            pepper.get_casted_assets_for_shot()
+
+        Returns:
+            [(asset_type_name: asset_name), (asset_type_name_2: asset_name_2), ...]
+
+        Raises:
+            Exception: If self.project doesn't exist, if self.sequenece doesn't exist, and if self.shot don't exist.
+        """
+        self.dict_check(self.project, 'no_project')
+        self.dict_check(self.sequence, 'no_sequence')
+        self.dict_check(self.shot, 'no_shot')
+        return [(asset['asset_type_name'] + ':' + asset['asset_name'])
+                for asset in gazu.casting.get_shot_casting(self.shot)]
+
+    @staticmethod
+    def get_my_projects():
+        """로그인한 유저가 assign되어있는 모든 project의 이름을 반환한다.
+
+        Examples:
+            pepper.get_my_projects()
+
+        Returns:
+            ['PEPPER', 'Redpepper', ...]
+        """
+        my_projects = [project['name'] for project in gazu.user.all_open_projects()]
+        return my_projects
+
+# --------------------------------------------
+# ----------error handling 관련 메소드----------
+# --------------------------------------------
 
     def dict_check(self, test_dict, code):
         """다른 메소드를 통해 dict값을 받아오려 할 때, 잘못된 입력으로 None이 받아지지 않았는지 체크한다.
@@ -637,155 +812,6 @@ class Houpub:
             raise Exception(f"There's no output type named '{code[13:]}")
         else:
             raise Exception("NO ERROR CODE")
-
-    @staticmethod
-    def get_all_projects():
-        """Host DB 안의 모든 project들을 반환한다.
-
-        Examples:
-            pepper.get_all_projects()
-
-        Returns:
-            ['pepper', 'chopsticks', ...]
-        """
-        return [proj['name'] for proj in gazu.project.all_open_projects()]
-
-    def get_all_assets(self):
-        """self.project안의 모든 asset들을 반환한다. \n
-        self.project가 없을 시 작동하지 않는다.
-
-        Example:
-            pepper.get_all_assets()
-
-        Returns:
-            ['temp_fire', 'temp_waterfall', ...]
-
-        Raises:
-            Exception: if self.project doesn't exist.
-        """
-        self.dict_check(self.project, 'no_project')
-        return [asset['name'] for asset in gazu.asset.all_assets_for_project(self.project)]
-
-    def get_all_sequences(self):
-        """self.project 안의 모든 sequence들을 반환한다. \n
-        self.project가 없을 시 작동하지 않는다.
-
-        Example:
-            pepper.get_all_sequences()
-
-        Raises:
-            Exception: if input is not exists, "No project is assigned."
-
-        Returns:
-            ['sq01', 'sq02', ...]
-
-        Raises:
-            Exception: if self.project doesn't exist.
-        """
-        self.dict_check(self.project, 'no_project')
-        return [seq['name'] for seq in gazu.shot.all_sequences_for_project(self.project)]
-
-    def get_all_shots(self):
-        """self.sequence 안의 모든 shot들을 반환한다. \n
-        self.project와 self.sequence가 없을 시 작동하지 않는다.
-
-        Example :
-            pepper.get_all_shots()
-
-        Returns:
-            ['0010', '0020, ...]
-
-        Raises :
-            Exception: If self.project doesn't exist, and if self.sequence doesn't exist.
-        """
-        self.dict_check(self.project, 'no_project')
-        self.dict_check(self.sequence, 'no_sequence')
-        return [shot['name'] for shot in gazu.shot.all_shots_for_sequence(self.sequence)]
-
-    def get_task_types_for_asset(self):
-        """self.asset의 의 모든 task들에 대한 task type을 반환한다. \n
-        self.project가 없을 시 작동하지 않는다.
-
-        Examples:
-            pepper.get_task_types_for_asset()
-
-        Returns:
-            ['simulation', 'FX', ...]
-
-        Raises:
-            Exception: If self.project doesn't exist, and if self.asset doesn't exist.
-        """
-        self.dict_check(self.asset, 'no_asset')
-        return [task_type['name'] for task_type in gazu.task.all_task_types_for_asset(self.asset)]
-
-    def get_casted_assets_for_shot(self):
-        """self.shot에 캐스팅 된 모든 asset의 type name과 asset name을 dict로 반환해준다. \n
-        self.project, self.sequence, self.shot이 없을 시 작동하지 않는다.
-
-        Examples:
-            pepper.get_casted_assets_for_shot()
-
-        Returns:
-            [(asset_type_name: asset_name), (asset_type_name_2: asset_name_2), ...]
-
-        Raises:
-            Exception: If self.project doesn't exist, if self.sequenece doesn't exist, and if self.shot don't exist.
-        """
-        self.dict_check(self.project, 'no_project')
-        self.dict_check(self.sequence, 'no_sequence')
-        self.dict_check(self.shot, 'no_shot')
-        return [(asset['asset_type_name'] + ':' + asset['asset_name'])
-                for asset in gazu.casting.get_shot_casting(self.shot)]
-
-    @staticmethod
-    def get_my_projects():
-        """로그인한 유저가 assign되어있는 모든 project의 이름을 반환한다.
-
-        Examples:
-            pepper.get_my_projects()
-
-        Returns:
-            ['PEPPER', 'Redpepper', ...]
-        """
-        my_projects = [project['name'] for project in gazu.user.all_open_projects()]
-        return my_projects
-
-    def make_precomp_dict(self, casted_shot):
-        sequence_name = casted_shot['sequence_name']
-        shot_name = casted_shot['shot_name']
-        name = '_'.join([self.project['name'], self.asset['name'][5:], sequence_name, shot_name])
-        self.entity = 'asset'
-        temp_working_path = self.working_file_path('simulation')
-        self.sequence = sequence_name
-        self.shot = shot_name
-        self.entity = 'shot'
-        layout_output_path = self.output_file_path('camera', 'layout')
-        fx_working_path = self.make_next_working_path('FX')
-        video_output_path = self.make_next_output_path('Movie_file', 'FX')
-        self.precomp_list.append({'name': name, 'temp_working_path': temp_working_path,
-                                  'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
-                                  'video_output_path': video_output_path})
-
-    def publish_precomp_working(self, precomp):
-        split_name = precomp['name'].split('_')
-        self.project = split_name[0]
-        self.sequence = split_name[2]
-        self.shot = split_name[3]
-        self.entity = 'shot'
-        self.publish_working_file('FX')
-        # nwp = self.make_next_working_path('FX')
-        # print(nwp)
-
-    def publish_precomp_output(self, precomp):
-        split_name = precomp['name'].split('_')
-        self.project = split_name[0]
-        self.sequence = split_name[2]
-        self.shot = split_name[3]
-        self.entity = 'shot'
-        self.publish_output_file('FX', 'Movie_file', 'test_precomp')
-        self.make_next_output_path('Movie_file', 'FX')
-        # nwp = self.make_next_output_path('Movie_file', 'FX')
-        # print(nwp)
 
 
 # pepper = Houpub()
