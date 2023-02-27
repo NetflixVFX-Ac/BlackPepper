@@ -818,10 +818,14 @@ class Houpub:
 # pepper.software = 'hipnc'
 # pepper.project = 'PEPPER'
 # pepper.asset = 'temp_fire'
-# casted_shots, _, _ = pepper.get_casting_path_for_asset()
+# casted_shots = pepper.get_casting_path_for_asset()
+# for cs in casted_shots:
+#     print(cs)
 # for casted_shot in casted_shots:
 #     pepper.make_precomp_dict(casted_shot)
 # print(pepper.precomp_list)
+# for pc in pepper.precomp_list:
+#     print(pc)
 # for precomp in pepper.precomp_list:
 #     pepper.publish_precomp_working(precomp)
 # for precomp in pepper.precomp_list:
