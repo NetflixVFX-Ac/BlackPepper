@@ -27,7 +27,7 @@ class Houpub:
         유저 id는 self.identif에 저장해 logging이 가능하게 한다.
 
         Examples:
-            pepper.login("http://192.168.3.116/api", "pipeline@rapa.org ", "netflixacademy")
+            pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
 
         Args:
             host(str): host url
@@ -410,7 +410,8 @@ class Houpub:
         self.dict_check(output_type, f'no_output_type{output_type_name}')
         revision_max = gazu.files.get_last_entity_output_revision(self.entity, output_type, task_type, name='main')
         path = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type, revision=revision_max + 1)
-        return path
+        ext = output_type['short_name']
+        return path + '.' + ext
 
     def get_working_revision_max(self, task):
         """해당 task의 마지막 working file의 revision을 반환한다.
@@ -490,16 +491,14 @@ class Houpub:
 
         Returns:
             casted_shots: [(shot_1_dict), (shot_2_dict), ...]
-            layout_tasks: [(shot_1_layout_task_dict), (shot_2_layout_task_dict), ...]
-            fx_tasks: [(shot_1_fx_task_dict), (shot_2_fx_task_dict), ...]
 
         Raises:
             Exception: If self.asset doesn't exist.
         """
         self.dict_check(self.asset, 'no_asset')
         casted_shots = gazu.casting.get_asset_cast_in(self.asset)
-        layout_task_type = gazu.task.get_task_type_by_name('Layout')
-        fx_task_type = gazu.task.get_task_type_by_name('FX')
+        # layout_task_type = gazu.task.get_task_type_by_name('Layout')
+        # fx_task_type = gazu.task.get_task_type_by_name('FX')
         # layout_tasks = [gazu.task.get_task_by_name(shot['shot_id'], layout_task_type) for shot in casted_shots]
         # fx_tasks = [gazu.task.get_task_by_name(shot['shot_id'], fx_task_type) for shot in casted_shots]
         return casted_shots
@@ -525,9 +524,9 @@ class Houpub:
         self.sequence = sequence_name
         self.shot = shot_name
         self.entity = 'shot'
-        layout_output_path = self.output_file_path('camera_cache', 'layout')
+        layout_output_path = self.output_file_path('camera', 'layout')
         fx_working_path = self.make_next_working_path('FX')
-        video_output_path = self.make_next_output_path('jpg_sequence', 'FX')
+        video_output_path = self.make_next_output_path('Movie_file', 'FX')
         self.precomp_list.append({'name': name, 'temp_working_path': temp_working_path,
                                   'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
                                   'video_output_path': video_output_path})
