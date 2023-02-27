@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>PepperMain</class>
+ <widget class="QDialog" name="PepperMain">
   <property name="enabled">
    <bool>true</bool>
   </property>
@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Pepper Main</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <property name="leftMargin">
@@ -112,103 +112,26 @@
      </item>
      <item>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="1" column="2">
-        <widget class="QLabel" name="label_4">
-         <property name="font">
-          <font>
-           <pointsize>16</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Shots</string>
-         </property>
-        </widget>
-       </item>
        <item row="2" column="0">
-        <widget class="QListWidget" name="listWidget">
-         <item>
-          <property name="text">
-           <string>project1</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>project2</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string/>
-          </property>
-         </item>
-        </widget>
+        <widget class="QListView" name="listView_proj"/>
        </item>
-       <item row="2" column="5">
-        <widget class="QListWidget" name="listWidget_4">
+       <item row="2" column="3">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
-          <property name="text">
-           <string>project1_fire_SQ01_0010</string>
-          </property>
+          <widget class="QToolButton" name="append_btn">
+           <property name="text">
+            <string>&gt;</string>
+           </property>
+          </widget>
          </item>
          <item>
-          <property name="text">
-           <string>project2_fog_SQ01_0020</string>
-          </property>
+          <widget class="QToolButton" name="del_btn">
+           <property name="text">
+            <string>&lt;</string>
+           </property>
+          </widget>
          </item>
-         <item>
-          <property name="text">
-           <string/>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QListWidget" name="listWidget_2">
-         <item>
-          <property name="text">
-           <string>fire</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>smoke</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>fog</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>rain</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string/>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="2" column="2">
-        <widget class="QListWidget" name="listWidget_3">
-         <item>
-          <property name="text">
-           <string>SQ01_0010</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>SQ01_0020</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string/>
-          </property>
-         </item>
-        </widget>
+        </layout>
        </item>
        <item row="1" column="5">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -233,33 +156,34 @@
          </item>
         </layout>
        </item>
-       <item row="2" column="3">
-        <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item row="2" column="5">
+        <widget class="QListWidget" name="listWidget_4">
          <item>
-          <widget class="QToolButton" name="append_btn">
-           <property name="text">
-            <string>&gt;</string>
-           </property>
-          </widget>
+          <property name="text">
+           <string>project1_fire_SQ01_0010</string>
+          </property>
          </item>
          <item>
-          <widget class="QToolButton" name="del_btn">
-           <property name="text">
-            <string>&lt;</string>
-           </property>
-          </widget>
+          <property name="text">
+           <string>project2_fog_SQ01_0020</string>
+          </property>
          </item>
-        </layout>
+         <item>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+        </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label">
+       <item row="1" column="2">
+        <widget class="QLabel" name="label_4">
          <property name="font">
           <font>
            <pointsize>16</pointsize>
           </font>
          </property>
          <property name="text">
-          <string>Projects</string>
+          <string>Shots</string>
          </property>
         </widget>
        </item>
@@ -272,6 +196,37 @@
          </property>
          <property name="text">
           <string>Templates</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QListWidget" name="seqsh_list">
+         <item>
+          <property name="text">
+           <string>SQ01_0010</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>SQ01_0020</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>16</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Projects</string>
          </property>
         </widget>
        </item>
@@ -290,6 +245,9 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="2" column="1">
+        <widget class="QListView" name="listView_temp"/>
        </item>
       </layout>
      </item>
