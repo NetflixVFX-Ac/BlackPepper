@@ -12,5 +12,10 @@ class MainModel(QtCore.QAbstractListModel):
             text = self.model[index.row()]
             return text
 
+        # if role == Qt.DecorationRole:
+        #     status, _ = self.todos[index.row()]
+        #     if status:
+        #         return tick
+
     def rowCount(self, index):
         return len(self.model)
