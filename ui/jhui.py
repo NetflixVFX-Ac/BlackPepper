@@ -29,11 +29,11 @@ class pepper_login(QtWidgets.QMainWindow):
         print(self.pepper.software)
         self.open_main_ui()
 
-    # def open_main_ui(self):
-    #     self.setCentralWidget(self.main_ui)
-    #     self.setWindowTitle("pepper v0.0.1")
-    # self.show(
-    #     self.run_main()
+    def open_main_ui(self):
+        self.setCentralWidget(self.main_ui)
+        self.setWindowTitle("pepper v0.0.1")
+        self.show()
+        self.run_main()
 
     def run_main(self):
         projects = self.pepper.get_all_projects()
