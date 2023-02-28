@@ -410,8 +410,7 @@ class Houpub:
         self.dict_check(output_type, f'no_output_type{output_type_name}')
         revision_max = gazu.files.get_last_entity_output_revision(self.entity, output_type, task_type, name='main')
         path = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type, revision=revision_max + 1)
-        ext = output_type['short_name']
-        return path + '.' + ext
+        return path
 
     def get_working_revision_max(self, task):
         """해당 task의 마지막 working file의 revision을 반환한다.
@@ -526,9 +525,9 @@ class Houpub:
         self.sequence = sequence_name
         self.shot = shot_name
         self.entity = 'shot'
-        layout_output_path = self.output_file_path('camera', 'layout')
+        layout_output_path = self.output_file_path('camera_cache', 'layout')
         fx_working_path = self.make_next_working_path('FX')
-        video_output_path = self.make_next_output_path('Movie_file', 'FX')
+        video_output_path = self.make_next_output_path('jpg_sequence', 'FX')
         self.precomp_list.append({'name': name, 'temp_working_path': temp_working_path,
                                   'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
                                   'video_output_path': video_output_path})
