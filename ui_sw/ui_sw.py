@@ -22,8 +22,8 @@ class PepperModel(QtWidgets.QWidget):
         self._data = data
 
         # path
-        login_path = "/home/rapa/git/hook/ui_sw/login.ui"
-        main_path = "/home/rapa/git/hook/ui_sw/main.ui"
+        login_path = "/ui_sw/ui_test/login.ui"
+        main_path = "/ui_sw/ui_test/main.ui"
 
         # Load UI file login & main
         loader = QtUiTools.QUiLoader()

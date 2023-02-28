@@ -9,8 +9,8 @@ pepperpepper
 """
 loader = QtUiTools.QUiLoader()
 host = "http://192.168.3.116/api"
-login_path = "/home/rapa/git/hook/ui_sw/login.ui"
-main_path = "/home/rapa/git/hook/ui_sw/main.ui"
+login_path = "/ui_sw/ui_test/login.ui"
+main_path = "/ui_sw/ui_test/main.ui"
 
 
 class Pepi(QtWidgets.QWidget):

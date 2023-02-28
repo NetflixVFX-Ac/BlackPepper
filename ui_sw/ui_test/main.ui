@@ -103,7 +103,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Pepper v0.0.1</string>
+        <string>Pepper v0.0.1 sw</string>
        </property>
       </widget>
      </item>
@@ -111,9 +111,6 @@
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="2" column="2">
         <widget class="QListView" name="lv_shot"/>
-       </item>
-       <item row="2" column="0">
-        <widget class="QListView" name="lv_proj"/>
        </item>
        <item row="2" column="3">
         <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -132,9 +129,6 @@
           </widget>
          </item>
         </layout>
-       </item>
-       <item row="2" column="5">
-        <widget class="QListView" name="lv_render"/>
        </item>
        <item row="1" column="2">
         <widget class="QLabel" name="label_4">
@@ -164,28 +158,8 @@
          </property>
         </spacer>
        </item>
-       <item row="1" column="5">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QLabel" name="label_5">
-           <property name="font">
-            <font>
-             <pointsize>16</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Render files</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="reset_btn">
-           <property name="text">
-            <string>reset</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+       <item row="2" column="5">
+        <widget class="QListView" name="lv_render"/>
        </item>
        <item row="1" column="1">
         <widget class="QLabel" name="label_2">
@@ -210,6 +184,32 @@
           <string>Projects</string>
          </property>
         </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QListView" name="lv_proj"/>
+       </item>
+       <item row="1" column="5">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="font">
+            <font>
+             <pointsize>16</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Render files</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="reset_btn">
+           <property name="text">
+            <string>reset</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item row="2" column="1">
         <widget class="QListView" name="lv_temp"/>
