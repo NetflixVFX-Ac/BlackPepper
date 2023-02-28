@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PepperMain</class>
- <widget class="QDialog" name="PepperMain">
-  <property name="enabled">
-   <bool>true</bool>
-  </property>
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>744</width>
+    <height>532</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Pepper Main</string>
+   <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <property name="leftMargin">
@@ -106,14 +103,17 @@
         </font>
        </property>
        <property name="text">
-        <string>Pepper v0.0.1 sw</string>
+        <string>Pepper v0.0.1</string>
        </property>
       </widget>
      </item>
      <item>
       <layout class="QGridLayout" name="gridLayout_3">
+       <item row="2" column="2">
+        <widget class="QListView" name="lv_shot"/>
+       </item>
        <item row="2" column="0">
-        <widget class="QListView" name="listView_proj"/>
+        <widget class="QListView" name="lv_proj"/>
        </item>
        <item row="2" column="3">
         <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -132,6 +132,37 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item row="2" column="5">
+        <widget class="QListView" name="lv_render"/>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLabel" name="label_4">
+         <property name="font">
+          <font>
+           <pointsize>16</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Shots</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>50</width>
+           <height>30</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item row="1" column="5">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -156,37 +187,6 @@
          </item>
         </layout>
        </item>
-       <item row="2" column="5">
-        <widget class="QListWidget" name="listWidget_4">
-         <item>
-          <property name="text">
-           <string>project1_fire_SQ01_0010</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>project2_fog_SQ01_0020</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string/>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QLabel" name="label_4">
-         <property name="font">
-          <font>
-           <pointsize>16</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Shots</string>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="1">
         <widget class="QLabel" name="label_2">
          <property name="font">
@@ -197,25 +197,6 @@
          <property name="text">
           <string>Templates</string>
          </property>
-        </widget>
-       </item>
-       <item row="2" column="2">
-        <widget class="QListWidget" name="seqsh_list">
-         <item>
-          <property name="text">
-           <string>SQ01_0010</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>SQ01_0020</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string/>
-          </property>
-         </item>
         </widget>
        </item>
        <item row="1" column="0">
@@ -230,24 +211,8 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>50</width>
-           <height>30</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
        <item row="2" column="1">
-        <widget class="QListView" name="listView_temp"/>
+        <widget class="QListView" name="lv_temp"/>
        </item>
       </layout>
      </item>
