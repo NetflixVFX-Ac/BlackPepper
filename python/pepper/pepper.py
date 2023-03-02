@@ -481,9 +481,9 @@ class Houpub:
         self.dict_check(task, 'no_task_in_entity')
         return task_type, task
 
-# ---------------------------------------------
-# ----------- ui 작동에 필요한 메소드들 -----------
-# ---------------------------------------------
+    # ---------------------------------------------
+    # ----------- ui 작동에 필요한 메소드들 -----------
+    # ---------------------------------------------
 
     def get_casting_path_for_asset(self):
         """asset이 casting된 shot과 그 shot의 layout과 FX task를 튜플로 묶어 모든 shot들을 리스트로 반환해준다.
@@ -579,9 +579,9 @@ class Houpub:
         self.entity = 'shot'
         self.publish_output_file('FX', 'Movie_file', 'test_precomp')
 
-# -------------------------------------------
-# ----------- get all 관련 메소드들 -----------
-# -------------------------------------------
+    # -------------------------------------------
+    # ----------- get all 관련 메소드들 -----------
+    # -------------------------------------------
 
     @staticmethod
     def get_all_projects():
@@ -679,6 +679,10 @@ class Houpub:
         return [(asset['asset_type_name'] + ':' + asset['asset_name'])
                 for asset in gazu.casting.get_shot_casting(self.shot)]
 
+    # ----------------------------------
+    # ----------user 관련 메소드----------
+    # ----------------------------------
+
     @staticmethod
     def get_my_projects():
         """로그인한 유저가 assign되어있는 모든 project의 이름을 반환한다.
@@ -692,9 +696,30 @@ class Houpub:
         my_projects = [project['name'] for project in gazu.user.all_open_projects()]
         return my_projects
 
-# --------------------------------------------
-# ----------error handling 관련 메소드----------
-# --------------------------------------------
+    def get_working_file_data(self, task_type_name, entity_type):
+        self.entity = entity_type
+        _, task = self.get_task(task_type_name)
+        working_file = gazu.files.get_last_working_files(task)
+        created_time = working_file['main']['created_at']
+        rev = working_file['main']['revision']
+        person_id = working_file['main']['person_id']
+        person = gazu.person.get_person(person_id)
+        return person['first_name'] + person['last_name'], created_time, rev
+
+    def get_output_file_data(self, output_type_name, task_type_name, entity_type):
+        self.entity = entity_type
+        task_type, _ = self.get_task(task_type_name)
+        output_type = gazu.files.get_output_type_by_name(output_type_name)
+        output_file = gazu.files.get_last_output_files_for_entity(self.entity, output_type, task_type)[0]
+        rev = output_file['revision']
+        created_time = output_file['created_at']
+        person_id = output_file['person_id']
+        person = gazu.person.get_person(person_id)
+        return person['first_name'] + person['last_name'], created_time, rev
+
+    # --------------------------------------------
+    # ----------error handling 관련 메소드----------
+    # --------------------------------------------
 
     def dict_check(self, test_dict, code):
         """다른 메소드를 통해 dict값을 받아오려 할 때, 잘못된 입력으로 None이 받아지지 않았는지 체크한다.
