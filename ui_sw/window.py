@@ -32,6 +32,7 @@ class MainWindow:
 
     def __init__(self):
         super().__init__()
+        self.render_selection = None
         self.shots_selection = None
 
         self.get_shots = None
@@ -79,6 +80,9 @@ class MainWindow:
 
         self.window_main.add_btn.clicked.connect(self.add_render_file)
         # self.window_main.del_btn.clicked.connect(self.del_render_file)
+        self.window_main.reset_btn.clicked.connect(self.reset_render_file)
+
+
 
     def set_login(self):
         email = self.window_login.input_id.text()
@@ -102,9 +106,12 @@ class MainWindow:
         # setModel
         self.window_main.lv_proj.setModel(self.model_proj)
         self.window_main.lv_temp.setModel(self.model_temp)
+
         self.window_main.lv_shot.setModel(self.model_shot)
         self.shots_selection = self.window_main.lv_shot.selectionModel()
+
         self.window_main.lv_render.setModel(self.model_render)
+        self.render_selection = self.window_main.lv_render.selectionModel()
 
         # get my project
         self.get_projects = self.pepper.get_my_projects()
@@ -163,6 +170,8 @@ class MainWindow:
 
         """
         # event
+        # self.shots_selection.clear()
+
         casted_shot = self.get_casting_shots[event.row()]
         print(casted_shot)
 
@@ -173,8 +182,6 @@ class MainWindow:
 
         self.model_render.layoutChanged.emit()
 
-
-
     def add_render_file(self):
         """
         add_btn 을 설정하는 함수이다.
@@ -182,6 +189,9 @@ class MainWindow:
         add_btn 을 clicked 하면 lv_render(liseview) 에 추가 한다.
         render files listview 에 있는 render 할 파일목록들을
         """
+        for idx in self.shots_selection.selectedRows():
+            shot_dict = self.get_casting_shots[idx.row()]
+            self.pepper.make_precomp_dict(shot_dict)
         precomp = None
         # self.choice_shot(event)
         # casted_shot = self.get_casting_shots[event.row()]
@@ -190,16 +200,23 @@ class MainWindow:
         # self.pepper.make_precomp_dict(casted_shot)
         # self.model_render.model.clear()
         for precomp in self.pepper.precomp_list:
-            # return
-            self.model_render.model.append(precomp["name"])
-            # return
+            if precomp["name"] not in self.model_render.model:
+                self.model_render.model.append(precomp["name"])
         self.model_render.layoutChanged.emit()
+        self.shots_selection.clear()
+        # self.render_selection.clear()
 
     def del_render_file(self):
-        pass
+        add_renderfile = None
+        if add_renderfile["name"] in self.model_render.model:
+            self.model_reder.model.clear(add_renderfile["name"])
+        self.model_render.layoutChanged.emit()
 
     def reset_render_file(self):
-        pass
+        self.pepper.precomp_list = None
+        self.model_render.model.clear()
+        self.model_render.layoutChanged.emit()
+
 
     def choice_render(self, event):
 
@@ -211,6 +228,7 @@ class MainWindow:
 
     def shot_info(self):
         pass
+
 
     # def keyPressEvent(self, e):
     #
