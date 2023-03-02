@@ -216,7 +216,7 @@
         </spacer>
        </item>
        <item row="2" column="5">
-        <widget class="QListView" name="lv_shot_2">
+        <widget class="QListView" name="lv_render">
          <property name="selectionMode">
           <enum>QAbstractItemView::MultiSelection</enum>
          </property>
