@@ -530,9 +530,18 @@ class Houpub:
         layout_output_path = self.output_file_path('camera_cache', 'layout')
         fx_working_path = self.make_next_working_path('FX')
         video_output_path = self.make_next_output_path('jpg_sequence', 'FX')
-        self.precomp_list.append({'name': name, 'temp_working_path': temp_working_path,
-                                  'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
-                                  'video_output_path': video_output_path})
+        precomp = {'name': name, 'temp_working_path': temp_working_path,
+                   'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
+                   'video_output_path': video_output_path}
+        if precomp in self.precomp_list:
+            return
+        self.precomp_list.append(precomp)
+        return
+
+    def delete_precomp_dict(self, name):
+        for precomp in self.precomp_list:
+            if precomp['name'] == name:
+                self.precomp_list.remove(precomp)
 
     def publish_precomp_working(self, precomp):
         """self.make_precomp_dict 의 정보들로 fx의 working file을 publish 해준다. \n
@@ -824,8 +833,8 @@ class Houpub:
 # pepper.asset = 'temp_dancing_particle'
 # css = pepper.get_casting_path_for_asset()
 # for cs in css:
-#     pepper.sequence = cs['sequence_name']
-#     pepper.shot = cs['shot_name']
+#     pepper.make_precomp_dict(cs)
+# pepper.delete_precomp_dict('PEPPER_dancing_particle_SQ01_0040')
 # pepper.entity = 'shot'
 # nwp = pepper.make_next_working_path('FX')
 # nop = pepper.make_next_output_path('test', 'FX')
