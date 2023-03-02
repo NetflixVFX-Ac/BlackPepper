@@ -28,10 +28,12 @@ class MainWindow:
         self.shots_listview = PepperView(self)
         self.renderlists_listview = PepperView(self)
         self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
         self.projects_selection = None
         self.templates_selection = None
+        self.shots_selection = None
+        self.renderlists_selection = None
 
         login_ui_path = '/home/rapa/login.ui'
         self.login_ui = QtCore.QFile(login_ui_path)
@@ -85,11 +87,13 @@ class MainWindow:
         self.window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
 
         self.projects_listview.setModel(self.project_model)
-        self.projects_selection = self.projects_listview.selectionModel()
         self.templates_listview.setModel(self.template_model)
-        self.templates_selection = self.templates_listview.selectionModel()
         self.shots_listview.setModel(self.shot_model)
         self.renderlists_listview.setModel(self.render_model)
+        self.projects_selection = self.projects_listview.selectionModel()
+        self.templates_selection = self.templates_listview.selectionModel()
+        self.shots_selection = self.shots_listview.selectionModel()
+        self.renderlists_selection = self.renderlists_listview.selectionModel()
 
         self.my_projects = self.pepper.get_my_projects()
         for my_project in self.my_projects:
@@ -128,6 +132,7 @@ class MainWindow:
         for shot in self.all_shots:
             self.shot_model.pepperlist.append(shot['sequence_name'] + '_' + shot['shot_name'])
         self.shot_model.layoutChanged.emit()
+        self.shots_selection.clear()
 
     def shot_selected(self, event):
         shot_dict = self.all_shots[event.row()]
@@ -148,4 +153,3 @@ QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
 app = QtWidgets.QApplication(sys.argv)
 window = MainWindow()
 app.exec_()
-
