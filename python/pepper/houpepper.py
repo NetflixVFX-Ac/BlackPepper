@@ -261,7 +261,6 @@ for shot in casted_shots:
     layout_output_path = pepper.output_file_path(output_type_name, layout_type_name)
     pepper.software = 'hipnc'
     fx_type_name = 'fx'
-    # pepper.publish_working_file(fx_type_name)
     fx_path = pepper.working_file_path(fx_type_name)
     next_fx_path = pepper.make_next_working_path(fx_type_name)
     output_type_name = "JPG"
