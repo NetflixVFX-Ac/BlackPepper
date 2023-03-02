@@ -1,3 +1,11 @@
+"""
+
+login.ui를 불러와서 사용자가 Login 버튼을 누르면 login.ui 창을 닫고 main.ui 창을 연다.
+
+Qt디자이너 에서 설정한 ui 를 가져와서 listview와 Model.py를 컨트롤한다.
+
+"""
+
 import sys
 from PySide2 import QtCore, QtWidgets
 # from PySide2.QtWidgets import QWidget
@@ -24,6 +32,7 @@ class MainWindow:
     def __init__(self):
         super().__init__()
 
+        self.get_shots = None
         self.get_casting_shots = None
         self.get_assets = None
         self.get_projects = None
@@ -57,9 +66,13 @@ class MainWindow:
 
         # set connect Ui
         self.window_login.login_btn.clicked.connect(self.set_login)
+
         self.window_main.lv_proj.clicked.connect(self.choice_project)
         self.window_main.lv_temp.clicked.connect(self.choice_temp)
         self.window_main.lv_shot.clicked.connect(self.choice_shot)
+
+        self.window_main.add_btn.clicked.connect(self.add_render_file)
+        # self.window_main.del_btn.clicked.connect(self.del_render_file)
 
     def set_login(self):
         email = self.window_login.input_id.text()
@@ -114,6 +127,7 @@ class MainWindow:
         # reset 시그널! emit !
         self.model_temp.layoutChanged.emit()
 
+
     def choice_temp(self, event):
         # setModel
         self.window_main.lv_shot.setModel(self.model_shot)
@@ -127,11 +141,68 @@ class MainWindow:
         for get_casting_shot in self.get_casting_shots:
             self.model_shot.model.append(get_casting_shot["sequence_name"]+"_"+get_casting_shot["shot_name"])
         print(f"{template_name}_casting_shots = {get_casting_shot['sequence_name']+'_'+get_casting_shot['shot_name']}")
-
         self.model_shot.layoutChanged.emit()
 
-    def choice_shot(self, event):
 
+    def choice_shot(self, event):
+        """
+        샷 리스트를 선택하면 정보를 가져온다 . 이정보를 add_btn 에서 사용한다.
+        Args:
+            event:
+
+        Returns:
+
+        """
+        precomp = None
+        # setModel
+        self.window_main.lv_render.setModel(self.model_render)
+
+
+        # event
+        shot_name = self.get_casting_shots[event.row()]
+        print(shot_name)
+        # self.pick_precomp = shot_name
+        self.pepper.make_precomp_dict(shot_name)
+        self.model_render.model.clear()
+
+        # for precomp in self.pepper.precomp_list:
+        #         self.model_render.model.append(precomp["name"])
+        # self.model_render.layoutChanged.emit()
+
+    def choice_render(self, event):
+
+        self.window_main.lv_render.setModel(self.model_render)
+
+        pass
+
+    def add_render_file(self, event):
+        """
+        add_btn 을 설정하는 함수이다.
+        lv_shot (listview)  pepper.get_casting_path_for_asset 된 seq_name , shot_name 을 click 하고
+        add_btn 을 clicked 하면 lv_render(liseview) 에 추가 한다.
+        render files listview 에 있는 render 할 파일목록들을
+        """
+        self.window_main.lv_render.setModel(self.model_render)
+        shot_name = self.get_casting_shots[event.row()]
+        # text = self.window.todoEdit.text()
+        self.pepper.make_precomp_dict(shot_name)
+        self.model_render.model.clear()
+
+        for precomp in self.pepper.precomp_list:
+                self.model_render.model.append(precomp["name"])
+        self.model_render.layoutChanged.emit()
+        if text:  # Don't add empty strings.
+            # Access the list via the model.
+            self.model_render.model.append(text)
+            # Trigger refresh.
+            self.model_render.layoutChanged.emit()
+            #  Empty the input
+            self.window_main.lv_render.setText("")
+
+    def del_render_file(self):
+        pass
+
+    def reset_render_file(self):
         pass
 
 
