@@ -165,6 +165,31 @@
          </item>
         </layout>
        </item>
+<<<<<<< HEAD
+=======
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_2">
+         <property name="font">
+          <font>
+           <pointsize>16</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Templates</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QListView" name="lv_temp"/>
+       </item>
+       <item row="2" column="2">
+        <widget class="QListView" name="lv_shot">
+         <property name="selectionMode">
+          <enum>QAbstractItemView::MultiSelection</enum>
+         </property>
+        </widget>
+       </item>
+>>>>>>> 1052d7c51d66d45e05174f0fa7fbbedcc346b894
        <item row="0" column="0">
         <spacer name="verticalSpacer">
          <property name="orientation">
@@ -206,6 +231,7 @@
         </widget>
        </item>
        <item row="2" column="5">
+<<<<<<< HEAD
         <widget class="QListView" name="lv_render"/>
        </item>
        <item row="2" column="1">
@@ -213,6 +239,13 @@
        </item>
        <item row="2" column="2">
         <widget class="QListView" name="lv_shot"/>
+=======
+        <widget class="QListView" name="lv_shot_2">
+         <property name="selectionMode">
+          <enum>QAbstractItemView::MultiSelection</enum>
+         </property>
+        </widget>
+>>>>>>> 1052d7c51d66d45e05174f0fa7fbbedcc346b894
        </item>
       </layout>
      </item>
