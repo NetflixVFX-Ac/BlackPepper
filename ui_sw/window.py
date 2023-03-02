@@ -32,6 +32,7 @@ class MainWindow:
 
     def __init__(self):
         super().__init__()
+        self.shots_selection = None
 
         self.get_shots = None
         self.get_casting_shots = None
@@ -102,6 +103,7 @@ class MainWindow:
         self.window_main.lv_proj.setModel(self.model_proj)
         self.window_main.lv_temp.setModel(self.model_temp)
         self.window_main.lv_shot.setModel(self.model_shot)
+        self.shots_selection = self.window_main.lv_shot.selectionModel()
         self.window_main.lv_render.setModel(self.model_render)
 
         # get my project
@@ -129,6 +131,7 @@ class MainWindow:
         self.get_assets = self.pepper.get_all_assets()
         print(f"project_name : {project_name} get_assets = {self.get_assets}")
         self.model_temp.model.clear()
+        self.model_shot.model.clear()
 
         # temp list asset append
         for get_asset in self.get_assets:
@@ -151,6 +154,8 @@ class MainWindow:
         print(
             f"{template_name}_casting_shots = {get_casting_shot['sequence_name'] + '_' + get_casting_shot['shot_name']}")
         self.model_shot.layoutChanged.emit()
+        self.shots_selection.clear()
+
 
     def choice_shot(self, event):
         """
@@ -160,13 +165,15 @@ class MainWindow:
         # event
         casted_shot = self.get_casting_shots[event.row()]
         print(casted_shot)
-        self.model_render.model.clear()
+
         self.pepper.make_precomp_dict(casted_shot)
-        self.model_render.layoutChanged.emit()
-        #
+        # self.model_shot.model.clear()
         # for precomp in self.pepper.precomp_list:
         #         self.model_render.model.append(precomp["name"])
-        # self.model_render.layoutChanged.emit()
+
+        self.model_render.layoutChanged.emit()
+
+
 
     def add_render_file(self):
         """
@@ -181,9 +188,11 @@ class MainWindow:
         # selectedrow
         # text = self.window.todoEdit.text()
         # self.pepper.make_precomp_dict(casted_shot)
-        self.model_render.model.clear()
+        # self.model_render.model.clear()
         for precomp in self.pepper.precomp_list:
+            # return
             self.model_render.model.append(precomp["name"])
+            # return
         self.model_render.layoutChanged.emit()
 
     def del_render_file(self):
