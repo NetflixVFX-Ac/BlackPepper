@@ -1,9 +1,9 @@
 import sys
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
-from ui.mvc import model
-from ui.mvc.view import PepperView
-from python.pepper.pepper import Houpub
+from hook.ui.mvc import model
+from hook.ui.mvc.view import PepperView
+from hook.python.pepper.pepper import Houpub
 
 # class ProjectView(QtWidgets.QListView):
 #     def __init__(self, parent):
