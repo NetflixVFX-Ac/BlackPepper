@@ -5,15 +5,6 @@ from hook.ui.mvc import model
 from hook.ui.mvc.view import PepperView
 from hook.python.pepper.pepper import Houpub
 
-# class ProjectView(QtWidgets.QListView):
-#     def __init__(self, parent):
-#         super(ProjectView, self).__init__(parent=None)
-#
-#     def get_selected_project(self):
-#         if not self.model():
-#             return
-#         return self.model().selectedIndexes()[-1]
-
 
 class MainWindow:
     def __init__(self):
@@ -35,13 +26,11 @@ class MainWindow:
         self.shots_selection = None
         self.renderlists_selection = None
 
-        login_ui_path = '/home/rapa/login.ui'
-        self.login_ui = QtCore.QFile(login_ui_path)
+        self.login_ui = QtCore.QFile('mvc_login.ui')
         self.login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
 
-        main_ui_path = '/home/rapa/main.ui'
-        self.main_ui = QtCore.QFile(main_ui_path)
+        self.main_ui = QtCore.QFile('mvc_main.ui')
         self.main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
 
@@ -54,21 +43,6 @@ class MainWindow:
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
-
-        # self.window = self.main_ui_loader.load(self.main_ui)
-        # self.window.lv_proj.setModel(self.project_model)
-        # self.window.lv_temp.setModel(self.template_model)
-        # self.window.lv_shot.setModel(self.shot_model)
-        # self.window.lv_rend.setModel(self.render_model)
-        # self.pepper = Houpub()
-        # self.pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
-        # ppp = self.pepper.get_self.my_projects()
-        # for i in ppp:
-        #     self.project_model.projects.append(i)
-        #     self.template_model.templates.append(i)
-        #     self.shot_model.shots.append(i)
-        #     self.render_model.renders.append(i)
-        # self.window.addButton.pressed.connect(self.add)
 
     def user_login(self):
         user_id = self.window.input_id.text()
@@ -104,7 +78,7 @@ class MainWindow:
         self.window.show()
         self.projects_listview.clicked.connect(self.project_selected)
         self.templates_listview.clicked.connect(self.template_selected)
-        # self.shots_listview.clicked.connect(self.shot_selected)
+        self.shots_listview.clicked.connect(self.shot_selected)
         self.window.reset_btn.clicked.connect(self.clear_list)
         self.window.render_btn.clicked.connect(self.render_execute)
         self.window.append_btn.clicked.connect(self.append_render_list)
@@ -128,6 +102,10 @@ class MainWindow:
     def template_selected(self, event):
         template_name = self.all_assets[event.row()]
         self.pepper.asset = template_name
+
+        name, time, rev = self.pepper.get_working_file_data('simulation', 'asset')
+        self.window.template_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
+
         self.all_shots = self.pepper.get_casting_path_for_asset()
         self.shot_model.pepperlist.clear()
         for shot in self.all_shots:
@@ -137,6 +115,12 @@ class MainWindow:
 
     def shot_selected(self, event):
         shot_dict = self.all_shots[event.row()]
+        self.pepper.sequence = shot_dict['sequence_name']
+        self.pepper.shot = shot_dict['shot_name']
+        # self.pepper.get_output_file_data('camera_cache', 'layout', 'shot')
+        name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', 'shot')
+        self.window.shot_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
+
         self.pepper.make_precomp_dict(shot_dict)
         self.render_model.pepperlist.clear()
         for render in self.pepper.precomp_list:
