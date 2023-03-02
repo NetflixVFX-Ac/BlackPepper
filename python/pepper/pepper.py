@@ -353,7 +353,11 @@ class Houpub:
         self.args_str_check(task_type_name)
         _, task = self.get_task(task_type_name)
         self.dict_check(task, 'no_task_in_entity')
-        revision_max = self.get_working_revision_max(task)
+        last_working_file = gazu.files.get_last_working_file_revision(task)
+        if last_working_file is None:
+            revision_max = 0
+        else:
+            revision_max = self.get_working_revision_max(task)
         path = gazu.files.build_working_file_path(task, revision=revision_max + 1)
         return path
 
@@ -806,21 +810,27 @@ class Houpub:
         if code == 'entity_not_assigned':
             raise Exception("Entity is not assigned")
         if 'no_task_type' in code:
-            raise Exception(f"There's no task type named '{code[11:]}")
+            raise Exception(f"There's no task type named '{code[12:]}'")
         if 'no_output_type' in code:
-            raise Exception(f"There's no output type named '{code[13:]}")
+            raise Exception(f"There's no output type named '{code[14:]}'")
         else:
             raise Exception("NO ERROR CODE")
 
 
-# pepper = Houpub()
-# pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
-# pepper.software = 'hipnc'
-# pepper.project = 'PEPPER'
-# pepper.asset = 'temp_fire'
-# casted_shots = pepper.get_casting_path_for_asset()
-# for cs in casted_shots:
-#     print(cs)
+pepper = Houpub()
+pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+pepper.software = 'hipnc'
+pepper.project = 'PEPPER'
+pepper.asset = 'temp_dancing_particle'
+css = pepper.get_casting_path_for_asset()
+for cs in css:
+    pepper.sequence = cs['sequence_name']
+    pepper.shot = cs['shot_name']
+pepper.entity = 'shot'
+nwp = pepper.make_next_working_path('FX')
+# nop = pepper.make_next_output_path('test', 'FX')
+print(nwp)
+
 # for casted_shot in casted_shots:
 #     pepper.make_precomp_dict(casted_shot)
 # print(pepper.precomp_list)
@@ -831,195 +841,195 @@ class Houpub:
 # for precomp in pepper.precomp_list:
 #     pepper.publish_precomp_output(precomp)
 
-    # -----------Unused methods----------
+# -----------Unused methods----------
 
-    # -----Login-----
+# -----Login-----
 
-    # @property
-    # def host(self):
-    #     return self._host
+# @property
+# def host(self):
+#     return self._host
 
-    # @host.setter
-    # def host(self, path):
-    #     self._host = path
+# @host.setter
+# def host(self, path):
+#     self._host = path
 
-    # @property
-    # def identify(self):
-    #     return self._identify
+# @property
+# def identify(self):
+#     return self._identify
 
-    # @identify.setter
-    # def identify(self, id_pw):
-    #     self._identify = id_pw
+# @identify.setter
+# def identify(self, id_pw):
+#     self._identify = id_pw
 
-    # def login(self):
-    #     gazu.client.set_host(self.host)
-    #     gazu.log_in(self.identify[0], self.identify[1])
+# def login(self):
+#     gazu.client.set_host(self.host)
+#     gazu.log_in(self.identify[0], self.identify[1])
 
-    # -----Making new entities-----
+# -----Making new entities-----
 
-    # def new_project(self, proj_name):
-    #     if gazu.project.get_project_by_name(proj_name) is None:
-    #         gazu.project.new_project(proj_name, asset_types=self._asset_types, task_types=self._task_types)
+# def new_project(self, proj_name):
+#     if gazu.project.get_project_by_name(proj_name) is None:
+#         gazu.project.new_project(proj_name, asset_types=self._asset_types, task_types=self._task_types)
 
-    # def new_sequence(self, seq_name):
-    #     if gazu.shot.get_sequence_by_name(self.project, seq_name) is None:
-    #         gazu.shot.new_sequence(self.project, seq_name)
+# def new_sequence(self, seq_name):
+#     if gazu.shot.get_sequence_by_name(self.project, seq_name) is None:
+#         gazu.shot.new_sequence(self.project, seq_name)
 
-    # def new_shot(self, shot_name):
-    #     if gazu.entity.get_entity_by_name(shot_name) is None:
-    #         gazu.shot.new_shot(self.project, self.sequence, shot_name)
+# def new_shot(self, shot_name):
+#     if gazu.entity.get_entity_by_name(shot_name) is None:
+#         gazu.shot.new_shot(self.project, self.sequence, shot_name)
 
-    # def new_asset(self, asset_name, asset_type_name):
-    #     asset_type = gazu.asset.get_asset_type_by_name(asset_type_name)
-    #     if asset_type is None:
-    #         return
-    #     if gazu.asset.get_asset_by_name(self.project, asset_name, asset_type) is None:
-    #         gazu.asset.new_asset(self.project, asset_type, asset_name)
+# def new_asset(self, asset_name, asset_type_name):
+#     asset_type = gazu.asset.get_asset_type_by_name(asset_type_name)
+#     if asset_type is None:
+#         return
+#     if gazu.asset.get_asset_by_name(self.project, asset_name, asset_type) is None:
+#         gazu.asset.new_asset(self.project, asset_type, asset_name)
 
-    # -----Making local directories-----
+# -----Making local directories-----
 
-    # def make_working_dirs(self):
-    #     for shot in gazu.shot.all_shots_for_project(self.project):
-    #         for task in gazu.task.all_tasks_for_shot(shot):
-    #             working_file_path = os.path.dirname(
-    #                 gazu.files.build_working_file_path(task)
-    #             )
-    #             rev = self.get_revision(task)
-    #             for rev in range(1, rev + 1):
-    #                 rev_path = os.path.join(working_file_path, f'v{rev:03}')
-    #                 self.make_dirs(rev_path)
+# def make_working_dirs(self):
+#     for shot in gazu.shot.all_shots_for_project(self.project):
+#         for task in gazu.task.all_tasks_for_shot(shot):
+#             working_file_path = os.path.dirname(
+#                 gazu.files.build_working_file_path(task)
+#             )
+#             rev = self.get_revision(task)
+#             for rev in range(1, rev + 1):
+#                 rev_path = os.path.join(working_file_path, f'v{rev:03}')
+#                 self.make_dirs(rev_path)
 
-    # def make_output_dirs(self, task_type, output_type):
-    #     task_type = gazu.task.get_task_type_by_name(task_type)
-    #     output_type = gazu.files.get_output_type_by_name(output_type)
-    # gazu.entity.get_entity_by_name(shot)
-    # a = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type)
+# def make_output_dirs(self, task_type, output_type):
+#     task_type = gazu.task.get_task_type_by_name(task_type)
+#     output_type = gazu.files.get_output_type_by_name(output_type)
+# gazu.entity.get_entity_by_name(shot)
+# a = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type)
 
-    # @staticmethod
-    # def make_dirs(dir_path):
-    #     if os.path.exists(dir_path):
-    #         print("Path exists", dir_path)
-    #         pass
-    #     else:
-    #         print("Path made", dir_path)
-    #         os.makedirs(dir_path)
+# @staticmethod
+# def make_dirs(dir_path):
+#     if os.path.exists(dir_path):
+#         print("Path exists", dir_path)
+#         pass
+#     else:
+#         print("Path made", dir_path)
+#         os.makedirs(dir_path)
 
-    # @staticmethod
-    #     def find_shot(dirs, inp):
-    #         for arg in dirs:
-    #             if arg['name'] == inp:
-    #                 return inp
-    #             else:
-    #                 pass
-    #         raise
+# @staticmethod
+#     def find_shot(dirs, inp):
+#         for arg in dirs:
+#             if arg['name'] == inp:
+#                 return inp
+#             else:
+#                 pass
+#         raise
 
-    # -----Download & uplaad-----
+# -----Download & uplaad-----
 
-    # def upload_working_file(self, task_type_name, path):
-    #     _, task = self.get_task(task_type_name)
-    #     working_file = gazu.files.get_last_working_file_revision(task)
-    #     gazu.files.upload_working_file(working_file, path)
+# def upload_working_file(self, task_type_name, path):
+#     _, task = self.get_task(task_type_name)
+#     working_file = gazu.files.get_last_working_file_revision(task)
+#     gazu.files.upload_working_file(working_file, path)
 
-    # def download_working_file(self, task_type_name, path):
-    #     _, task = self.get_task(task_type_name)
-    #     working = gazu.files.get_last_working_file_revision(task)
-    #     filename = working['path'].split(os.sep)[-1:][0]
-    #     gazu.files.download_working_file(working, file_path=os.path.join(path, filename))
+# def download_working_file(self, task_type_name, path):
+#     _, task = self.get_task(task_type_name)
+#     working = gazu.files.get_last_working_file_revision(task)
+#     filename = working['path'].split(os.sep)[-1:][0]
+#     gazu.files.download_working_file(working, file_path=os.path.join(path, filename))
 
-    # ----------asset type & task type-----------
+# ----------asset type & task type-----------
 
-    # @property
-    # def asset_types(self):
-    #     return self._asset_types
-    #
-    # @asset_types.setter
-    # def asset_types(self, *args):
-    #     self._asset_types = [*args]
-    #
-    # @property
-    # def task_types(self):
-    #     return self._task_types
-    #
-    # @task_types.setter
-    # def task_types(self, *args):
-    #     self._task_types = [*args]
-    #
-    # def add_task_to_entity(self, task_type_name):
-    #     task_type = gazu.task.get_task_type_by_name(task_type_name)
-    #     if task_type is None:
-    #         return
-    #     gazu.task.new_task(self.entity, task_type)
-    #
-    # @staticmethod
-    # def new_asset_type(asset_type_name):
-    #     gazu.asset.new_asset_type(asset_type_name)
+# @property
+# def asset_types(self):
+#     return self._asset_types
+#
+# @asset_types.setter
+# def asset_types(self, *args):
+#     self._asset_types = [*args]
+#
+# @property
+# def task_types(self):
+#     return self._task_types
+#
+# @task_types.setter
+# def task_types(self, *args):
+#     self._task_types = [*args]
+#
+# def add_task_to_entity(self, task_type_name):
+#     task_type = gazu.task.get_task_type_by_name(task_type_name)
+#     if task_type is None:
+#         return
+#     gazu.task.new_task(self.entity, task_type)
+#
+# @staticmethod
+# def new_asset_type(asset_type_name):
+#     gazu.asset.new_asset_type(asset_type_name)
 
-    # ----------casting----------
+# ----------casting----------
 
-    # def casting_multiple_assets(self, *args):
-    #     asset_castings = gazu.casting.get_shot_casting(self.shot)
-    #     for asset_name in args:
-    #         asset = gazu.asset.get_asset_by_name(self.project, asset_name)
-    #         new_casting = {"asset_id": asset['id'], "nb_occurences": 1}
-    #         asset_castings.append(new_casting)
-    #     gazu.casting.update_shot_casting(self.project, self.shot, casting=asset_castings)
-    #
-    # def casting_create(self, nb):
-    #     asset_castings = gazu.casting.get_shot_casting(self.shot)
-    #     new_casting = {"asset_id": self.asset['id'], "nb_occurences": nb}
-    #     asset_castings.append(new_casting)
-    #     gazu.casting.update_shot_casting(self.project, self.shot, casting=asset_castings)
-    #
-    # def casting_delete(self):
-    #     asset_name = self.asset['name']
-    #     asset_castings = gazu.casting.get_shot_casting(self.shot)
-    #     filtered_assets = [asset for asset in asset_castings if asset_name != asset['asset_name']]
-    #     gazu.casting.update_shot_casting(self.project, self.shot, casting=filtered_assets)
+# def casting_multiple_assets(self, *args):
+#     asset_castings = gazu.casting.get_shot_casting(self.shot)
+#     for asset_name in args:
+#         asset = gazu.asset.get_asset_by_name(self.project, asset_name)
+#         new_casting = {"asset_id": asset['id'], "nb_occurences": 1}
+#         asset_castings.append(new_casting)
+#     gazu.casting.update_shot_casting(self.project, self.shot, casting=asset_castings)
+#
+# def casting_create(self, nb):
+#     asset_castings = gazu.casting.get_shot_casting(self.shot)
+#     new_casting = {"asset_id": self.asset['id'], "nb_occurences": nb}
+#     asset_castings.append(new_casting)
+#     gazu.casting.update_shot_casting(self.project, self.shot, casting=asset_castings)
+#
+# def casting_delete(self):
+#     asset_name = self.asset['name']
+#     asset_castings = gazu.casting.get_shot_casting(self.shot)
+#     filtered_assets = [asset for asset in asset_castings if asset_name != asset['asset_name']]
+#     gazu.casting.update_shot_casting(self.project, self.shot, casting=filtered_assets)
 
-    # @staticmethod
-    # def check_task_status(task):
-    #     if gazu.task.get_task_status(task['task_status']) == 'done':
-    #         return task
-    #     else:
-    #         pass
+# @staticmethod
+# def check_task_status(task):
+#     if gazu.task.get_task_status(task['task_status']) == 'done':
+#         return task
+#     else:
+#         pass
 
-    # ----------get all tasks-----------
+# ----------get all tasks-----------
 
-    # def get_all_tasks(self, task_type_name):
-    #     task_type = gazu.task.get_task_type_by_name(task_type_name)
-    #     task_status = gazu.task.get_task_status_by_name("done")
-    #     all_tasks = gazu.task.all_tasks_for_task_status(self.project, task_type, task_status)
-    #     return all_tasks
-    #
-    # def get_all_working_paths_for_task_type(self, task_type_name, software_name):
-    #     tasks = self.get_all_tasks(task_type_name)
-    #     ext = self.get_software(software_name)['file_extension']
-    #     paths = []
-    #     for task in tasks:
-    #         if task['task_status_id'] == gazu.task.get_task_status_by_name('Done')['id']:
-    #             working = gazu.files.get_last_working_file_revision(task)
-    #             paths.append(working['path'] + '.' + ext)
-    #     return paths
+# def get_all_tasks(self, task_type_name):
+#     task_type = gazu.task.get_task_type_by_name(task_type_name)
+#     task_status = gazu.task.get_task_status_by_name("done")
+#     all_tasks = gazu.task.all_tasks_for_task_status(self.project, task_type, task_status)
+#     return all_tasks
+#
+# def get_all_working_paths_for_task_type(self, task_type_name, software_name):
+#     tasks = self.get_all_tasks(task_type_name)
+#     ext = self.get_software(software_name)['file_extension']
+#     paths = []
+#     for task in tasks:
+#         if task['task_status_id'] == gazu.task.get_task_status_by_name('Done')['id']:
+#             working = gazu.files.get_last_working_file_revision(task)
+#             paths.append(working['path'] + '.' + ext)
+#     return paths
 
-    # ------------set software-------------
-    # def get_software(self, software_name):
-    #     """houdini의 extension 타입별로 software dict를 반환해준다
-    #
-    #     Args:
-    #         software_name(str): 'hip', 'hipnc', or 'hiplc'
-    #
-    #     Returns:
-    #         Software dict
-    #
-    #     Raises:
-    #         Exception: If software_name is not hip, hipnc, or hiplc.
-    #
-    #     """
-    #     if software_name == 'hip':
-    #         return gazu.files.get_software_by_name('houdini')
-    #     if software_name == 'hipnc':
-    #         return gazu.files.get_software_by_name('houdininc')
-    #     if software_name == 'hpilc':
-    #         return gazu.files.get_software_by_name('houdinilc')
-    #     else:
-    #         self.error('hou')
+# ------------set software-------------
+# def get_software(self, software_name):
+#     """houdini의 extension 타입별로 software dict를 반환해준다
+#
+#     Args:
+#         software_name(str): 'hip', 'hipnc', or 'hiplc'
+#
+#     Returns:
+#         Software dict
+#
+#     Raises:
+#         Exception: If software_name is not hip, hipnc, or hiplc.
+#
+#     """
+#     if software_name == 'hip':
+#         return gazu.files.get_software_by_name('houdini')
+#     if software_name == 'hipnc':
+#         return gazu.files.get_software_by_name('houdininc')
+#     if software_name == 'hpilc':
+#         return gazu.files.get_software_by_name('houdinilc')
+#     else:
+#         self.error('hou')
