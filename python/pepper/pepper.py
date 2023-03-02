@@ -817,19 +817,19 @@ class Houpub:
             raise Exception("NO ERROR CODE")
 
 
-pepper = Houpub()
-pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
-pepper.software = 'hipnc'
-pepper.project = 'PEPPER'
-pepper.asset = 'temp_dancing_particle'
-css = pepper.get_casting_path_for_asset()
-for cs in css:
-    pepper.sequence = cs['sequence_name']
-    pepper.shot = cs['shot_name']
-pepper.entity = 'shot'
-nwp = pepper.make_next_working_path('FX')
+# pepper = Houpub()
+# pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+# pepper.software = 'hipnc'
+# pepper.project = 'PEPPER'
+# pepper.asset = 'temp_dancing_particle'
+# css = pepper.get_casting_path_for_asset()
+# for cs in css:
+#     pepper.sequence = cs['sequence_name']
+#     pepper.shot = cs['shot_name']
+# pepper.entity = 'shot'
+# nwp = pepper.make_next_working_path('FX')
 # nop = pepper.make_next_output_path('test', 'FX')
-print(nwp)
+# print(nwp)
 
 # for casted_shot in casted_shots:
 #     pepper.make_precomp_dict(casted_shot)
