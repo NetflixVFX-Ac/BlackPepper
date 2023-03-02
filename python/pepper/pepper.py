@@ -530,7 +530,7 @@ class Houpub:
         self.entity = 'shot'
         layout_output_path = self.output_file_path('camera_cache', 'layout')
         fx_working_path = self.make_next_working_path('FX')
-        video_output_path = self.make_next_output_path('Movie_file', 'FX')
+        video_output_path = self.make_next_output_path('jpg_sequence', 'FX')
         self.precomp_list.append({'name': name, 'temp_working_path': temp_working_path,
                                   'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
                                   'video_output_path': video_output_path})
