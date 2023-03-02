@@ -175,6 +175,7 @@ class MainWindow:
 
         """
         casted_shot = self.get_casting_shots[event.row()]
+
         # print(casted_shot)
 
     def add_render_file(self):
@@ -187,7 +188,7 @@ class MainWindow:
         for index in self.shots_selection.selectedRows():
             shot_dict = self.get_casting_shots[index.row()]
             self.pepper.make_precomp_dict(shot_dict)
-
+        self.model_render.model.clear()
         for precomp in self.pepper.precomp_list:
             if precomp["name"] not in self.model_render.model:
                 self.model_render.model.append(precomp["name"])
@@ -198,13 +199,11 @@ class MainWindow:
 
     def del_render_file(self):
         for index in self.shots_selection.selectedRows():
-            shot_dict = self.get_casting_shots[index.row()]
-            print(shot_dict)
-            self.pepper.delete_precomp_dict(shot_dict["name"])
+            self.pepper.delete_precomp_dict(index.data())
+        print(index)
         self.model_render.model.clear()
-        # for precomp in self.pepper.precomp_list:
-        #     if precomp["name"] not in self.model_render.model:
-        #         self.model_render.model.append(precomp["name"])
+        for precomp in self.pepper.precomp_list:
+            self.model_render.model.append(precomp["name"])
 
         self.model_render.layoutChanged.emit()
         self.shots_selection.clear()
