@@ -74,6 +74,7 @@ class MainWindow:
         self.window_main.lv_proj.clicked.connect(self.choice_project)
         self.window_main.lv_temp.clicked.connect(self.choice_temp)
         self.window_main.lv_shot.clicked.connect(self.choice_shot)
+        # self.window_main.template_info.setText(self.temp_info)
 
         self.window_main.add_btn.clicked.connect(self.add_render_file)
         # self.window_main.del_btn.clicked.connect(self.del_render_file)
@@ -161,7 +162,7 @@ class MainWindow:
         print(casted_shot)
         self.model_render.model.clear()
         self.pepper.make_precomp_dict(casted_shot)
-        # self.model_render.layoutChanged.emit()
+        self.model_render.layoutChanged.emit()
         #
         # for precomp in self.pepper.precomp_list:
         #         self.model_render.model.append(precomp["name"])
@@ -193,6 +194,13 @@ class MainWindow:
 
     def choice_render(self, event):
 
+        pass
+
+    def temp_info(self):
+        # self.pepper.get_casting_path_for_asset()
+        pass
+
+    def shot_info(self):
         pass
 
     # def keyPressEvent(self, e):
