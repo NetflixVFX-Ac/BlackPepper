@@ -1,19 +1,18 @@
 import sys
-from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtCore import Qt
+from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
+from hook.ui.mvc import model
+from hook.ui.mvc.view import PepperView
 from hook.python.pepper.pepper import Houpub
-from hook.ui.myuitest import model
 
-
-class ProjectView(QtWidgets.QListView):
-    def __init__(self, parent):
-        super(ProjectView, self).__init__(parent=None)
-
-    def get_selected_project(self):
-        if not self.model():
-            return
-        return self.model().selectedIndexes()[-1]
+# class ProjectView(QtWidgets.QListView):
+#     def __init__(self, parent):
+#         super(ProjectView, self).__init__(parent=None)
+#
+#     def get_selected_project(self):
+#         if not self.model():
+#             return
+#         return self.model().selectedIndexes()[-1]
 
 
 class MainWindow:
@@ -24,15 +23,17 @@ class MainWindow:
         self.render_model = model.PepperModel()
         self.pepper = Houpub()
 
-        self.projects_listview = ProjectView(self)
-        print(self.projects_listview.get_selected_project())
-        self.templates_listview = QtWidgets.QListView()
-        self.shots_listview = QtWidgets.QListView()
+        self.projects_listview = PepperView(self)
+        self.templates_listview = PepperView(self)
+        self.shots_listview = PepperView(self)
+        self.renderlists_listview = PepperView(self)
         self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.renderlists_listview = QtWidgets.QListView()
+        self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
         self.projects_selection = None
         self.templates_selection = None
+        self.shots_selection = None
+        self.renderlists_selection = None
 
         login_ui_path = '/home/rapa/login.ui'
         self.login_ui = QtCore.QFile(login_ui_path)
@@ -47,6 +48,10 @@ class MainWindow:
         self.window = self.login_ui_loader.load(self.login_ui)
         self.window.show()
         self.window.login_btn.clicked.connect(lambda: self.login())
+
+        self.my_projects = []
+        self.all_assets = []
+        self.all_shots = []
 
         # self.window = self.main_ui_loader.load(self.main_ui)
         # self.window.lv_proj.setModel(self.project_model)
@@ -82,11 +87,13 @@ class MainWindow:
         self.window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
 
         self.projects_listview.setModel(self.project_model)
-        self.projects_selection = self.projects_listview.selectionModel()
         self.templates_listview.setModel(self.template_model)
-        self.templates_selection = self.templates_listview.selectionModel()
         self.shots_listview.setModel(self.shot_model)
         self.renderlists_listview.setModel(self.render_model)
+        self.projects_selection = self.projects_listview.selectionModel()
+        self.templates_selection = self.templates_listview.selectionModel()
+        self.shots_selection = self.shots_listview.selectionModel()
+        self.renderlists_selection = self.renderlists_listview.selectionModel()
 
         self.my_projects = self.pepper.get_my_projects()
         for my_project in self.my_projects:
@@ -117,7 +124,6 @@ class MainWindow:
         self.shot_model.layoutChanged.emit()
         self.templates_selection.clear()
 
-
     def template_selected(self, event):
         template_name = self.all_assets[event.row()]
         self.pepper.asset = template_name
@@ -126,6 +132,7 @@ class MainWindow:
         for shot in self.all_shots:
             self.shot_model.pepperlist.append(shot['sequence_name'] + '_' + shot['shot_name'])
         self.shot_model.layoutChanged.emit()
+        self.shots_selection.clear()
 
     def shot_selected(self, event):
         shot_dict = self.all_shots[event.row()]
@@ -146,4 +153,3 @@ QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
 app = QtWidgets.QApplication(sys.argv)
 window = MainWindow()
 app.exec_()
-
