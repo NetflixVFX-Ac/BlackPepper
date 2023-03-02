@@ -8,8 +8,9 @@ Qt디자이너 에서 설정한 ui 를 가져와서 listview와 Model.py를 컨�
 
 import sys
 from PySide2 import QtCore, QtWidgets
+from PySide2.QtCore import Qt
 # from PySide2.QtWidgets import QWidget
-# from PySide2.QtCore import Qt, QFile
+# from PySide2.QtCore import QFile
 from PySide2.QtUiTools import QUiLoader
 
 from pepper import Houpub
@@ -66,6 +67,9 @@ class MainWindow:
 
         # set connect Ui
         self.window_login.login_btn.clicked.connect(self.set_login)
+        self.window_login.input_id.returnPressed.connect(self.set_login)
+        self.window_login.input_pw.returnPressed.connect(self.set_login)
+
 
         self.window_main.lv_proj.clicked.connect(self.choice_project)
         self.window_main.lv_temp.clicked.connect(self.choice_temp)
@@ -92,15 +96,21 @@ class MainWindow:
         self.open_main()
 
     def open_main(self):
+
         # setModel
         self.window_main.lv_proj.setModel(self.model_proj)
+        self.window_main.lv_temp.setModel(self.model_temp)
+        self.window_main.lv_shot.setModel(self.model_shot)
+        self.window_main.lv_render.setModel(self.model_render)
+
+        # get my project
         self.get_projects = self.pepper.get_my_projects()
         print(f"get_projects = {self.get_projects}")
-        # project list append
+        self.model_proj.model.clear()
+        # project listview(model) append
         for get_project in self.get_projects:
             self.model_proj.model.append(get_project)
-
-        # self.window_main.show()
+        self.model_proj.layoutChanged.emit()
 
     def choice_project(self, event):
         """
@@ -111,8 +121,7 @@ class MainWindow:
         Returns:
 
         """
-        # setModel
-        self.window_main.lv_temp.setModel(self.model_temp)
+
         # event
         project_name = self.get_projects[event.row()]
         self.pepper.project = project_name
@@ -127,10 +136,8 @@ class MainWindow:
         # reset 시그널! emit !
         self.model_temp.layoutChanged.emit()
 
-
     def choice_temp(self, event):
-        # setModel
-        self.window_main.lv_shot.setModel(self.model_shot)
+
         # event
         template_name = self.get_assets[event.row()]
         self.pepper.asset = template_name
@@ -139,65 +146,44 @@ class MainWindow:
         self.model_shot.model.clear()
 
         for get_casting_shot in self.get_casting_shots:
-            self.model_shot.model.append(get_casting_shot["sequence_name"]+"_"+get_casting_shot["shot_name"])
-        print(f"{template_name}_casting_shots = {get_casting_shot['sequence_name']+'_'+get_casting_shot['shot_name']}")
+            self.model_shot.model.append(get_casting_shot["sequence_name"] + "_" + get_casting_shot["shot_name"])
+        print(
+            f"{template_name}_casting_shots = {get_casting_shot['sequence_name'] + '_' + get_casting_shot['shot_name']}")
         self.model_shot.layoutChanged.emit()
-
 
     def choice_shot(self, event):
         """
         샷 리스트를 선택하면 정보를 가져온다 . 이정보를 add_btn 에서 사용한다.
-        Args:
-            event:
-
-        Returns:
 
         """
-        precomp = None
-        # setModel
-        self.window_main.lv_render.setModel(self.model_render)
-
-
         # event
-        shot_name = self.get_casting_shots[event.row()]
-        print(shot_name)
-        # self.pick_precomp = shot_name
-        self.pepper.make_precomp_dict(shot_name)
+        casted_shot = self.get_casting_shots[event.row()]
+        print(casted_shot)
         self.model_render.model.clear()
-
+        self.pepper.make_precomp_dict(casted_shot)
+        # self.model_render.layoutChanged.emit()
+        #
         # for precomp in self.pepper.precomp_list:
         #         self.model_render.model.append(precomp["name"])
         # self.model_render.layoutChanged.emit()
 
-    def choice_render(self, event):
-
-        self.window_main.lv_render.setModel(self.model_render)
-
-        pass
-
-    def add_render_file(self, event):
+    def add_render_file(self):
         """
         add_btn 을 설정하는 함수이다.
         lv_shot (listview)  pepper.get_casting_path_for_asset 된 seq_name , shot_name 을 click 하고
         add_btn 을 clicked 하면 lv_render(liseview) 에 추가 한다.
         render files listview 에 있는 render 할 파일목록들을
         """
-        self.window_main.lv_render.setModel(self.model_render)
-        shot_name = self.get_casting_shots[event.row()]
+        precomp = None
+        # self.choice_shot(event)
+        # casted_shot = self.get_casting_shots[event.row()]
+        # selectedrow
         # text = self.window.todoEdit.text()
-        self.pepper.make_precomp_dict(shot_name)
+        # self.pepper.make_precomp_dict(casted_shot)
         self.model_render.model.clear()
-
         for precomp in self.pepper.precomp_list:
-                self.model_render.model.append(precomp["name"])
+            self.model_render.model.append(precomp["name"])
         self.model_render.layoutChanged.emit()
-        if text:  # Don't add empty strings.
-            # Access the list via the model.
-            self.model_render.model.append(text)
-            # Trigger refresh.
-            self.model_render.layoutChanged.emit()
-            #  Empty the input
-            self.window_main.lv_render.setText("")
 
     def del_render_file(self):
         pass
@@ -205,7 +191,24 @@ class MainWindow:
     def reset_render_file(self):
         pass
 
+    def choice_render(self, event):
 
+        pass
+
+    # def keyPressEvent(self, e):
+    #
+    #     if e.key() == Qt.Key_Escape:
+    #         self.window_login.close()
+    #     elif e.key() == Qt.Key_Enter:
+    #         self.window_login.close()
+    #         self.open_main()
+
+
+
+
+"""
+QApplication을 생성하기 전에 AA_ShareOpenGLContexts 를 설정
+"""
 QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
 app = QtWidgets.QApplication(sys.argv)
 window = MainWindow()
