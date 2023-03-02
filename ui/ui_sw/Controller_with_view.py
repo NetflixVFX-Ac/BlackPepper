@@ -8,7 +8,7 @@ Qt디자이너 에서 설정한 ui 를 가져와서 listview와 Model.py를 컨�
 
 import sys
 from PySide2 import QtCore, QtWidgets
-from PySide2.QtCore import Qt
+# from PySide2.QtCore import Qt
 # from PySide2.QtWidgets import QWidget
 # from PySide2.QtCore import QFile
 from PySide2.QtUiTools import QUiLoader
@@ -53,7 +53,7 @@ class MainWindow:
         self.model_render = MainModel()
 
         # login Ui loader
-        login_ui_file = "/home/rapa/login.ui"
+        login_ui_file = "/home/rapa/git/hook/ui/ui_sw/login.ui"
         login_ui = QtCore.QFile(login_ui_file)
         login_ui.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
@@ -61,7 +61,7 @@ class MainWindow:
         self.window_login.show()
 
         # main Ui loader
-        main_ui_file = "/home/rapa/main.ui"
+        main_ui_file = "/home/rapa/git/hook/ui/ui_sw/main.ui"
         main_ui = QtCore.QFile(main_ui_file)
         main_ui.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
@@ -73,7 +73,6 @@ class MainWindow:
         self.window_login.input_id.returnPressed.connect(self.set_login)
         self.window_login.input_pw.returnPressed.connect(self.set_login)
 
-
         self.window_main.lv_proj.clicked.connect(self.choice_project)
         self.window_main.lv_temp.clicked.connect(self.choice_temp)
         self.window_main.lv_shot.clicked.connect(self.choice_shot)
@@ -82,8 +81,6 @@ class MainWindow:
         self.window_main.append_btn.clicked.connect(self.add_render_file)
         self.window_main.del_btn.clicked.connect(self.del_render_file)
         self.window_main.reset_btn.clicked.connect(self.reset_renderfile_list)
-
-
 
     def set_login(self):
         email = self.window_login.input_id.text()
@@ -167,7 +164,6 @@ class MainWindow:
         #     f"{template_name}_casting_shots = {get_casting_shot['sequence_name'] + '_' + get_casting_shot['shot_name']}")
         self.model_shot.layoutChanged.emit()
         self.shots_selection.clear()
-
 
     def choice_shot(self, event):
         """
