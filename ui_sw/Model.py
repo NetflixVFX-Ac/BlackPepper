@@ -1,57 +1,25 @@
-"""
-
-Model.py
-
-"""
-from pepper import Houpub
+from PySide2 import QtCore
+from PySide2.QtCore import Qt
 
 
-class PepM:
+class MainModel(QtCore.QAbstractListModel):
+    """
+    model=None 를 설정하여 안정적이다.
+    """
+    def __init__(self, model=None):
+        super(MainModel, self).__init__()
+        self.model = model or []
 
-    def __init__(self):
-        self.host = "http://192.168.3.116/api"
-        self.email = "pepper@hook.com"
-        self.pw = "pepperpepper"
-        self.sel_software = "hip"
+    def data(self, index, role):
+        if role == Qt.DisplayRole:
+            text = self.model[index.row()]
+            return text
 
-    def login_data(self, email, pw, sel_software):
+        # DecorationRole : tick: 아이콘
+        # if role == Qt.DecorationRole:
+        #     status, _ = self.todos[index.row()]
+        #     if status:
+        #         return tick
 
-        self.email = email
-        self.pw = pw
-        self.sel_software = sel_software
-        pep = Houpub()
-        pep.login(self.host, email, pw)
-        pep.software = sel_software
-        print(f"login id : {email} , seleted software : {sel_software}")
-
-    def get_project(self):
-        pep = Houpub()
-        pep.get_my_projects()
-
-    def get_temp(self, project_name):
-        pep = Houpub()
-        pep.project = project_name
-        # print(pep.project)
-        asset_list = pep.get_all_assets()
-        # print(asset_list)
-        return asset_list
-
-
-
-
-
-# def main():
-#     c = PepM()
-#     # c.email = "pepper@hook.com"
-#     # c.pw = "pepperpepper"
-#     c.email = "pipeline@rapa.org"
-#     c.pw = "netflixacademy"
-#     c.sel_software = "hip"
-#     c.login_data(c.email, c.pw, c.sel_software)
-#     project_name = c.get_project()
-#     c.get_temp(project_name[0])
-#     # pass
-#
-#
-# if __name__ == "__main__":
-#     main()
+    def rowCount(self, index):
+        return len(self.model)

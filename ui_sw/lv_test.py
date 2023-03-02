@@ -35,7 +35,7 @@ class MainWindow():
         self.model = TodoModel()
 
         # main Ui loder
-        main_ui_file = "ui_test/main.ui"
+        main_ui_file = "main.ui"
         mainUi = QtCore.QFile(main_ui_file)
         mainUi.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
@@ -52,7 +52,7 @@ class LoginWindow():
         self.model = TodoModel()
 
         # login Ui loder
-        login_ui_file = "ui_test/login.ui"
+        login_ui_file = "login.ui"
         loginUi = QtCore.QFile(login_ui_file)
         loginUi.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()

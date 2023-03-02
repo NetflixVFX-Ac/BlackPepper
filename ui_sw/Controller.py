@@ -114,7 +114,7 @@ def main():
     #   QApplication을 생성하기 전에 AA_ShareOpenGLContexts를 설정하여 수정
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
     app = QtWidgets.QApplication(sys.argv)
-    myapp = PepC("ui_test/login.ui", "ui_test/main.ui")
+    myapp = PepC("login.ui", "main.ui")
     # mymain = PepC("main.ui")
     sys.exit(app.exec_())
 
