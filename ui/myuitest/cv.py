@@ -1,19 +1,18 @@
 import sys
-from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtCore import Qt
+from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
-from hook.python.pepper.pepper import Houpub
 from hook.ui.myuitest import model
+from hook.ui.myuitest.view import PepperView
+from hook.python.pepper.pepper import Houpub
 
-
-class ProjectView(QtWidgets.QListView):
-    def __init__(self, parent):
-        super(ProjectView, self).__init__(parent=None)
-
-    def get_selected_project(self):
-        if not self.model():
-            return
-        return self.model().selectedIndexes()[-1]
+# class ProjectView(QtWidgets.QListView):
+#     def __init__(self, parent):
+#         super(ProjectView, self).__init__(parent=None)
+#
+#     def get_selected_project(self):
+#         if not self.model():
+#             return
+#         return self.model().selectedIndexes()[-1]
 
 
 class MainWindow:
@@ -24,12 +23,12 @@ class MainWindow:
         self.render_model = model.PepperModel()
         self.pepper = Houpub()
 
-        self.projects_listview = ProjectView(self)
-        print(self.projects_listview.get_selected_project())
-        self.templates_listview = QtWidgets.QListView()
-        self.shots_listview = QtWidgets.QListView()
+        self.projects_listview = PepperView(self)
+        self.templates_listview = PepperView(self)
+        self.shots_listview = PepperView(self)
+        self.renderlists_listview = PepperView(self)
         self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.renderlists_listview = QtWidgets.QListView()
+        self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
         self.projects_selection = None
         self.templates_selection = None
@@ -47,6 +46,10 @@ class MainWindow:
         self.window = self.login_ui_loader.load(self.login_ui)
         self.window.show()
         self.window.login_btn.clicked.connect(lambda: self.login())
+
+        self.my_projects = []
+        self.all_assets = []
+        self.all_shots = []
 
         # self.window = self.main_ui_loader.load(self.main_ui)
         # self.window.lv_proj.setModel(self.project_model)
@@ -116,7 +119,6 @@ class MainWindow:
         self.template_model.layoutChanged.emit()
         self.shot_model.layoutChanged.emit()
         self.templates_selection.clear()
-
 
     def template_selected(self, event):
         template_name = self.all_assets[event.row()]
