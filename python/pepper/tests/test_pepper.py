@@ -434,6 +434,8 @@ class TestHoupub(TestCase):
         saved info
         -   self.pepper.project = project
         -   self.pepper.asset = 'temp_fire'
+        
+        
         """
         shots = []
         casted_shots, layout_type, fx_tasks = self.pepper.get_casting_path_for_asset()
