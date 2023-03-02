@@ -32,6 +32,7 @@ class MainWindow:
 
     def __init__(self):
         super().__init__()
+        self.temps_selection = None
         self.render_selection = None
         self.shots_selection = None
 
@@ -65,7 +66,7 @@ class MainWindow:
         main_ui.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
         self.window_main = loader.load(main_ui)
-        self.window_main.show()
+        # self.window_main.show()
 
         # set connect Ui
         self.window_login.login_btn.clicked.connect(self.set_login)
@@ -79,7 +80,7 @@ class MainWindow:
         # self.window_main.template_info.setText(self.temp_info)
 
         self.window_main.add_btn.clicked.connect(self.add_render_file)
-        # self.window_main.del_btn.clicked.connect(self.del_render_file)
+        self.window_main.del_btn.clicked.connect(self.del_render_file)
         self.window_main.reset_btn.clicked.connect(self.reset_render_file)
 
 
@@ -99,6 +100,7 @@ class MainWindow:
         self.pepper.software = sel_software
         print(f"login id : {email} , software : {sel_software}")
         self.window_login.close()
+        self.window_main.show()
         self.open_main()
 
     def open_main(self):
@@ -106,6 +108,7 @@ class MainWindow:
         # setModel
         self.window_main.lv_proj.setModel(self.model_proj)
         self.window_main.lv_temp.setModel(self.model_temp)
+        self.temps_selection = self.window_main.lv_temp.selectionModel()
 
         self.window_main.lv_shot.setModel(self.model_shot)
         self.shots_selection = self.window_main.lv_shot.selectionModel()
@@ -146,6 +149,8 @@ class MainWindow:
 
         # reset 시그널! emit !
         self.model_temp.layoutChanged.emit()
+        self.model_shot.layoutChanged.emit()
+        self.temps_selection.clear()
 
     def choice_temp(self, event):
 
@@ -158,8 +163,8 @@ class MainWindow:
 
         for get_casting_shot in self.get_casting_shots:
             self.model_shot.model.append(get_casting_shot["sequence_name"] + "_" + get_casting_shot["shot_name"])
-        print(
-            f"{template_name}_casting_shots = {get_casting_shot['sequence_name'] + '_' + get_casting_shot['shot_name']}")
+        # print(
+        #     f"{template_name}_casting_shots = {get_casting_shot['sequence_name'] + '_' + get_casting_shot['shot_name']}")
         self.model_shot.layoutChanged.emit()
         self.shots_selection.clear()
 
@@ -169,51 +174,44 @@ class MainWindow:
         샷 리스트를 선택하면 정보를 가져온다 . 이정보를 add_btn 에서 사용한다.
 
         """
-        # event
-        # self.shots_selection.clear()
-
         casted_shot = self.get_casting_shots[event.row()]
-        print(casted_shot)
-
-        self.pepper.make_precomp_dict(casted_shot)
-        # self.model_shot.model.clear()
-        # for precomp in self.pepper.precomp_list:
-        #         self.model_render.model.append(precomp["name"])
-
-        self.model_render.layoutChanged.emit()
+        # print(casted_shot)
 
     def add_render_file(self):
         """
         add_btn 을 설정하는 함수이다.
         lv_shot (listview)  pepper.get_casting_path_for_asset 된 seq_name , shot_name 을 click 하고
         add_btn 을 clicked 하면 lv_render(liseview) 에 추가 한다.
-        render files listview 에 있는 render 할 파일목록들을
+        render files listview 에 있는 render 할 파일목록들 중복체크해줌
         """
-        for idx in self.shots_selection.selectedRows():
-            shot_dict = self.get_casting_shots[idx.row()]
+        for index in self.shots_selection.selectedRows():
+            shot_dict = self.get_casting_shots[index.row()]
             self.pepper.make_precomp_dict(shot_dict)
-        precomp = None
-        # self.choice_shot(event)
-        # casted_shot = self.get_casting_shots[event.row()]
-        # selectedrow
-        # text = self.window.todoEdit.text()
-        # self.pepper.make_precomp_dict(casted_shot)
-        # self.model_render.model.clear()
+
         for precomp in self.pepper.precomp_list:
             if precomp["name"] not in self.model_render.model:
                 self.model_render.model.append(precomp["name"])
+
         self.model_render.layoutChanged.emit()
         self.shots_selection.clear()
-        # self.render_selection.clear()
+        self.render_selection.clear()
 
     def del_render_file(self):
-        add_renderfile = None
-        if add_renderfile["name"] in self.model_render.model:
-            self.model_reder.model.clear(add_renderfile["name"])
+        for index in self.shots_selection.selectedRows():
+            shot_dict = self.get_casting_shots[index.row()]
+            print(shot_dict)
+            self.pepper.delete_precomp_dict(shot_dict["name"])
+        self.model_render.model.clear()
+        # for precomp in self.pepper.precomp_list:
+        #     if precomp["name"] not in self.model_render.model:
+        #         self.model_render.model.append(precomp["name"])
+
         self.model_render.layoutChanged.emit()
+        self.shots_selection.clear()
+        self.render_selection.clear()
 
     def reset_render_file(self):
-        self.pepper.precomp_list = None
+        self.pepper.precomp_list = []
         self.model_render.model.clear()
         self.model_render.layoutChanged.emit()
 
