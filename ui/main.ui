@@ -195,7 +195,7 @@
        <item row="2" column="2">
         <widget class="QListView" name="lv_shot">
          <property name="selectionMode">
-          <enum>QAbstractItemView::MultiSelection</enum>
+          <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>
         </widget>
        </item>
@@ -218,7 +218,7 @@
        <item row="2" column="5">
         <widget class="QListView" name="lv_render">
          <property name="selectionMode">
-          <enum>QAbstractItemView::MultiSelection</enum>
+          <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>
         </widget>
        </item>
