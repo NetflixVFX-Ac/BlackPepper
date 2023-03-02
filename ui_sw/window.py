@@ -53,7 +53,7 @@ class MainWindow:
         self.model_render = MainModel()
 
         # login Ui loader
-        login_ui_file = "/home/rapa/git/hook/ui/login.ui"
+        login_ui_file = "/home/rapa/login.ui"
         login_ui = QtCore.QFile(login_ui_file)
         login_ui.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
@@ -198,9 +198,8 @@ class MainWindow:
         self.render_selection.clear()
 
     def del_render_file(self):
-        for index in self.shots_selection.selectedRows():
+        for index in self.render_selection.selectedRows():
             self.pepper.delete_precomp_dict(index.data())
-        print(index)
         self.model_render.model.clear()
         for precomp in self.pepper.precomp_list:
             self.model_render.model.append(precomp["name"])
