@@ -47,7 +47,9 @@ class MainWindow:
 
         self.window = self.login_ui_loader.load(self.login_ui)
         self.window.show()
-        self.window.login_btn.clicked.connect(lambda: self.login())
+        self.window.login_btn.clicked.connect(self.user_login)
+        # self.window.input_id.returnPressed.connect(self.window.login_btn.clicked.connect(self.user_login))
+        # self.window.input_pw.returnPressed.connect(self.window.login_btn.clicked.connect(self.user_login))
 
         self.my_projects = []
         self.all_assets = []
@@ -68,7 +70,7 @@ class MainWindow:
         #     self.render_model.renders.append(i)
         # self.window.addButton.pressed.connect(self.add)
 
-    def login(self):
+    def user_login(self):
         user_id = self.window.input_id.text()
         user_pw = self.window.input_pw.text()
         user_software = self.window.hipbox.currentText()[1:]
@@ -76,9 +78,9 @@ class MainWindow:
 
         self.pepper.login(host, user_id, user_pw)
         self.pepper.software = user_software
-        self.main()
+        self.main_window()
 
-    def main(self):
+    def main_window(self):
         self.window = self.main_ui_loader.load(self.main_ui)
 
         self.window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
@@ -102,15 +104,14 @@ class MainWindow:
         self.window.show()
         self.projects_listview.clicked.connect(self.project_selected)
         self.templates_listview.clicked.connect(self.template_selected)
-        self.shots_listview.clicked.connect(self.shot_selected)
+        # self.shots_listview.clicked.connect(self.shot_selected)
         self.window.reset_btn.clicked.connect(self.clear_list)
+        self.window.render_btn.clicked.connect(self.render_execute)
+        self.window.append_btn.clicked.connect(self.append_render_list)
+        self.window.del_btn.clicked.connect(self.delete_render_list)
 
         # slot -> clicked, connect
         # signal -> emit
-        # self.window.lwg_templates.itemClicked.connect(s
-        #     lambda: self.assign_template(self.all_assets[self.window.lwg_templates.currentRow()]))
-        # self.window.lwg_shots.itemClicked.connect(
-        #     lambda: self.assign_shots(self.all_shots[self.window.lwg_shots.currentRow()]))
 
     def project_selected(self, event):
         project_name = self.my_projects[event.row()]
@@ -136,17 +137,40 @@ class MainWindow:
 
     def shot_selected(self, event):
         shot_dict = self.all_shots[event.row()]
-        print(shot_dict)
         self.pepper.make_precomp_dict(shot_dict)
         self.render_model.pepperlist.clear()
         for render in self.pepper.precomp_list:
             self.render_model.pepperlist.append(render['name'])
         self.render_model.layoutChanged.emit()
 
+    def append_render_list(self):
+        for idx in self.shots_selection.selectedRows():
+            shot_dict = self.all_shots[idx.row()]
+            self.pepper.make_precomp_dict(shot_dict)
+        self.render_model.pepperlist.clear()
+        for render in self.pepper.precomp_list:
+            self.render_model.pepperlist.append(render['name'])
+        self.render_model.layoutChanged.emit()
+        self.shots_selection.clear()
+        self.renderlists_selection.clear()
+
+    def delete_render_list(self):
+        for idx in self.renderlists_selection.selectedRows():
+            self.pepper.delete_precomp_dict(idx.data())
+        self.render_model.pepperlist.clear()
+        for render in self.pepper.precomp_list:
+            self.render_model.pepperlist.append(render['name'])
+        self.render_model.layoutChanged.emit()
+        self.renderlists_selection.clear()
+
     def clear_list(self):
         self.pepper.precomp_list = []
         self.render_model.pepperlist.clear()
         self.render_model.layoutChanged.emit()
+
+    def render_execute(self):
+        print(self.pepper.precomp_list)
+        return self.pepper.precomp_list
 
 
 QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
