@@ -79,7 +79,7 @@ class MainWindow:
         self.window_main.lv_shot.clicked.connect(self.choice_shot)
         # self.window_main.template_info.setText(self.temp_info)
 
-        self.window_main.add_btn.clicked.connect(self.add_render_file)
+        self.window_main.append_btn.clicked.connect(self.add_render_file)
         self.window_main.del_btn.clicked.connect(self.del_render_file)
         self.window_main.reset_btn.clicked.connect(self.reset_renderfile_list)
 
