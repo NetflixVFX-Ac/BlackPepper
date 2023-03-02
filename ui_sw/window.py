@@ -18,14 +18,14 @@ from Model import MainModel
 
 
 # 영빈님 sub class
-class ProjectView(QtWidgets.QListView):
-    def __init__(self, parent):
-        super(ProjectView, self).__init__(parent=None)
-
-    def get_selected_project(self):
-        if not self.model():
-            return
-        return self.model().selectedIndexes()[-1]
+# class ProjectView(QtWidgets.QListView):
+#     def __init__(self, parent):
+#         super(ProjectView, self).__init__(parent=None)
+#
+#     def get_selected_project(self):
+#         if not self.model():
+#             return
+#         return self.model().selectedIndexes()[-1]
 
 
 class MainWindow:
@@ -81,7 +81,7 @@ class MainWindow:
 
         self.window_main.add_btn.clicked.connect(self.add_render_file)
         self.window_main.del_btn.clicked.connect(self.del_render_file)
-        self.window_main.reset_btn.clicked.connect(self.reset_render_file)
+        self.window_main.reset_btn.clicked.connect(self.reset_renderfile_list)
 
 
 
@@ -210,7 +210,7 @@ class MainWindow:
         self.shots_selection.clear()
         self.render_selection.clear()
 
-    def reset_render_file(self):
+    def reset_renderfile_list(self):
         self.pepper.precomp_list = []
         self.model_render.model.clear()
         self.model_render.layoutChanged.emit()
@@ -227,7 +227,6 @@ class MainWindow:
     def shot_info(self):
         pass
 
-
     # def keyPressEvent(self, e):
     #
     #     if e.key() == Qt.Key_Escape:
@@ -235,8 +234,6 @@ class MainWindow:
     #     elif e.key() == Qt.Key_Enter:
     #         self.window_login.close()
     #         self.open_main()
-
-
 
 
 """
