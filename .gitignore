@@ -5,4 +5,4 @@
 **pycache
 *.xml
 .idea/workspace.xml
-/hou_sw
+hou_sw/

@@ -8,7 +8,7 @@ Qt디자이너 에서 설정한 ui 를 가져와서 listview와 Model.py를 컨�
 
 import sys
 from PySide2 import QtCore, QtWidgets
-from PySide2.QtCore import Qt
+# from PySide2.QtCore import Qt
 # from PySide2.QtWidgets import QWidget
 # from PySide2.QtCore import QFile
 from PySide2.QtUiTools import QUiLoader
@@ -18,14 +18,14 @@ from Model import MainModel
 
 
 # 영빈님 sub class
-class ProjectView(QtWidgets.QListView):
-    def __init__(self, parent):
-        super(ProjectView, self).__init__(parent=None)
-
-    def get_selected_project(self):
-        if not self.model():
-            return
-        return self.model().selectedIndexes()[-1]
+# class ProjectView(QtWidgets.QListView):
+#     def __init__(self, parent):
+#         super(ProjectView, self).__init__(parent=None)
+#
+#     def get_selected_project(self):
+#         if not self.model():
+#             return
+#         return self.model().selectedIndexes()[-1]
 
 
 class MainWindow:
@@ -53,7 +53,7 @@ class MainWindow:
         self.model_render = MainModel()
 
         # login Ui loader
-        login_ui_file = "/home/rapa/login.ui"
+        login_ui_file = "/home/rapa/git/hook/ui/ui_sw/login.ui"
         login_ui = QtCore.QFile(login_ui_file)
         login_ui.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
@@ -61,7 +61,7 @@ class MainWindow:
         self.window_login.show()
 
         # main Ui loader
-        main_ui_file = "/home/rapa/main.ui"
+        main_ui_file = "/home/rapa/git/hook/ui/ui_sw/main.ui"
         main_ui = QtCore.QFile(main_ui_file)
         main_ui.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
@@ -73,17 +73,14 @@ class MainWindow:
         self.window_login.input_id.returnPressed.connect(self.set_login)
         self.window_login.input_pw.returnPressed.connect(self.set_login)
 
-
         self.window_main.lv_proj.clicked.connect(self.choice_project)
         self.window_main.lv_temp.clicked.connect(self.choice_temp)
         self.window_main.lv_shot.clicked.connect(self.choice_shot)
         # self.window_main.template_info.setText(self.temp_info)
 
-        self.window_main.add_btn.clicked.connect(self.add_render_file)
+        self.window_main.append_btn.clicked.connect(self.add_render_file)
         self.window_main.del_btn.clicked.connect(self.del_render_file)
-        self.window_main.reset_btn.clicked.connect(self.reset_render_file)
-
-
+        self.window_main.reset_btn.clicked.connect(self.reset_renderfile_list)
 
     def set_login(self):
         email = self.window_login.input_id.text()
@@ -168,13 +165,13 @@ class MainWindow:
         self.model_shot.layoutChanged.emit()
         self.shots_selection.clear()
 
-
     def choice_shot(self, event):
         """
         샷 리스트를 선택하면 정보를 가져온다 . 이정보를 add_btn 에서 사용한다.
 
         """
         casted_shot = self.get_casting_shots[event.row()]
+
         # print(casted_shot)
 
     def add_render_file(self):
@@ -187,7 +184,7 @@ class MainWindow:
         for index in self.shots_selection.selectedRows():
             shot_dict = self.get_casting_shots[index.row()]
             self.pepper.make_precomp_dict(shot_dict)
-
+        self.model_render.model.clear()
         for precomp in self.pepper.precomp_list:
             if precomp["name"] not in self.model_render.model:
                 self.model_render.model.append(precomp["name"])
@@ -197,20 +194,17 @@ class MainWindow:
         self.render_selection.clear()
 
     def del_render_file(self):
-        for index in self.shots_selection.selectedRows():
-            shot_dict = self.get_casting_shots[index.row()]
-            print(shot_dict)
-            self.pepper.delete_precomp_dict(shot_dict["name"])
+        for index in self.render_selection.selectedRows():
+            self.pepper.delete_precomp_dict(index.data())
         self.model_render.model.clear()
-        # for precomp in self.pepper.precomp_list:
-        #     if precomp["name"] not in self.model_render.model:
-        #         self.model_render.model.append(precomp["name"])
+        for precomp in self.pepper.precomp_list:
+            self.model_render.model.append(precomp["name"])
 
         self.model_render.layoutChanged.emit()
         self.shots_selection.clear()
         self.render_selection.clear()
 
-    def reset_render_file(self):
+    def reset_renderfile_list(self):
         self.pepper.precomp_list = []
         self.model_render.model.clear()
         self.model_render.layoutChanged.emit()
@@ -227,7 +221,6 @@ class MainWindow:
     def shot_info(self):
         pass
 
-
     # def keyPressEvent(self, e):
     #
     #     if e.key() == Qt.Key_Escape:
@@ -235,8 +228,6 @@ class MainWindow:
     #     elif e.key() == Qt.Key_Enter:
     #         self.window_login.close()
     #         self.open_main()
-
-
 
 
 """
