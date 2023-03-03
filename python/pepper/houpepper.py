@@ -158,7 +158,7 @@ class HouPepper:
     def set_cam_key(self, key, node, parm):
         # self.set_cam_key(tr, cam_node, 't')
         J = ['x', 'y', 'z', 'w']
-        # key_np : matrix - tr : [[x1, y1 ,z1], 
+        # key_np : matrix - tr : [[x1, y1 ,z1],
         #                         [x2,y2,z2] ...] tx, ty, tz rx,rt, rz
         key_np = np.array(key)
         s = [1, -1]
@@ -220,8 +220,8 @@ class HouPepper:
 
     def set_mantra_for_render(self, hip_path, output_path):
         cam_setting = f'/obj/{self.cam_node}/'
-        print("cam_setting :", cam_setting)
-        print("abc_range :", self.abc_range)
+        print(cam_setting)
+        print(self.abc_range)
         hou.hipFile.load(hip_path)
         root = hou.node('/out')
         if root != None:
@@ -247,7 +247,7 @@ pepper.entity = 'asset'
 # need software handling method
 pepper.software = 'hiplc'
 simulation_type_name = 'simulation'
-simulation_path = pepper.working_file_path(simulation_type_name)
+simulation_path = pepper.working_file_path(simulation_type_name, input_num=1)
 casted_shots = pepper.get_casting_path_for_asset()
 
 hou_pepper = HouPepper()
@@ -261,6 +261,7 @@ for shot in casted_shots:
     layout_output_path = pepper.output_file_path(output_type_name, layout_type_name)
     pepper.software = 'hipnc'
     fx_type_name = 'fx'
+    # pepper.publish_working_file(fx_type_name)
     fx_path = pepper.working_file_path(fx_type_name)
     next_fx_path = pepper.make_next_working_path(fx_type_name)
     output_type_name = "JPG"
