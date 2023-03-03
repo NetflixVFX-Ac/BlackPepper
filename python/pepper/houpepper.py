@@ -8,10 +8,17 @@ class HouPepper:
     def __init__(self):
         self.cam_list = []
         self.cam_path = []
+<<<<<<< HEAD
         self.cam_node = None
         self._abc_path = None
         self._abc_tree_all = None
         self._abc_tree_path = None
+=======
+        self._abc_path = None
+        self._abc_tree_all = None
+        self._abc_tree_path = None
+        self._name = None
+>>>>>>> aa13e86 (hou update)
         self._abc_range = None
 
         # self.aperture = []
@@ -38,11 +45,29 @@ class HouPepper:
     @property
     def abc_path(self):
         return self._abc_path
+<<<<<<< HEAD
 
     @abc_path.setter
     def abc_path(self, abc_path):
         self._abc_path = abc_path
 
+=======
+    @abc_path.setter
+    def abc_path(self, abc_path):
+        self._abc_path = abc_path
+    @property
+    def abc_tree_all(self):
+        return self._abc_tree_all
+    @abc_tree_all.setter
+    def abc_tree_all(self, abc_tree_all):
+        self._abc_tree_all = abc_tree_all
+    @property
+    def name(self):
+        return self._name
+    @name.setter
+    def name(self, name):
+        self.name = name
+>>>>>>> aa13e86 (hou update)
     @property
     def abc_tree_all(self):
         return self._abc_tree_all
@@ -50,6 +75,12 @@ class HouPepper:
     @abc_tree_all.setter
     def abc_tree_all(self, abc_tree_all):
         self._abc_tree_all = abc_tree_all
+    @property
+    def abc_range(self):
+        return self._abc_range
+    @abc_range.setter
+    def abc_range(self, abc_range):
+        self._abc_range = abc_range
 
     @property
     def abc_tree_path(self):
@@ -77,10 +108,15 @@ class HouPepper:
                 self.abc_tree_all = abc.alembicGetSceneHierarchy(self.abc_path, '')
                 self.abc_tree_path = abc.alembicGetObjectPathListForMenu(self.abc_path)
                 self.get_abc_cam_tree(self.abc_tree_all)
+<<<<<<< HEAD
         print("abc_path :", self.abc_path)
         print("cam_path :", self.cam_path)
         print("cam_list :", self.cam_list)
         self.abc_range = abc.alembicTimeRange(self.abc_path)
+=======
+            self.name = [abc.alembicGetSceneHierarchy(self.abc_path, i)[0] for i in self.cam_path]
+            self.abc_range = abc.alembicTimeRange(self.abc_path)
+>>>>>>> aa13e86 (hou update)
 
     def get_abc_cam_tree(self, abc_tree_all):
         node_name = abc_tree_all[0]
@@ -184,8 +220,11 @@ class HouPepper:
 
     def set_cam_create(self, abc_path):
         self.set_abc_cam_tree(abc_path)
+<<<<<<< HEAD
         name = [abc.alembicGetSceneHierarchy(abc_path, i)[0] for i in self.cam_path]
         print("name :", name)
+=======
+>>>>>>> aa13e86 (hou update)
         # cam_path : ['/cam1/cam1Camera']
         for cam in self.cam_path:
             # cam_node = cam1Camera
@@ -213,6 +252,7 @@ class HouPepper:
 
     def set_fx_working_for_shot(self, hip_path, abc_path, saved_path):
         hou.hipFile.load(hip_path)
+<<<<<<< HEAD
         self.set_cam_create(abc_path)
         hou.hipFile.save(file_name=saved_path)
         self.cam_list.clear()
@@ -222,6 +262,12 @@ class HouPepper:
         cam_setting = f'/obj/{self.cam_node}/'
         print(cam_setting)
         print(self.abc_range)
+=======
+        self.set_cam_key(abc_path)
+        hou.hipFile.save(file_name=saved_path)
+
+    def set_mantra_for_render(self, hip_path, output_path, saved_path):
+>>>>>>> aa13e86 (hou update)
         hou.hipFile.load(hip_path)
         root = hou.node('/out')
         if root != None:
@@ -247,11 +293,16 @@ pepper.entity = 'asset'
 # need software handling method
 pepper.software = 'hiplc'
 simulation_type_name = 'simulation'
-simulation_path = pepper.working_file_path(simulation_type_name, input_num=1)
+simulation_path = pepper.working_file_path(simulation_type_name)
 casted_shots = pepper.get_casting_path_for_asset()
+print(simulation_path)
 
+<<<<<<< HEAD
 hou_pepper = HouPepper()
 
+=======
+print(casted_shots)
+>>>>>>> aa13e86 (hou update)
 for shot in casted_shots:
     pepper.sequence = shot.get('sequence_name')
     pepper.shot = shot.get('shot_name')
@@ -259,10 +310,15 @@ for shot in casted_shots:
     layout_type_name = 'layout'
     output_type_name = 'camera_cache'
     layout_output_path = pepper.output_file_path(output_type_name, layout_type_name)
+<<<<<<< HEAD
+=======
+    print("hou_pepper.abc_path :", layout_output_path)
+>>>>>>> aa13e86 (hou update)
     pepper.software = 'hipnc'
     fx_type_name = 'fx'
     fx_path = pepper.working_file_path(fx_type_name)
     next_fx_path = pepper.make_next_working_path(fx_type_name)
+<<<<<<< HEAD
     output_type_name = "JPG"
     fx_output = pepper.output_file_path(output_type_name, fx_type_name)
     print("fx_path :", fx_path)
@@ -274,3 +330,12 @@ for shot in casted_shots:
     # hou_pepper.set_mantra_for_render(fx_path, fx_output)
     # pepper.publish_working_file(fx_type_name)
 
+=======
+    print(fx_path)
+    print(next_fx_path)
+    # hou_pepper.set_cam_create()
+    # hou.hipFile.save(file_name=f'{next_fx_path}.hipnc')
+    # pepper.publish_working_file(fx_type_name)
+
+# hou_pepper = HouPepper()
+>>>>>>> aa13e86 (hou update)
