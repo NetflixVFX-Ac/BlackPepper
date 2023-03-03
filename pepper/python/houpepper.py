@@ -2,7 +2,9 @@ import hou
 import _alembic_hom_extensions as abc
 import numpy as np
 from pepper import Houpub
-
+import shutil
+import os
+import glob
 
 class HouPepper:
     def __init__(self):
@@ -77,9 +79,6 @@ class HouPepper:
                 self.abc_tree_all = abc.alembicGetSceneHierarchy(self.abc_path, '')
                 self.abc_tree_path = abc.alembicGetObjectPathListForMenu(self.abc_path)
                 self.get_abc_cam_tree(self.abc_tree_all)
-        print("abc_path :", self.abc_path)
-        print("cam_path :", self.cam_path)
-        print("cam_list :", self.cam_list)
         self.abc_range = abc.alembicTimeRange(self.abc_path)
 
     def get_abc_cam_tree(self, abc_tree_all):
@@ -185,13 +184,11 @@ class HouPepper:
     def set_cam_create(self, abc_path):
         self.set_abc_cam_tree(abc_path)
         name = [abc.alembicGetSceneHierarchy(abc_path, i)[0] for i in self.cam_path]
-        print("name :", name)
         # cam_path : ['/cam1/cam1Camera']
         for cam in self.cam_path:
             # cam_node = cam1Camera
             cam_node = hou.node('/obj').createNode('cam', name[self.cam_path.index(cam)])
             self.cam_node = cam_node
-            print("cam_node :", self.cam_node)
             self.set_cam_view(cam)
             # check_resolution : True
             check_resolution = self.get_cam_resolution(cam)
@@ -220,13 +217,16 @@ class HouPepper:
 
     def set_mantra_for_render(self, hip_path, output_path):
         cam_setting = f'/obj/{self.cam_node}/'
-        print(cam_setting)
-        print(self.abc_range)
-        hou.hipFile.load(hip_path)
+        basename = os.path.basename(hip_path)
+        home_path = os.path.expanduser('~')
+        temp_path = os.path.join(home_path+'/temp', basename)
+        if not os.path.isdir(home_path+'/temp'):
+            os.makedirs(home_path+'/temp')
+        shutil.copyfile(hip_path, temp_path)
+        hou.hipFile.load(temp_path)
         root = hou.node('/out')
         if root != None:
             n = root.createNode('ifd')
-            print(output_path[:-30])
             n.parm('camera').set(cam_setting)
             n.parm('vm_picture').set(f'{output_path[:-8]}$F4.jpg')
             n.parm('trange').set(1)
@@ -235,6 +235,18 @@ class HouPepper:
             n.parmTuple('f').set([self.abc_range[0] * hou.fps(), self.abc_range[1] * hou.fps(), 1])
             n.parm("execute").pressButton()
 
+        output_dir = os.path.dirname(output_path) + '/*.jpg'
+        error_dir = os.path.dirname(output_path) + '/*.jpg.mantra_checkpoint'
+        file_list = glob.glob(output_dir)
+        error_list = glob.glob(error_dir)
+        if len(file_list) == self.abc_range[1] * hou.fps():
+            if len(error_list) == 0:
+                shutil.rmtree(home_path+'/temp')
+            else:
+                print("render error")
+        else:
+            print("missing sequence frame")
+
     def set_ffmpeg_seq_to_mov(self, seq_path, output_path):
         framerate = hou.fps()
         sequence_file_path = seq_path
@@ -242,7 +254,7 @@ class HouPepper:
 pepper = Houpub()
 pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
 pepper.project = 'PEPPER'
-pepper.asset = 'temp_dancing_particle'
+pepper.asset = 'temp_breaking_glass'
 pepper.entity = 'asset'
 # need software handling method
 pepper.software = 'hiplc'
@@ -272,5 +284,5 @@ for shot in casted_shots:
     print("layout_output_path :", layout_output_path)
     hou_pepper.set_fx_working_for_shot(simulation_path, layout_output_path,
                                        f'{next_fx_path}.{pepper.software.get("file_extension")}')
-    # hou_pepper.set_mantra_for_render(fx_path, fx_output)
+    hou_pepper.set_mantra_for_render(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output)
     # pepper.publish_working_file(fx_type_name)

@@ -6,7 +6,7 @@ from view import PepperView
 from pepper import Houpub
 
 
-class MainWindow:
+class PepperWindow:
     def __init__(self):
         self.project_model = PepperModel()
         self.template_model = PepperModel()
@@ -156,7 +156,7 @@ class MainWindow:
 def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
     app = QtWidgets.QApplication(sys.argv)
-    window = MainWindow()
+    window = PepperWindow()
     app.exec_()
 
 

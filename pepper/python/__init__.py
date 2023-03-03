@@ -1,6 +1,6 @@
 """
 *** What is pepper ? ***
-    > 이 모듈은 kitsu의 python rest full API(Gazu)를 활용하여 \n
+    > 이 모듈은 kitsu의 pepper rest full API(Gazu)를 활용하여 \n
     path를 추출하는 kitsu 매핑 API 이다. \n
     FX 템플릿을 각 템플릿이 캐스팅된 샷에 일괄적으로 적용한 뒤 모든 샷의 pre-render을 실행,
     pre-comp 영상을 받아 아티스트가 FX의 pre-viz를 볼 수 있다.\n
