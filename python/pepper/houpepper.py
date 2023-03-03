@@ -224,7 +224,7 @@ class HouPepper:
         print(self.abc_range)
         hou.hipFile.load(hip_path)
         root = hou.node('/out')
-        if root != None:
+        if root is not None:
             n = root.createNode('ifd')
             print(output_path[:-30])
             n.parm('camera').set(cam_setting)
@@ -234,6 +234,9 @@ class HouPepper:
                 i.deleteAllKeyframes()
             n.parmTuple('f').set([self.abc_range[0] * hou.fps(), self.abc_range[1] * hou.fps(), 1])
             n.parm("execute").pressButton()
+            while n.isRendering():
+                print("Rendering frame:", hou.frame())
+                hou.updateProgressAndCheckForInterrupt()
 
     def set_ffmpeg_seq_to_mov(self, seq_path, output_path):
         framerate = hou.fps()
