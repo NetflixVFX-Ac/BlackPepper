@@ -1,4 +1,5 @@
 from unittest import TestCase
+<<<<<<< HEAD
 from pepper import Houpub
 from houpepper import HouPepper
 import hou
@@ -32,6 +33,13 @@ class TestHouPepper(TestCase):
             output_type_name = 'camera_cache'
             layout_output_path = self.pepper.output_file_path(output_type_name, layout_type_name)
             print(layout_output_path)
+=======
+
+
+class TestHouPepper(TestCase):
+    def test_abc_path(self):
+        self.fail()
+>>>>>>> 15ba1b4 (test start)
 
     def test_abc_path(self):
         self.fail()
