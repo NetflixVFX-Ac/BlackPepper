@@ -1,7 +1,7 @@
 from unittest import TestCase
 from pepper import Houpub
-import hou
 from houpepper import HouPepper
+import hou
 
 class TestHouPepper(TestCase):
 
