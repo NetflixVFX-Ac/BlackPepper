@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>PepperLogin</class>
+ <widget class="QWidget" name="PepperLogin">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>540</width>
-    <height>359</height>
+    <width>600</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Pepper Login</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0">
@@ -38,7 +41,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Pepper v0.0.1</string>
+        <string>Pepper v0.0.1 sw</string>
        </property>
       </widget>
      </item>
@@ -81,6 +84,9 @@
          <height>30</height>
         </size>
        </property>
+       <property name="text">
+        <string>pipeline@rapa.org</string>
+       </property>
       </widget>
      </item>
      <item>
@@ -115,6 +121,9 @@
          <width>0</width>
          <height>30</height>
         </size>
+       </property>
+       <property name="text">
+        <string>netflixacademy</string>
        </property>
        <property name="echoMode">
         <enum>QLineEdit::PasswordEchoOnEdit</enum>
