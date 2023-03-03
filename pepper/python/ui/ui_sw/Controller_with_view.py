@@ -56,7 +56,7 @@ class MainWindow:
         self.model_render = MainModel()
 
         # login Ui loader
-        login_ui_file = "/home/rapa/git/hook/ui/ui_sw/login.ui"
+        login_ui_file = "/ui/ui_sw/login.ui"
         login_ui = QtCore.QFile(login_ui_file)
         login_ui.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
@@ -64,7 +64,7 @@ class MainWindow:
         self.window_login.show()
 
         # main Ui loader
-        main_ui_file = "/home/rapa/git/hook/ui/ui_sw/main.ui"
+        main_ui_file = "/ui/ui_sw/main.ui"
         main_ui = QtCore.QFile(main_ui_file)
         main_ui.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
