@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>546</height>
+    <height>566</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -134,6 +134,9 @@
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="2" column="2">
         <widget class="QListView" name="lv_shot">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
          <property name="selectionMode">
           <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>
@@ -219,6 +222,9 @@
            <height>0</height>
           </size>
          </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
          <property name="selectionMode">
           <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>
@@ -249,7 +255,11 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QListView" name="lv_proj"/>
+        <widget class="QListView" name="lv_proj">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item row="1" column="5">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -294,7 +304,11 @@
         </layout>
        </item>
        <item row="2" column="1">
-        <widget class="QListView" name="lv_temp"/>
+        <widget class="QListView" name="lv_temp">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
