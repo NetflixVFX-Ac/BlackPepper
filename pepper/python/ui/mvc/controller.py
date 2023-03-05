@@ -8,6 +8,12 @@ from pepper import Houpub
 
 class PepperWindow:
     def __init__(self):
+        """이 모듈은 pepper를 통해 얻어 온 kitsu 상의 template asset과 casting 된 shot들의 정보들을 UI를 통해 보여준다.
+        UI 모듈은 controller, model, view로 분리되어 있고, mvc_login, mvc_main의 .ui 파일이 UI 데이터를 가지고 있다. \n
+        메인 UI의 4개 model은 PepperModel에서 가져오며, ListView는 PepperView에서 가져온다.
+        여러 개의 shot들을 한번에 선택해 조정할 수 있도록 shots와 rendelistes의 view는 ExtendedSelection으로 설정했다. \n
+        PepperWindow 실행 시 self.login_ui가 우선 실행된다.
+        """
         self.project_model = PepperModel()
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
@@ -45,6 +51,13 @@ class PepperWindow:
         self.all_shots = []
 
     def user_login(self):
+        """mvc_login.ui를 디스플레이 해주는 메소드. 유저의 로그인 페이지 UI에서 Login 버튼 클릭, Enter 입력 시 실행된다. \n
+        UI에서는 id, password를 입력받고, combobox를 통해 Houdini의 license 종류를 입력받는다. \n
+        host는 http://192.168.3.116/api 로 고정되어 있다.
+        입력받은 id, password 값을 pepper의 login 메소드를 통해 kitsu에 로그인한다.
+        로그인 성공 시 입력받은 Houdini license 종류가 pepper의 self.software에 set 된다.
+        이후 self.main_window가 바로 실행되어 pepper의 메인 UI가 디스플레이 된다.
+        """
         user_id = self.window.input_id.text()
         user_pw = self.window.input_pw.text()
         user_software = self.window.hipbox.currentText()[1:]
@@ -55,6 +68,15 @@ class PepperWindow:
         self.main_window()
 
     def main_window(self):
+        """mvc_main.ui를 디스플레이 해주는 메소드. 로그인 성공 시 실행된다. \n
+        projects, templates, shots, render_lists의 네 가지 부분으로 나뉘어 있다. \n
+        projects 에서는 로그인 된 유저가 assign 되어있는 project들을 projects_listview에 디스플레이 해준다.
+        templates 에서는 선택된 project 안의 fx templates를 templates_listview에 디스플레이 해준다.
+        shots 에서는 선택된 fx template가 casting 된 shots를 shots_listview에 디스플레이 해준다.
+        renderlists 에서는 Houdini로 넘겨 precomp를 진행할 shot들을 renderlists_listview에 디스플레이 해준다. \n
+        renderlists는 pepper.precomp_list에 담긴 shot 들의 name의 value 값만 보여주는 것이고,
+        render 버튼 클릭 시 pepper.precomp_list 속 dict를 Houdini로 전달한다.
+        """
         self.window = self.main_ui_loader.load(self.main_ui)
 
         self.window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
@@ -88,6 +110,15 @@ class PepperWindow:
         # signal -> emit
 
     def project_selected(self, event):
+        """projects_listview를 클릭 시 실행되는 메소드. \n
+        선택한 project의 fx template들을 pepper.project에 set 한 뒤, self.all_assets에 fx template 들을 받아온다.
+        가져온 fx template들을 templates_listview에 디스플레이 해준다.
+        다른 project 클릭 시 templates_listview를 clear 한 뒤 같은 방법으로 templates_listview에 fx templates들을 디스플레이 해준다.
+
+        Args:
+            event: Listview click event
+        """
+        # self.pepper.project = event.data()
         project_name = self.my_projects[event.row()]
         self.pepper.project = project_name
         self.all_assets = self.pepper.get_all_assets()
@@ -102,6 +133,12 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def template_selected(self, event):
+        """
+
+        Args:
+            event: Listview click event
+        """
+        # self.pepper.asset = event.data()
         template_name = self.all_assets[event.row()]
         self.pepper.asset = template_name
         name, time, rev = self.pepper.get_working_file_data('simulation', 'asset')
@@ -115,6 +152,11 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def shot_selected(self, event):
+        """
+
+        Args:
+            event: Listview click event
+        """
         shot_dict = self.all_shots[event.row()]
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
@@ -123,6 +165,11 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def append_render_list(self):
+        """
+
+        Returns:
+
+        """
         for idx in self.shots_selection.selectedRows():
             shot_dict = self.all_shots[idx.row()]
             self.pepper.make_precomp_dict(shot_dict)
@@ -134,6 +181,11 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def delete_render_list(self):
+        """
+
+        Returns:
+
+        """
         for idx in self.renderlists_selection.selectedRows():
             self.pepper.delete_precomp_dict(idx.data())
         self.render_model.pepperlist.clear()
@@ -143,14 +195,23 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def clear_list(self):
+        """
+
+        Returns:
+
+        """
         self.pepper.precomp_list = []
         self.render_model.pepperlist.clear()
         self.render_model.layoutChanged.emit()
 
     def render_execute(self):
+        """
+
+        Returns:
+
+        """
         print(self.pepper.precomp_list)
         return self.pepper.precomp_list
-
 
 
 def main():
