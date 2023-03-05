@@ -64,7 +64,7 @@ class PepperWindow:
         """
         user_id = self.login_window.input_id.text()
         user_pw = self.login_window.input_pw.text()
-        user_software = self.login_window.hipbox.currentText()[1:]
+        user_software = self.window.hipbox.currentText()[1:]
         host = "http://192.168.3.116/api"
 
         self.pepper.login(host, user_id, user_pw)
