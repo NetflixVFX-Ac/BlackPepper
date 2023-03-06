@@ -1,13 +1,15 @@
 import sys
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
-from model import PepperModel
-from view import PepperView
+from BlackPepper.ui.mvc.model import PepperModel
+from BlackPepper.ui.mvc.view import PepperView
 from BlackPepper.pepper import Houpub
 
 
 class PepperWindow:
     def __init__(self):
+        QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
+        app = QtWidgets.QApplication(sys.argv)
         self.project_model = PepperModel()
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
@@ -37,12 +39,12 @@ class PepperWindow:
         self.window = self.login_ui_loader.load(self.login_ui)
         self.window.show()
         self.window.login_btn.clicked.connect(self.user_login)
-        # self.window.input_id.returnPressed.connect(self.window.login_btn.clicked.connect(self.user_login))
-        # self.window.input_pw.returnPressed.connect(self.window.login_btn.clicked.connect(self.user_login))
 
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
+
+        app.exec_()
 
     def user_login(self):
         user_id = self.window.input_id.text()
@@ -53,6 +55,9 @@ class PepperWindow:
         self.pepper.login(host, user_id, user_pw)
         self.pepper.software = user_software
         self.main_window()
+
+    # def enter_login(self, event):
+    #     user_id = self.window.input_id.text()
 
     def main_window(self):
         self.window = self.main_ui_loader.load(self.main_ui)
@@ -152,12 +157,8 @@ class PepperWindow:
         return self.pepper.precomp_list
 
 
-
 def main():
-    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-    app = QtWidgets.QApplication(sys.argv)
     window = PepperWindow()
-    app.exec_()
 
 
 if __name__ == "__main__":
