@@ -16,7 +16,7 @@ from PySide2 import QtCore, QtWidgets
 # from PySide2.QtCore import QFile
 from PySide2.QtUiTools import QUiLoader
 
-from main.python.pepper import Houpub
+from BlackPepper.pepper import Houpub
 from Model import MainModel
 
 
@@ -57,7 +57,7 @@ class MainWindow:
 
         # login Ui loader
         login_ui_file = "/ui/ui_sw/login.ui"
-        login_ui = QtCore.QFile(login_ui_file)
+        login_ui = QtCore.QFile("login.ui")
         login_ui.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
         self.window_login = loader.load(login_ui)
@@ -65,7 +65,7 @@ class MainWindow:
 
         # main Ui loader
         main_ui_file = "/ui/ui_sw/main.ui"
-        main_ui = QtCore.QFile(main_ui_file)
+        main_ui = QtCore.QFile("main.ui")
         main_ui.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
         self.window_main = loader.load(main_ui)

@@ -1,8 +1,8 @@
 import sys
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
-from model import PepperModel
-from view import PepperView
+from BlackPepper.ui.mvc.model import PepperModel
+from BlackPepper.ui.mvc.view import PepperView
 from BlackPepper.pepper import Houpub
 
 
@@ -14,6 +14,8 @@ class PepperWindow:
         여러 개의 shot들을 한번에 선택해 조정할 수 있도록 shots와 rendelistes의 view는 ExtendedSelection으로 설정했다. \n
         PepperWindow 실행 시 self.login_ui가 우선 실행된다.
         """
+        QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
+        app = QtWidgets.QApplication(sys.argv)
         self.project_model = PepperModel()
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
@@ -49,6 +51,8 @@ class PepperWindow:
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
+
+        app.exec_()
 
     def user_login(self):
         """mvc_login.ui를 디스플레이 해주는 메소드. 유저의 로그인 페이지 UI에서 Login 버튼 클릭, Enter 입력 시 실행된다. \n
@@ -156,11 +160,6 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def shot_selected(self, event):
-        """
-
-        Args:
-            event: Listview click event
-        """
         shot_dict = self.all_shots[event.row()]
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
@@ -169,11 +168,6 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def append_render_list(self):
-        """
-
-        Returns:
-
-        """
         for idx in self.shots_selection.selectedRows():
             shot_dict = self.all_shots[idx.row()]
             self.pepper.make_precomp_dict(shot_dict)
@@ -185,11 +179,6 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def delete_render_list(self):
-        """
-
-        Returns:
-
-        """
         for idx in self.renderlists_selection.selectedRows():
             self.pepper.delete_precomp_dict(idx.data())
         self.render_model.pepperlist.clear()
@@ -199,30 +188,17 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def clear_list(self):
-        """
-
-        Returns:
-
-        """
         self.pepper.precomp_list = []
         self.render_model.pepperlist.clear()
         self.render_model.layoutChanged.emit()
 
     def render_execute(self):
-        """
-
-        Returns:
-
-        """
         print(self.pepper.precomp_list)
         return self.pepper.precomp_list
 
 
 def main():
-    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-    app = QtWidgets.QApplication(sys.argv)
     window = PepperWindow()
-    app.exec_()
 
 
 if __name__ == "__main__":
