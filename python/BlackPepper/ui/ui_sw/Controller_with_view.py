@@ -107,12 +107,11 @@ class MainWindow:
         # setModel
         self.window_main.lv_proj.setModel(self.model_proj)
         self.window_main.lv_temp.setModel(self.model_temp)
-        self.temps_selection = self.window_main.lv_temp.selectionModel()
-
         self.window_main.lv_shot.setModel(self.model_shot)
-        self.shots_selection = self.window_main.lv_shot.selectionModel()
-
         self.window_main.lv_render.setModel(self.model_render)
+
+        self.temps_selection = self.window_main.lv_temp.selectionModel()
+        self.shots_selection = self.window_main.lv_shot.selectionModel()
         self.render_selection = self.window_main.lv_render.selectionModel()
 
         # get my project
