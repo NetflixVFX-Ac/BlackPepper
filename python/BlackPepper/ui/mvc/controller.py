@@ -3,7 +3,7 @@ from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from model import PepperModel
 from view import PepperView
-from BlackPepper.python.pepper import Houpub
+from BlackPepper.pepper import Houpub
 
 
 class PepperWindow:
