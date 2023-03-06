@@ -5,6 +5,7 @@ from PySide2.QtUiTools import QUiLoader
 from BlackPepper.ui.mvc.model import PepperModel
 from BlackPepper.ui.mvc.view import PepperView
 from BlackPepper.pepper import Houpub
+from BlackPepper.houpepper import HouPepper
 
 
 class PepperWindow:
@@ -199,8 +200,9 @@ class PepperWindow:
         self.render_model.layoutChanged.emit()
 
     def render_execute(self):
-        print(self.pepper.precomp_list)
-        return self.pepper.precomp_list
+        houp = HouPepper()
+        for precomp in self.pepper.precomp_list:
+            houp.abc_path = precomp['layout_output_path']
 
 
 def main():
