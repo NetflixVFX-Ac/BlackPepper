@@ -1,4 +1,5 @@
 import sys
+import os
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from BlackPepper.ui.mvc.model import PepperModel
@@ -34,11 +35,12 @@ class PepperWindow:
         self.shots_selection = None
         self.renderlists_selection = None
 
-        self.login_ui = QtCore.QFile('mvc_login.ui')
+        script_path = os.path.dirname(os.path.realpath(__file__))
+        self.login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login.ui'))
         self.login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
 
-        self.main_ui = QtCore.QFile('mvc_main.ui')
+        self.main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main.ui'))
         self.main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
 
@@ -64,7 +66,7 @@ class PepperWindow:
         """
         user_id = self.login_window.input_id.text()
         user_pw = self.login_window.input_pw.text()
-        user_software = self.window.hipbox.currentText()[1:]
+        user_software = self.login_window.hipbox.currentText()[1:]
         host = "http://192.168.3.116/api"
 
         self.pepper.login(host, user_id, user_pw)

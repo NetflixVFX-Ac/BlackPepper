@@ -2,7 +2,7 @@ from BlackPepper.ui.mvc.controller import PepperWindow
 
 
 def main():
-    window = PepperWindow()
+    PepperWindow()
 
 
 if __name__ == "__main__":
