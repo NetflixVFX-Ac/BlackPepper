@@ -225,7 +225,7 @@ class HouPepper:
         shutil.copyfile(hip_path, temp_path)
         hou.hipFile.load(temp_path)
         root = hou.node('/out')
-        if root != None:
+        if root is not None:
             n = root.createNode('ifd')
             n.parm('camera').set(cam_setting)
             n.parm('vm_picture').set(f'{output_path[:-8]}$F4.jpg')
@@ -234,6 +234,9 @@ class HouPepper:
                 i.deleteAllKeyframes()
             n.parmTuple('f').set([self.abc_range[0] * hou.fps(), self.abc_range[1] * hou.fps(), 1])
             n.parm("execute").pressButton()
+            while n.isRendering():
+                print("Rendering frame:", hou.frame())
+                hou.updateProgressAndCheckForInterrupt()
 
         output_dir = os.path.dirname(output_path) + '/*.jpg'
         error_dir = os.path.dirname(output_path) + '/*.jpg.mantra_checkpoint'
