@@ -110,10 +110,11 @@ class PepperWindow:
         # signal -> emit
 
     def project_selected(self, event):
-        """projects_listview를 클릭 시 실행되는 메소드. \n
+        """projects_listview 클릭 시 실행되는 메소드. \n
         선택한 project의 fx template들을 pepper.project에 set 한 뒤, self.all_assets에 fx template 들을 받아온다.
         가져온 fx template들을 templates_listview에 디스플레이 해준다.
         다른 project 클릭 시 templates_listview를 clear 한 뒤 같은 방법으로 templates_listview에 fx templates들을 디스플레이 해준다.
+        template가 설정되어 있을 경우에는 shots_listview도 clear 해준다.
 
         Args:
             event: Listview click event
@@ -133,7 +134,10 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def template_selected(self, event):
-        """
+        """templates_listview 클릭 시 실행되는 메소드. \n
+        선택한 template이 casting된 shot들을 self.all_shots에 받아온다.
+        가져온 shot들을 shots_listview에 디스플레이 해준다.
+        다른 template 클릭 시 shots_listview를 clear 한 뒤 같은 방법으로 shots_listview에 shot들을 디스플레이 해준다.
 
         Args:
             event: Listview click event
