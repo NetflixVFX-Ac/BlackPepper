@@ -2,7 +2,7 @@ import sys
 
 import gazu
 from PySide2 import QtWidgets, QtCore, QtUiTools
-from hook.python.pepper.pepper import Houpub
+from hook.pepper.python.pepper import Houpub
 
 
 class pepper_login(QtWidgets.QMainWindow):

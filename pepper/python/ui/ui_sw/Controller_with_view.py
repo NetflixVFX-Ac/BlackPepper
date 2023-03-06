@@ -4,6 +4,9 @@ login.ui를 불러와서 사용자가 Login 버튼을 누르면 login.ui 창을 
 
 Qt디자이너 에서 설정한 ui 를 가져와서 listview와 Model.py를 컨트롤한다.
 
+slot -> clicked, connect
+signal -> emit
+
 """
 
 import sys
@@ -53,7 +56,7 @@ class MainWindow:
         self.model_render = MainModel()
 
         # login Ui loader
-        login_ui_file = "/home/rapa/git/hook/ui/ui_sw/login.ui"
+        login_ui_file = "/ui/ui_sw/login.ui"
         login_ui = QtCore.QFile(login_ui_file)
         login_ui.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
@@ -61,12 +64,11 @@ class MainWindow:
         self.window_login.show()
 
         # main Ui loader
-        main_ui_file = "/home/rapa/git/hook/ui/ui_sw/main.ui"
+        main_ui_file = "/ui/ui_sw/main.ui"
         main_ui = QtCore.QFile(main_ui_file)
         main_ui.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
         self.window_main = loader.load(main_ui)
-        # self.window_main.show()
 
         # set connect Ui
         self.window_login.login_btn.clicked.connect(self.set_login)
@@ -80,7 +82,7 @@ class MainWindow:
 
         self.window_main.append_btn.clicked.connect(self.add_render_file)
         self.window_main.del_btn.clicked.connect(self.del_render_file)
-        self.window_main.reset_btn.clicked.connect(self.reset_renderfile_list)
+        self.window_main.reset_btn.clicked.connect(self.reset_render_list)
 
     def set_login(self):
         email = self.window_login.input_id.text()
@@ -120,7 +122,6 @@ class MainWindow:
         # project listview(model) append
         for get_project in self.get_projects:
             self.model_proj.model.append(get_project)
-        self.model_proj.layoutChanged.emit()
 
     def choice_project(self, event):
         """
@@ -160,15 +161,12 @@ class MainWindow:
 
         for get_casting_shot in self.get_casting_shots:
             self.model_shot.model.append(get_casting_shot["sequence_name"] + "_" + get_casting_shot["shot_name"])
-        # print(
-        #     f"{template_name}_casting_shots = {get_casting_shot['sequence_name'] + '_' + get_casting_shot['shot_name']}")
         self.model_shot.layoutChanged.emit()
         self.shots_selection.clear()
 
     def choice_shot(self, event):
         """
         샷 리스트를 선택하면 정보를 가져온다 . 이정보를 add_btn 에서 사용한다.
-
         """
         casted_shot = self.get_casting_shots[event.row()]
 
@@ -204,15 +202,10 @@ class MainWindow:
         self.shots_selection.clear()
         self.render_selection.clear()
 
-    def reset_renderfile_list(self):
+    def reset_render_list(self):
         self.pepper.precomp_list = []
         self.model_render.model.clear()
         self.model_render.layoutChanged.emit()
-
-
-    def choice_render(self, event):
-
-        pass
 
     def temp_info(self):
         # self.pepper.get_casting_path_for_asset()

@@ -1,17 +1,17 @@
 import sys
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
-from hook.ui.mvc import model
-from hook.ui.mvc.view import PepperView
-from hook.python.pepper.pepper import Houpub
+from model import PepperModel
+from view import PepperView
+from pepper import Houpub
 
 
-class MainWindow:
+class PepperWindow:
     def __init__(self):
-        self.project_model = model.PepperModel()
-        self.template_model = model.PepperModel()
-        self.shot_model = model.PepperModel()
-        self.render_model = model.PepperModel()
+        self.project_model = PepperModel()
+        self.template_model = PepperModel()
+        self.shot_model = PepperModel()
+        self.render_model = PepperModel()
         self.pepper = Houpub()
 
         self.projects_listview = PepperView(self)
@@ -98,34 +98,29 @@ class MainWindow:
         self.template_model.layoutChanged.emit()
         self.shot_model.layoutChanged.emit()
         self.templates_selection.clear()
+        self.shots_selection.clear()
+        self.renderlists_selection.clear()
 
     def template_selected(self, event):
         template_name = self.all_assets[event.row()]
         self.pepper.asset = template_name
-
         name, time, rev = self.pepper.get_working_file_data('simulation', 'asset')
         self.window.template_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
-
         self.all_shots = self.pepper.get_casting_path_for_asset()
         self.shot_model.pepperlist.clear()
         for shot in self.all_shots:
             self.shot_model.pepperlist.append(shot['sequence_name'] + '_' + shot['shot_name'])
         self.shot_model.layoutChanged.emit()
         self.shots_selection.clear()
+        self.renderlists_selection.clear()
 
     def shot_selected(self, event):
         shot_dict = self.all_shots[event.row()]
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
-        # self.pepper.get_output_file_data('camera_cache', 'layout', 'shot')
         name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', 'shot')
         self.window.shot_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
-
-        self.pepper.make_precomp_dict(shot_dict)
-        self.render_model.pepperlist.clear()
-        for render in self.pepper.precomp_list:
-            self.render_model.pepperlist.append(render['name'])
-        self.render_model.layoutChanged.emit()
+        self.renderlists_selection.clear()
 
     def append_render_list(self):
         for idx in self.shots_selection.selectedRows():
@@ -157,7 +152,13 @@ class MainWindow:
         return self.pepper.precomp_list
 
 
-QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-app = QtWidgets.QApplication(sys.argv)
-window = MainWindow()
-app.exec_()
+
+def main():
+    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
+    app = QtWidgets.QApplication(sys.argv)
+    window = PepperWindow()
+    app.exec_()
+
+
+if __name__ == "__main__":
+    main()

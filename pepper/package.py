@@ -4,14 +4,14 @@ name = 'Hook'
 version = '0.0.1'
 authors = ['Sunjun Park', 'Sungwoo Park', 'Jinkwang Park', 'Yeolhoon Yoon', 'Jaehyuk Lee', 'Wongyu Lee']
 requires = [
-    'python', 'gazu', 'hou'
+    'pepper', 'gazu', 'hou'
 ]
 variants = [
-    ['platform-linux', 'python'],
+    ['platform-linux', 'pepper'],
 ]
 
 def commands():
-    env.PYTHONPATH.prepend("{root}/python")
+    env.PYTHONPATH.prepend("{root}/pepper")
 
 
 format_version = 1
