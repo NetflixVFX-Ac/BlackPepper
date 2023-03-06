@@ -16,7 +16,7 @@ from PySide2 import QtCore, QtWidgets
 # from PySide2.QtCore import QFile
 from PySide2.QtUiTools import QUiLoader
 
-from main.python.pepper import Houpub
+from BlackPepper.pepper import Houpub
 from Model import MainModel
 
 
