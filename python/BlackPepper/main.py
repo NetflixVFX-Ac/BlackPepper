@@ -1,8 +1,11 @@
 from BlackPepper.ui.mvc.controller import PepperWindow
+from houpepper import HouPepper
 
 
 def main():
-    PepperWindow()
+    ui = PepperWindow()
+    hp = HouPepper
+
 
 
 if __name__ == "__main__":

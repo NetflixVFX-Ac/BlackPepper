@@ -275,42 +275,48 @@ class HouPepper:
         else:
             print('error')
 
-pepper = Houpub()
-pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
-pepper.project = 'PEPPER'
-pepper.asset = 'temp_breaking_glass'
-pepper.entity = 'asset'
-# need software handling method
-pepper.software = 'hiplc'
-simulation_type_name = 'simulation'
-simulation_path = pepper.working_file_path(simulation_type_name, input_num=1)
-casted_shots = pepper.get_casting_path_for_asset()
 
-hou_pepper = HouPepper()
+def main():
+    pepper = Houpub()
+    pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+    pepper.project = 'PEPPER'
+    pepper.asset = 'temp_breaking_glass'
+    pepper.entity = 'asset'
+    # need software handling method
+    pepper.software = 'hiplc'
+    simulation_type_name = 'simulation'
+    simulation_path = pepper.working_file_path(simulation_type_name, input_num=1)
+    casted_shots = pepper.get_casting_path_for_asset()
 
-for shot in casted_shots:
-    pepper.sequence = shot.get('sequence_name')
-    pepper.shot = shot.get('shot_name')
-    pepper.entity = 'shot'
-    layout_type_name = 'layout'
-    output_type_name = 'camera_cache'
-    layout_output_path = pepper.output_file_path(output_type_name, layout_type_name)
-    pepper.software = 'hipnc'
-    fx_type_name = 'fx'
-    # BlackPepper.publish_working_file(fx_type_name)
-    fx_path = pepper.working_file_path(fx_type_name)
-    next_fx_path = pepper.make_next_working_path(fx_type_name)
-    output_type_name = 'JPG'
-    fx_output = pepper.output_file_path(output_type_name, fx_type_name)
-    output_type_name = 'movie_file'
-    mov_output = pepper.output_file_path(output_type_name, fx_type_name)
-    print("fx_path :", fx_path)
-    print("next_fx_path :", next_fx_path)
-    print("fx_output :", fx_output)
-    print("layout_output_path :", layout_output_path)
-    print("mov_output :", mov_output)
-    # hou_pepper.set_fx_working_for_shot(simulation_path, layout_output_path,
-    #                                    f'{next_fx_path}.{BlackPepper.software.get("file_extension")}')
-    # hou_pepper.set_mantra_for_render(f'{next_fx_path}.{BlackPepper.software.get("file_extension")}', fx_output)
-    # BlackPepper.publish_working_file(fx_type_name)
-    hou_pepper.set_ffmpeg_seq_to_mp4(fx_output, mov_output)
+    hou_pepper = HouPepper()
+
+    for shot in casted_shots:
+        pepper.sequence = shot.get('sequence_name')
+        pepper.shot = shot.get('shot_name')
+        pepper.entity = 'shot'
+        layout_type_name = 'layout'
+        output_type_name = 'camera_cache'
+        layout_output_path = pepper.output_file_path(output_type_name, layout_type_name)
+        pepper.software = 'hipnc'
+        fx_type_name = 'fx'
+        # BlackPepper.publish_working_file(fx_type_name)
+        fx_path = pepper.working_file_path(fx_type_name)
+        next_fx_path = pepper.make_next_working_path(fx_type_name)
+        output_type_name = 'JPG'
+        fx_output = pepper.output_file_path(output_type_name, fx_type_name)
+        output_type_name = 'movie_file'
+        mov_output = pepper.output_file_path(output_type_name, fx_type_name)
+        print("fx_path :", fx_path)
+        print("next_fx_path :", next_fx_path)
+        print("fx_output :", fx_output)
+        print("layout_output_path :", layout_output_path)
+        print("mov_output :", mov_output)
+        # hou_pepper.set_fx_working_for_shot(simulation_path, layout_output_path,
+        #                                    f'{next_fx_path}.{BlackPepper.software.get("file_extension")}')
+        # hou_pepper.set_mantra_for_render(f'{next_fx_path}.{BlackPepper.software.get("file_extension")}', fx_output)
+        # BlackPepper.publish_working_file(fx_type_name)
+        hou_pepper.set_ffmpeg_seq_to_mp4(fx_output, mov_output)
+
+
+if __name__ == "__main__":
+    main()
