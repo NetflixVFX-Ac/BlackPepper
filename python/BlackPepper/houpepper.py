@@ -1,10 +1,13 @@
-import hou
-import _alembic_hom_extensions as abc
+import sys
+import os
+import glob
 import numpy as np
 from pepper import Houpub
 import shutil
-import os
-import glob
+from ffmpeg_process_bar import MainWindow
+from PySide2 import QtWidgets
+import hou
+import _alembic_hom_extensions as abc
 
 class HouPepper:
     def __init__(self):
@@ -36,6 +39,7 @@ class HouPepper:
             exec("self.{}=[]".format(str))
         self.cam_resolution = []
         self.filmaspectratio = []
+        self.file_count = 0
 
     @property
     def abc_path(self):
@@ -184,6 +188,7 @@ class HouPepper:
     def set_cam_create(self, abc_path):
         self.set_abc_cam_tree(abc_path)
         name = [abc.alembicGetSceneHierarchy(abc_path, i)[0] for i in self.cam_path]
+        # cam_list : ['cam1Camera']
         # cam_path : ['/cam1/cam1Camera']
         for cam in self.cam_path:
             # cam_node = cam1Camera
@@ -234,9 +239,9 @@ class HouPepper:
                 i.deleteAllKeyframes()
             n.parmTuple('f').set([self.abc_range[0] * hou.fps(), self.abc_range[1] * hou.fps(), 1])
             n.parm("execute").pressButton()
-            while n.isRendering():
-                print("Rendering frame:", hou.frame())
-                hou.updateProgressAndCheckForInterrupt()
+            # while n.isRendering():
+            #     print("Rendering frame:", hou.frame())
+            #     hou.updateProgressAndCheckForInterrupt()
 
         output_dir = os.path.dirname(output_path) + '/*.jpg'
         error_dir = os.path.dirname(output_path) + '/*.jpg.mantra_checkpoint'
@@ -251,9 +256,11 @@ class HouPepper:
             print("missing sequence frame")
 
     def set_ffmpeg_seq_to_mp4(self, seq_path, output_path):
-        seq_dir = os.path.dirname(output_path)
+        output_dir = os.path.dirname(output_path)
+        seq_dir = os.path.dirname(seq_path)
         sequence_path = seq_path[:-8] + '%04d.jpg'
-        print(sequence_path)
+        print('seq_dir :', seq_dir)
+        print('sequence_path :', sequence_path)
         command = [
             'ffmpeg',
             "-framerate", str(hou.fps()),  # 초당프레임
@@ -268,12 +275,14 @@ class HouPepper:
         ]
         cmd = (' '.join(str(s) for s in command))
         print(cmd)
-        print("seq_dir :", seq_dir)
-        if not os.path.isdir(seq_dir):
-            os.makedirs(seq_dir)
-            os.system(cmd)
-        else:
-            print('error')
+        print("output_dir :", output_dir)
+        if not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
+        app = QtWidgets.QApplication()
+        w = MainWindow(cmd, seq_dir)
+        w.show()
+        app.exec_()
+
 
 pepper = Houpub()
 pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
@@ -302,8 +311,8 @@ for shot in casted_shots:
     next_fx_path = pepper.make_next_working_path(fx_type_name)
     output_type_name = 'JPG'
     fx_output = pepper.output_file_path(output_type_name, fx_type_name)
-    output_type_name = 'movie_file'
-    mov_output = pepper.output_file_path(output_type_name, fx_type_name)
+    output_type_name2 = 'movie_file'
+    mov_output = pepper.output_file_path(output_type_name2, fx_type_name)
     print("fx_path :", fx_path)
     print("next_fx_path :", next_fx_path)
     print("fx_output :", fx_output)
