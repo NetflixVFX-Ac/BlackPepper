@@ -9,7 +9,7 @@ from BlackPepper.pepper import Houpub
 class PepperWindow:
     def __init__(self):
         QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-        app = QtWidgets.QApplication(sys.argv)
+        self.app = QtWidgets.QApplication(sys.argv)
         self.project_model = PepperModel()
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
@@ -36,20 +36,22 @@ class PepperWindow:
         self.main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
 
-        self.window = self.login_ui_loader.load(self.login_ui)
-        self.window.show()
-        self.window.login_btn.clicked.connect(self.user_login)
+        self.login_window = self.login_ui_loader.load(self.login_ui)
+        self.login_window.show()
+        self.login_window.login_btn.clicked.connect(self.user_login)
+        self.login_window.input_pw.returnPressed.connect(self.user_login)
 
+        self.window = self.main_ui_loader.load(self.main_ui)
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
 
-        app.exec_()
+        self.app.exec_()
 
     def user_login(self):
-        user_id = self.window.input_id.text()
-        user_pw = self.window.input_pw.text()
-        user_software = self.window.hipbox.currentText()[1:]
+        user_id = self.login_window.input_id.text()
+        user_pw = self.login_window.input_pw.text()
+        user_software = self.login_window.hipbox.currentText()[1:]
         host = "http://192.168.3.116/api"
 
         self.pepper.login(host, user_id, user_pw)
@@ -60,7 +62,8 @@ class PepperWindow:
     #     user_id = self.window.input_id.text()
 
     def main_window(self):
-        self.window = self.main_ui_loader.load(self.main_ui)
+        self.login_window.close()
+        # self.window = self.main_ui_loader.load(self.main_ui)
 
         self.window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
