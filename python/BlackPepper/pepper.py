@@ -1,5 +1,5 @@
 import gazu
-from BlackPepper.python.log.log_pepper import make_logger
+from log.log_pepper import make_logger
 
 
 class Houpub:

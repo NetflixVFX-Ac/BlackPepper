@@ -1,5 +1,5 @@
 from unittest import TestCase
-from BlackPepper.python.pepper import Houpub
+from main.python.pepper import Houpub
 import gazu
 import os
 import pprint
