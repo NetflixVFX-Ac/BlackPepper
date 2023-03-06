@@ -15,7 +15,7 @@ class PepperWindow:
         PepperWindow 실행 시 self.login_ui가 우선 실행된다.
         """
         QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-        app = QtWidgets.QApplication(sys.argv)
+        self.app = QtWidgets.QApplication(sys.argv)
         self.project_model = PepperModel()
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
@@ -42,17 +42,17 @@ class PepperWindow:
         self.main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
 
-        self.window = self.login_ui_loader.load(self.login_ui)
-        self.window.show()
-        self.window.login_btn.clicked.connect(self.user_login)
-        # self.window.input_id.returnPressed.connect(self.window.login_btn.clicked.connect(self.user_login))
-        # self.window.input_pw.returnPressed.connect(self.window.login_btn.clicked.connect(self.user_login))
+        self.login_window = self.login_ui_loader.load(self.login_ui)
+        self.login_window.show()
+        self.login_window.login_btn.clicked.connect(self.user_login)
+        self.login_window.input_pw.returnPressed.connect(self.user_login)
 
+        self.window = self.main_ui_loader.load(self.main_ui)
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
 
-        app.exec_()
+        self.app.exec_()
 
     def user_login(self):
         """mvc_login.ui를 디스플레이 해주는 메소드. 유저의 로그인 페이지 UI에서 Login 버튼 클릭, Enter 입력 시 실행된다. \n
@@ -62,9 +62,9 @@ class PepperWindow:
         로그인 성공 시 입력받은 Houdini license 종류가 pepper의 self.software에 set 된다.
         이후 self.main_window가 바로 실행되어 pepper의 메인 UI가 디스플레이 된다.
         """
-        user_id = self.window.input_id.text()
-        user_pw = self.window.input_pw.text()
-        user_software = self.window.hipbox.currentText()[1:]
+        user_id = self.login_window.input_id.text()
+        user_pw = self.login_window.input_pw.text()
+        user_software = self.login_window.hipbox.currentText()[1:]
         host = "http://192.168.3.116/api"
 
         self.pepper.login(host, user_id, user_pw)
@@ -81,7 +81,7 @@ class PepperWindow:
         renderlists는 pepper.precomp_list에 담긴 shot 들의 name의 value 값만 보여주는 것이고,
         render 버튼 클릭 시 pepper.precomp_list 속 dict를 Houdini로 전달한다.
         """
-        self.window = self.main_ui_loader.load(self.main_ui)
+        self.login_window.close()
 
         self.window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
