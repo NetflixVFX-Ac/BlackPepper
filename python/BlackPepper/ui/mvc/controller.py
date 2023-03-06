@@ -47,6 +47,7 @@ class PepperWindow:
         self.login_window = self.login_ui_loader.load(self.login_ui)
         self.login_window.show()
         self.login_window.login_btn.clicked.connect(self.user_login)
+        self.login_window.input_id.returnPressed.connect(self.user_login)
         self.login_window.input_pw.returnPressed.connect(self.user_login)
 
         self.window = self.main_ui_loader.load(self.main_ui)
