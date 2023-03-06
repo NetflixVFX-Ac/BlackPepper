@@ -15,7 +15,7 @@ def make_logger(name):
     \n Logger : 어플리케이션 코드가 직접 사용할 수 있는 인터페이스를 제공함.
     \n Handler : logger 에 의해 만들어진 log 기록들을 적합한 위치로 보냄
     \n StreamHandler : 콘솔창에 로그 메시지 출력\n
-    \n FileHandler : 로깅 메세지를 파일로 저장 filename="pepper.log"
+    \n FileHandler : 로깅 메세지를 파일로 저장 filename="BlackPepper.log"
     \n Formatter : log 기록들의 최종 출력본의 레이아웃을 결정함
 
     Args:
@@ -37,7 +37,7 @@ def make_logger(name):
 
     # 4 handler instance 생성
     console = logging.StreamHandler()
-    file_handler = logging.FileHandler(filename="pepper.log")
+    file_handler = logging.FileHandler(filename="BlackPepper.log")
 
     # 5 handler 별로 다른 level 설정
     console.setLevel(logging.INFO)

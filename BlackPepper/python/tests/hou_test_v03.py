@@ -12,7 +12,7 @@ except:
 
 _AbcModule = __import__("_alembic_hom_extensions")
 
-temp_hip = "/home/rapa/test_2.hipnc"
+temp_hip = "/mnt/project/hook/BlackPepper/shots/sq01/0010/fx/working/v001/pepper_fx_template_temp_fire_simulation_002.hipnc"
 
 new_hip = "/home/rapa/test_21.hipnc"
 
@@ -24,33 +24,32 @@ hou.hipFile.load(temp_hip)
 
 # 씬 001의 있는 cam light여러 요소들을 불러와서 지금 여기 temp hip(템플릿) 에 적용하여 렌더
 
-obj = hou.node('/obj')
-geo = obj.createNode('geo')
-sphere = geo.createNode('sphere')
-box = geo.createNode('box')
-geo.setName('please')
-sphere.setName('sphere')
-obj.createNode('geo', 'wongyu')
+# obj = hou.node('/obj')
+# geo = obj.createNode('geo')
+# sphere = geo.createNode('sphere')
+# box = geo.createNode('box')
+# geo.setName('please')
+# sphere.setName('sphere')
+# obj.createNode('geo', 'wongyu')
 out = hou.node('/out')
 node = hou.pwd()
 
 
-def createCamera():
-    root = hou.node("/obj/")
-    if root != None:
-        n = root.createNode("cam")
-        n.parm("focal").set(35)
+# def createCamera():
+#     root = hou.node("/obj/")
+#     if root != None:
+#         n = root.createNode("cam")
+#         n.parm("focal").set(35)
 
 
 def createMantra():
     root = hou.node("/out")
     if root != None:
         n = root.createNode("ifd")
-        s = "/mnt/project/hook/pepper/shots/sq01/0010/fx/output/my_filename_0001.jpg"
+        s = "/mnt/project/hook/BlackPepper/shots/sq01/0010/fx/output/my_filename_0001.jpg"
         n.parm("camera").set()
         n.parm("vm_picture").set(s)
         n.parm("execute").pressButton()
-        n.parm("trange").set(1)
 
 
 createMantra()

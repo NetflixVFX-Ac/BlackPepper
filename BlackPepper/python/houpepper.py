@@ -294,7 +294,7 @@ for shot in casted_shots:
     layout_output_path = pepper.output_file_path(output_type_name, layout_type_name)
     pepper.software = 'hipnc'
     fx_type_name = 'fx'
-    # pepper.publish_working_file(fx_type_name)
+    # BlackPepper.publish_working_file(fx_type_name)
     fx_path = pepper.working_file_path(fx_type_name)
     next_fx_path = pepper.make_next_working_path(fx_type_name)
     output_type_name = 'JPG'
@@ -307,7 +307,7 @@ for shot in casted_shots:
     print("layout_output_path :", layout_output_path)
     print("mov_output :", mov_output)
     # hou_pepper.set_fx_working_for_shot(simulation_path, layout_output_path,
-    #                                    f'{next_fx_path}.{pepper.software.get("file_extension")}')
-    # hou_pepper.set_mantra_for_render(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output)
-    # pepper.publish_working_file(fx_type_name)
+    #                                    f'{next_fx_path}.{BlackPepper.software.get("file_extension")}')
+    # hou_pepper.set_mantra_for_render(f'{next_fx_path}.{BlackPepper.software.get("file_extension")}', fx_output)
+    # BlackPepper.publish_working_file(fx_type_name)
     hou_pepper.set_ffmpeg_seq_to_mp4(fx_output, mov_output)

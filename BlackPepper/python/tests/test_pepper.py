@@ -1,5 +1,5 @@
 from unittest import TestCase
-from pepper import Houpub
+from BlackPepper.python.pepper import Houpub
 import gazu
 import os
 import pprint
@@ -165,10 +165,10 @@ class TestHoupub(TestCase):
         self.pepper.asset = 'temp_fire'
         self.pepper.sequence = 'SQ01'
         self.pepper.shot = '0010'
-        # last_revision = self.pepper.get_casting_path_for_asset()
+        # last_revision = self.BlackPepper.get_casting_path_for_asset()
         # shot_dict = None
         # for i in range(len(last_revision)):
-        #     if last_revision[i][0].get('shot_name') == self.pepper.shot.get('name'):
+        #     if last_revision[i][0].get('shot_name') == self.BlackPepper.shot.get('name'):
         #         shot_dict = last_revision[i][0]
         # self.assertIsNotNone(shot_dict)
         casted_shots, layout_tasks, fx_tasks = self.pepper.get_casting_path_for_asset()
@@ -205,7 +205,7 @@ class TestHoupub(TestCase):
         # arg_num = 1
         arg = 'hook'
         args = 'num'
-        # check_arg_num = self.pepper.args_str_check(arg_num)
+        # check_arg_num = self.BlackPepper.args_str_check(arg_num)
         check_arg = self.pepper.args_str_check(arg)
         check_args = self.pepper.args_str_check(arg, args)
         self.assertEqual(check_arg, arg)
@@ -361,10 +361,10 @@ class TestHoupub(TestCase):
 
         1. login unittest
         소프트웨어 assign
-        self.pepper.software = 'hipnc'
+        self.BlackPepper.software = 'hipnc'
         """
         host = 'http://192.168.3.116/api'
-        identify = 'pepper@hook.com'
+        identify = 'BlackPepper@hook.com'
         password = 'pepperpepper'
         project = None
         self.pepper.login(host, identify, password)
@@ -374,7 +374,7 @@ class TestHoupub(TestCase):
         2. my_projects unittest / 
         
         saved info
-        -   self.pepper.project = project
+        -   self.BlackPepper.project = project
         
         """
         for proj in self.pepper.get_my_projects():
@@ -387,7 +387,7 @@ class TestHoupub(TestCase):
         3. template list unittest
         
         saved info
-        -   self.pepper.project = project
+        -   self.BlackPepper.project = project
         
         """
         assets = []
@@ -402,8 +402,8 @@ class TestHoupub(TestCase):
         4. pick template
         
         saved info
-        -   self.pepper.project = project = "PEPPER"
-        -   self.pepper.asset = 'temp_fire'
+        -   self.BlackPepper.project = project = "PEPPER"
+        -   self.BlackPepper.asset = 'temp_fire'
         """
         pick_template = None
         for asset in self.pepper.get_all_assets():
@@ -416,8 +416,8 @@ class TestHoupub(TestCase):
         5. template 'temp_fire' working file path unittest
         
         saved info
-        -   self.pepper.project = project = "PEPPER"
-        -   self.pepper.asset = 'temp_fire'
+        -   self.BlackPepper.project = project = "PEPPER"
+        -   self.BlackPepper.asset = 'temp_fire'
         """
         task_type = None
         self.pepper.entity = 'asset'
@@ -427,13 +427,13 @@ class TestHoupub(TestCase):
                 task_type = t
                 path = self.pepper.working_file_path(task_type.get('name'))
                 dir = os.path.dirname(path)
-        self.assertEqual(dir, 'mnt/projects/hook/pepper/assets/fx_template/temp_fire/simulation/working/v009')
+        self.assertEqual(dir, 'mnt/projects/hook/BlackPepper/assets/fx_template/temp_fire/simulation/working/v009')
 
         """
         6. casting shot unittest
         saved info
-        -   self.pepper.project = project
-        -   self.pepper.asset = 'temp_fire'
+        -   self.BlackPepper.project = project
+        -   self.BlackPepper.asset = 'temp_fire'
         
         
         """
@@ -448,10 +448,10 @@ class TestHoupub(TestCase):
         7. pick shot
         
         saved info
-        -   self.pepper.project = project
-        -   self.pepper.asset = 'temp_fire'
-        -   self.pepper.sequence = shot.get('sequence_name') = SQ01
-        -   self.pepper.shot = shot.get('shot_name') = 0010
+        -   self.BlackPepper.project = project
+        -   self.BlackPepper.asset = 'temp_fire'
+        -   self.BlackPepper.sequence = shot.get('sequence_name') = SQ01
+        -   self.BlackPepper.shot = shot.get('shot_name') = 0010
         """
         picked_shot = None
         shot = '0010'
@@ -466,10 +466,10 @@ class TestHoupub(TestCase):
         8. template + shot(layout) 
 
         saved info
-        -   self.pepper.project = project
-        -   self.pepper.asset = 'temp_fire'
-        -   self.pepper.sequence = shot.get('sequence_name') = SQ01
-        -   self.pepper.shot = shot.get('shot_name') = 0010        
+        -   self.BlackPepper.project = project
+        -   self.BlackPepper.asset = 'temp_fire'
+        -   self.BlackPepper.sequence = shot.get('sequence_name') = SQ01
+        -   self.BlackPepper.shot = shot.get('shot_name') = 0010        
         """
         self.pepper.make_precomp_dict(picked_shot)
         pick_precomp = None
@@ -482,10 +482,10 @@ class TestHoupub(TestCase):
         9. render button
         
         saved info
-        -   self.pepper.project = project
-        -   self.pepper.asset = 'temp_fire'
-        -   self.pepper.sequence = shot.get('sequence_name') = SQ01
-        -   self.pepper.shot = shot.get('shot_name') = 0010        
+        -   self.BlackPepper.project = project
+        -   self.BlackPepper.asset = 'temp_fire'
+        -   self.BlackPepper.sequence = shot.get('sequence_name') = SQ01
+        -   self.BlackPepper.shot = shot.get('shot_name') = 0010        
         """
 
         """
