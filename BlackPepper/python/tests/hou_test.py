@@ -12,7 +12,7 @@ except:
 
 _AbcModule = __import__("_alembic_hom_extensions")
 
-temp_hip = "/mnt/project/hook/pepper/shots/sq01/0010/fx/working/v046/pepper_sq01_0010_fx_046.hipnc"
+temp_hip = "/mnt/project/hook/BlackPepper/shots/sq01/0010/fx/working/v046/pepper_sq01_0010_fx_046.hipnc"
 
 new_hip = "/home/rapa/test_21.hipnc"
 
@@ -47,7 +47,7 @@ def createMantra():
     if root is not None:
         n = root.createNode("ifd")
         f1 = '$F4'
-        s = f'/mnt/project/hook/pepper/shots/sq01/0010/fx/output/my_filename_{f1}.jpg'
+        s = f'/mnt/project/hook/BlackPepper/shots/sq01/0010/fx/output/my_filename_{f1}.jpg'
         archive_path = '/mnt/project/hook/pepper/shots/sq01/0010/layout/working/v001/pepper_sq01_0010_layout_001.abc'
         n.parm("camera").set("/obj/cam1Camera")
         n.parm("vm_picture").set(s)

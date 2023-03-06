@@ -18,7 +18,7 @@ class ImportABC:
         self.camList = []
         self.camPath = []
         self.file = seletFile
-        # file : file : /mnt/project/hook/pepper/shots/sq01/0010/layout/working/v001/pepper_sq01_0010_layout_001.abc
+        # file : file : /mnt/project/hook/BlackPepper/shots/sq01/0010/layout/working/v001/pepper_sq01_0010_layout_001.abc
         if len(self.file) > 0:
             self.true = self.BuildHierarchyRoot()
             if self.true:
@@ -118,7 +118,7 @@ class ABC_Work:
     def setCamView(self, cam):
         import _alembic_hom_extensions as abc
         # alembicTimeRange : (0.041666666666666664, 10.0) getXfrom range: range(1, 240) ABC_Work abcFile :
-        # /mnt/project/hook/pepper/shots/sq01/0010/layout/working/v001/pepper_sq01_0010_layout_001.abc cam :
+        # /mnt/project/hook/BlackPepper/shots/sq01/0010/layout/working/v001/pepper_sq01_0010_layout_001.abc cam :
         # /cam1/cam1Camera
         for t in range(int(self.abcRange[0] * hou.fps()), int(self.abcRange[1] * hou.fps()) + 1):
             cameraDict = abc.alembicGetCameraDict(self.abcFile, cam, t / hou.fps())
@@ -130,7 +130,7 @@ class ABC_Work:
     def getCamRes(self, cam):
         import _alembic_hom_extensions as abc
         # alembicTimeRange : (0.041666666666666664, 10.0) getXfrom range: range(1, 240) ABC_Work abcFile :
-        # /mnt/project/hook/pepper/shots/sq01/0010/layout/working/v001/pepper_sq01_0010_layout_001.abc cam :
+        # /mnt/project/hook/BlackPepper/shots/sq01/0010/layout/working/v001/pepper_sq01_0010_layout_001.abc cam :
         # /cam1/cam1Camera
         for t in range(int(self.abcRange[0] * hou.fps()), int(self.abcRange[1] * hou.fps()) + 1):
             resTuple = abc.alembicGetCameraResolution(self.abcFile, cam, t)

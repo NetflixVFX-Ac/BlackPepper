@@ -16,7 +16,7 @@ from PySide2 import QtCore, QtWidgets
 # from PySide2.QtCore import QFile
 from PySide2.QtUiTools import QUiLoader
 
-from pepper import Houpub
+from BlackPepper.python.pepper import Houpub
 from Model import MainModel
 
 
@@ -175,7 +175,7 @@ class MainWindow:
     def add_render_file(self):
         """
         add_btn 을 설정하는 함수이다.
-        lv_shot (listview)  pepper.get_casting_path_for_asset 된 seq_name , shot_name 을 click 하고
+        lv_shot (listview)  BlackPepper.get_casting_path_for_asset 된 seq_name , shot_name 을 click 하고
         add_btn 을 clicked 하면 lv_render(liseview) 에 추가 한다.
         render files listview 에 있는 render 할 파일목록들 중복체크해줌
         """
@@ -208,7 +208,7 @@ class MainWindow:
         self.model_render.layoutChanged.emit()
 
     def temp_info(self):
-        # self.pepper.get_casting_path_for_asset()
+        # self.BlackPepper.get_casting_path_for_asset()
         pass
 
     def shot_info(self):
