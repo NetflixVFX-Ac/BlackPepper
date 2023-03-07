@@ -228,11 +228,12 @@ class HouPepper:
         if root is not None:
             n = root.createNode('ifd')
             n.parm('camera').set(cam_setting)
-            n.parm('vm_picture').set(f'{output_path[:-8]}$F4.jpg')
+            n.parm('vm_picture').set(f'{output_path[:-17]}{output_path[-5:]}_$F4.jpg')
             n.parm('trange').set(1)
             for i in n.parmTuple('f'):
                 i.deleteAllKeyframes()
-            n.parmTuple('f').set([self.abc_range[0] * hou.fps(), self.abc_range[1] * hou.fps(), 1])
+            # n.parmTuple('f').set([self.abc_range[0] * hou.fps(), self.abc_range[1] * hou.fps(), 1])
+            n.parmTuple('f').set([self.abc_range[0] * hou.fps(), 3, 1])
             n.parm("execute").pressButton()
             while n.isRendering():
                 print("Rendering frame:", hou.frame())
