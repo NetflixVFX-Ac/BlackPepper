@@ -33,11 +33,12 @@
        <property name="font">
         <font>
          <pointsize>16</pointsize>
+         <weight>50</weight>
          <bold>false</bold>
         </font>
        </property>
        <property name="text">
-        <string>Pepper v0.0.1</string>
+        <string>Black Pepper v0.0.1</string>
        </property>
       </widget>
      </item>
