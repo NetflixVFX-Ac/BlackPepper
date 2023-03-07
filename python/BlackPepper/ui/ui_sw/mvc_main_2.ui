@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1016</width>
-    <height>575</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,9 +26,6 @@
     </property>
     <property name="bottomMargin">
      <number>30</number>
-    </property>
-    <property name="horizontalSpacing">
-     <number>40</number>
     </property>
     <item row="0" column="0">
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -327,6 +324,13 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuSeleted_Shots_save">
+    <property name="title">
+     <string>Seleted Shots save</string>
+    </property>
+    <addaction name="separator"/>
+   </widget>
+   <addaction name="menuSeleted_Shots_save"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
