@@ -10,17 +10,15 @@ from BlackPepper.pepper import Houpub
 
 class PepperWindow:
     def __init__(self):
-        """
-        이 모듈은 pepper를 통해 얻어 온 kitsu 상의 template asset과 casting 된 shot들의 정보들을 UI를 통해 보여준다.
+        """이 모듈은 pepper를 통해 얻어 온 kitsu 상의 template asset과 casting 된 shot들의 정보들을 UI를 통해 보여준다.
         UI 모듈은 controller, model, view로 분리되어 있고, mvc_login, mvc_main의 .ui 파일이 UI 데이터를 가지고 있다. \n
         메인 UI의 4개 model은 PepperModel에서 가져오며, ListView는 PepperView에서 가져온다.
         여러 개의 shot들을 한번에 선택해 조정할 수 있도록 shots와 rendelistes의 view는 ExtendedSelection으로 설정했다. \n
         PepperWindow 실행 시 self.login_ui가 우선 실행된다.
         """
-        # QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-        # self.app = QtWidgets.QApplication(sys.argv)
+        QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
+        self.app = QtWidgets.QApplication(sys.argv)
         self.pepper = Houpub()
-
         self.projects_selection = None
         self.templates_selection = None
         self.shots_selection = None
@@ -28,13 +26,11 @@ class PepperWindow:
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
-
         # model instance
         self.project_model = PepperModel()
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
         self.render_model = PepperModel()
-
         # listview instance
         self.projects_listview = PepperView(self)
         self.templates_listview = PepperView(self)
@@ -42,30 +38,34 @@ class PepperWindow:
         self.renderlists_listview = PepperView(self)
         self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-
+        # setModel
+        self.projects_listview.setModel(self.project_model)
+        self.templates_listview.setModel(self.template_model)
+        self.shots_listview.setModel(self.shot_model)
+        self.renderlists_listview.setModel(self.render_model)
+        self.projects_selection = self.projects_listview.selectionModel()
+        self.templates_selection = self.templates_listview.selectionModel()
+        self.shots_selection = self.shots_listview.selectionModel()
+        self.renderlists_selection = self.renderlists_listview.selectionModel()
         # get script_path
         # __file__ (전역변수) : 현재 열려있는 파일의 위치와 이름을 가지고 있는 문자열 변수
         # path.realpath(파일이름) : 현재 파일의  표준 경로+이름 을 반환
         script_path = os.path.dirname(os.path.realpath(__file__))
-
         # login Ui loader
-        self.login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login.ui'))
-        self.login_ui.open(QtCore.QFile.ReadOnly)
+        login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login.ui'))
+        login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
-        self.login_window = self.login_ui_loader.load(self.login_ui)
+        self.login_window = self.login_ui_loader.load(login_ui)
         self.login_window.show()
-
         # main Ui loader
-        self.main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main.ui'))
-        self.main_ui.open(QtCore.QFile.ReadOnly)
+        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main.ui'))
+        main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
-        self.main_window = self.main_ui_loader.load(self.main_ui)
-
+        self.main_window = self.main_ui_loader.load(main_ui)
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
         self.login_window.input_pw.returnPressed.connect(self.user_login)
-
         # set connect main Ui
         self.projects_listview.clicked.connect(self.project_selected)
         self.templates_listview.clicked.connect(self.template_selected)
@@ -74,14 +74,13 @@ class PepperWindow:
         self.main_window.render_btn.clicked.connect(self.render_execute)
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
-
+        # add listview to ui
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
-
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
-        # self.app.exec_()
+        self.app.exec_()
 
     def user_login(self):
         """
@@ -103,8 +102,7 @@ class PepperWindow:
         self.open_main_window()
 
     def open_main_window(self):
-        """
-        mvc_main.ui를 디스플레이 해주는 메소드. 로그인 성공 시 실행된다. \n
+        """mvc_main.ui를 디스플레이 해주는 메소드. 로그인 성공 시 실행된다. \n
         projects, templates, shots, render_lists의 네 가지 부분으로 나뉘어 있다. \n
         projects 에서는 로그인 된 유저가 assign 되어있는 project들을 projects_listview에 디스플레이 해준다.
         templates 에서는 선택된 project 안의 fx templates를 templates_listview에 디스플레이 해준다.
@@ -113,28 +111,14 @@ class PepperWindow:
         renderlists는 pepper.precomp_list에 담긴 shot 들의 name의 value 값만 보여주는 것이고,
         render 버튼 클릭 시 pepper.precomp_list 속 dict를 Houdini로 전달한다.
         """
-
-        # setModel
-        self.projects_listview.setModel(self.project_model)
-        self.templates_listview.setModel(self.template_model)
-        self.shots_listview.setModel(self.shot_model)
-        self.renderlists_listview.setModel(self.render_model)
-
-        self.projects_selection = self.projects_listview.selectionModel()
-        self.templates_selection = self.templates_listview.selectionModel()
-        self.shots_selection = self.shots_listview.selectionModel()
-        self.renderlists_selection = self.renderlists_listview.selectionModel()
-
         # get my project
         self.my_projects = self.pepper.get_my_projects()
         for my_project in self.my_projects:
             self.project_model.pepperlist.append(my_project)
-
         self.main_window.show()
 
     def project_selected(self, event):
-        """
-        projects_listview 의 project 를 클릭 시 실행 되는 메소드. \n
+        """projects_listview 의 project 를 클릭 시 실행 되는 메소드. \n
         클릭한 project 의 fx template 들을 pepper.project 에 set 한 뒤 self.all_assets 에 fx template 들을 받아 온다.
         그리고 가져온 fx template 들을 templates_listview 에 display 해준다.
 
@@ -264,10 +248,7 @@ class PepperWindow:
 
 
 def main():
-    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-    app = QtWidgets.QApplication(sys.argv)
     window = PepperWindow()
-    app.exec_()
 
 
 if __name__ == "__main__":
