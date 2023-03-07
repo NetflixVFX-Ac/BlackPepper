@@ -579,6 +579,11 @@ class Houpub:
         self.entity = 'shot'
         self.publish_output_file('FX', 'Movie_file', 'test_precomp')
 
+    def get_every_revision_number(self):
+        self.entity = 'asset'
+        wf_list = gazu.files.get_all_working_files_for_entity(self.entity)
+        print(wf_list)
+
     # -------------------------------------------
     # ----------- get all 관련 메소드들 -----------
     # -------------------------------------------
