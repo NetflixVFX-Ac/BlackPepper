@@ -242,6 +242,7 @@ class PepperWindow:
         houp = HouPepper()
         for precomp in self.pepper.precomp_list:
             temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
+            print(temp_working_path, layout_output_path, fx_working_path)
             houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
         for precomp in self.pepper.precomp_list:
