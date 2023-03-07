@@ -83,8 +83,7 @@ class PepperWindow:
         self.app.exec_()
 
     def user_login(self):
-        """
-        mvc_login.ui를 디스플레이 해주는 메소드. 유저의 로그인 페이지 UI에서 Login 버튼 클릭, Enter 입력 시 실행된다. \n
+        """mvc_login.ui를 디스플레이 해주는 메소드. 유저의 로그인 페이지 UI에서 Login 버튼 클릭, Enter 입력 시 실행된다. \n
         UI에서는 id, password를 입력받고, combobox를 통해 Houdini의 license 종류를 입력받는다. \n
         host는 http://192.168.3.116/api 로 고정되어 있다.
         입력받은 id, password 값을 pepper의 login 메소드를 통해 kitsu에 로그인한다.
@@ -150,8 +149,7 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def template_selected(self, event):
-        """
-        templates_listview 의 template 를 클릭 시 실행 되는 메소드. \n
+        """templates_listview 의 template 를 클릭 시 실행 되는 메소드. \n
         클릭한 template 의 casting 된 shot 들을 pepper.asset 에 set 한 뒤 self.all_shots 에 받아 오고
         추가로 하단 Template info 에 created Artist,Time,Revision 정보를 보여 준다.
         그리고 template 의 casting 된 shot 들을 shots_listview 에 보여 준다.
@@ -184,8 +182,7 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def shot_selected(self, event):
-        """
-        Shots 를 선택 시 선택한 shot 의 정보(dict)를 self.all_shots = [] 에 담는 함수 이다.\n
+        """Shots 를 선택 시 선택한 shot 의 정보(dict)를 self.all_shots = [] 에 담는 함수 이다.\n
         추가로 하단 Shot info 에 created Artist,Time,Revision 정보를 보여 준다.
 
         Args:
