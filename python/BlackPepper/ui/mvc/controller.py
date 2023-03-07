@@ -5,7 +5,7 @@ from PySide2.QtUiTools import QUiLoader
 from BlackPepper.ui.mvc.model import PepperModel
 from BlackPepper.ui.mvc.view import PepperView
 from BlackPepper.pepper import Houpub
-from BlackPepper.houpepper import HouPepper
+# from BlackPepper.houpepper import HouPepper
 
 
 class PepperWindow:
@@ -16,14 +16,25 @@ class PepperWindow:
         여러 개의 shot들을 한번에 선택해 조정할 수 있도록 shots와 rendelistes의 view는 ExtendedSelection으로 설정했다. \n
         PepperWindow 실행 시 self.login_ui가 우선 실행된다.
         """
-        QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-        self.app = QtWidgets.QApplication(sys.argv)
+        # QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
+        # self.app = QtWidgets.QApplication(sys.argv)
+        self.pepper = Houpub()
+
+        self.projects_selection = None
+        self.templates_selection = None
+        self.shots_selection = None
+        self.renderlists_selection = None
+        self.my_projects = []
+        self.all_assets = []
+        self.all_shots = []
+
+        # model instance
         self.project_model = PepperModel()
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
         self.render_model = PepperModel()
-        self.pepper = Houpub()
 
+        # listview instance
         self.projects_listview = PepperView(self)
         self.templates_listview = PepperView(self)
         self.shots_listview = PepperView(self)
@@ -31,32 +42,45 @@ class PepperWindow:
         self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
-        self.projects_selection = None
-        self.templates_selection = None
-        self.shots_selection = None
-        self.renderlists_selection = None
-
+        # get script_path
+        # __file__ (전역변수) : 현재 열려있는 파일의 위치와 이름을 가지고 있는 문자열 변수
+        # path.realpath(파일이름) : 현재 파일의  표준 경로+이름 을 반환
         script_path = os.path.dirname(os.path.realpath(__file__))
+
+        # login Ui loader
         self.login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login.ui'))
         self.login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
+        self.login_window = self.login_ui_loader.load(self.login_ui)
+        self.login_window.show()
 
+        # main Ui loader
         self.main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main.ui'))
         self.main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
+        self.main_window = self.main_ui_loader.load(self.main_ui)
 
-        self.login_window = self.login_ui_loader.load(self.login_ui)
-        self.login_window.show()
+        # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
         self.login_window.input_pw.returnPressed.connect(self.user_login)
 
-        self.window = self.main_ui_loader.load(self.main_ui)
-        self.my_projects = []
-        self.all_assets = []
-        self.all_shots = []
+        # set connect main Ui
+        self.projects_listview.clicked.connect(self.project_selected)
+        self.templates_listview.clicked.connect(self.template_selected)
+        self.shots_listview.clicked.connect(self.shot_selected)
+        self.main_window.reset_btn.clicked.connect(self.clear_list)
+        self.main_window.render_btn.clicked.connect(self.render_execute)
+        self.main_window.append_btn.clicked.connect(self.append_render_list)
+        self.main_window.del_btn.clicked.connect(self.delete_render_list)
 
-        self.app.exec_()
+        self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
+        self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
+        self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
+        self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
+
+        # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
+        # self.app.exec_()
 
     def user_login(self):
         """mvc_login.ui를 디스플레이 해주는 메소드. 유저의 로그인 페이지 UI에서 Login 버튼 클릭, Enter 입력 시 실행된다. \n
@@ -73,12 +97,13 @@ class PepperWindow:
 
         self.pepper.login(host, user_id, user_pw)
         self.pepper.software = user_software
-        self.main_window()
+        self.login_window.close()
+        self.open_main_window()
 
     # def enter_login(self, event):
     #     user_id = self.window.input_id.text()
 
-    def main_window(self):
+    def open_main_window(self):
         """mvc_main.ui를 디스플레이 해주는 메소드. 로그인 성공 시 실행된다. \n
         projects, templates, shots, render_lists의 네 가지 부분으로 나뉘어 있다. \n
         projects 에서는 로그인 된 유저가 assign 되어있는 project들을 projects_listview에 디스플레이 해준다.
@@ -88,34 +113,37 @@ class PepperWindow:
         renderlists는 pepper.precomp_list에 담긴 shot 들의 name의 value 값만 보여주는 것이고,
         render 버튼 클릭 시 pepper.precomp_list 속 dict를 Houdini로 전달한다.
         """
-        self.login_window.close()
+        # self.login_window.close()
 
-        self.window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
-        self.window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
-        self.window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
-        self.window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
+        # self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
+        # self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
+        # self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
+        # self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
 
+        # setModel
         self.projects_listview.setModel(self.project_model)
         self.templates_listview.setModel(self.template_model)
         self.shots_listview.setModel(self.shot_model)
         self.renderlists_listview.setModel(self.render_model)
+
         self.projects_selection = self.projects_listview.selectionModel()
         self.templates_selection = self.templates_listview.selectionModel()
         self.shots_selection = self.shots_listview.selectionModel()
         self.renderlists_selection = self.renderlists_listview.selectionModel()
 
+        # get my project
         self.my_projects = self.pepper.get_my_projects()
         for my_project in self.my_projects:
             self.project_model.pepperlist.append(my_project)
 
-        self.window.show()
-        self.projects_listview.clicked.connect(self.project_selected)
-        self.templates_listview.clicked.connect(self.template_selected)
-        self.shots_listview.clicked.connect(self.shot_selected)
-        self.window.reset_btn.clicked.connect(self.clear_list)
-        self.window.render_btn.clicked.connect(self.render_execute)
-        self.window.append_btn.clicked.connect(self.append_render_list)
-        self.window.del_btn.clicked.connect(self.delete_render_list)
+        self.main_window.show()
+        # self.projects_listview.clicked.connect(self.project_selected)
+        # self.templates_listview.clicked.connect(self.template_selected)
+        # self.shots_listview.clicked.connect(self.shot_selected)
+        # self.main_window.reset_btn.clicked.connect(self.clear_list)
+        # self.main_window.render_btn.clicked.connect(self.render_execute)
+        # self.main_window.append_btn.clicked.connect(self.append_render_list)
+        # self.main_window.del_btn.clicked.connect(self.delete_render_list)
 
         # slot -> clicked, connect
         # signal -> emit
@@ -157,7 +185,7 @@ class PepperWindow:
         template_name = self.all_assets[event.row()]
         self.pepper.asset = template_name
         name, time, rev = self.pepper.get_working_file_data('simulation', 'asset')
-        self.window.template_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
+        self.main_window.template_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
         self.all_shots = self.pepper.get_casting_path_for_asset()
         self.shot_model.pepperlist.clear()
         for shot in self.all_shots:
@@ -167,14 +195,27 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def shot_selected(self, event):
+        """
+
+        Args:
+            event:
+
+        Returns:
+
+        """
         shot_dict = self.all_shots[event.row()]
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
         name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', 'shot')
-        self.window.shot_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
+        self.main_window.shot_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
         self.renderlists_selection.clear()
 
     def append_render_list(self):
+        """
+
+        Returns:
+
+        """
         for idx in self.shots_selection.selectedRows():
             shot_dict = self.all_shots[idx.row()]
             self.pepper.make_precomp_dict(shot_dict)
@@ -186,6 +227,11 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def delete_render_list(self):
+        """
+
+        Returns:
+
+        """
         for idx in self.renderlists_selection.selectedRows():
             self.pepper.delete_precomp_dict(idx.data())
         self.render_model.pepperlist.clear()
@@ -195,6 +241,11 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def clear_list(self):
+        """
+
+        Returns:
+
+        """
         self.pepper.precomp_list = []
         self.render_model.pepperlist.clear()
         self.render_model.layoutChanged.emit()
@@ -206,7 +257,10 @@ class PepperWindow:
 
 
 def main():
+    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
+    app = QtWidgets.QApplication(sys.argv)
     window = PepperWindow()
+    app.exec_()
 
 
 if __name__ == "__main__":
