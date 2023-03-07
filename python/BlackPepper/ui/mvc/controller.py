@@ -5,7 +5,7 @@ from PySide2.QtUiTools import QUiLoader
 from BlackPepper.ui.mvc.model import PepperModel
 from BlackPepper.ui.mvc.view import PepperView
 from BlackPepper.pepper import Houpub
-from BlackPepper.houpepper import HouPepper
+# from BlackPepper.houpepper import HouPepper
 
 
 class PepperWindow:
@@ -258,12 +258,8 @@ class PepperWindow:
         return temp_working_path, layout_output_path, fx_working_path, video_output_path
 
 
-
 def main():
-    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-    app = QtWidgets.QApplication(sys.argv)
     window = PepperWindow()
-    app.exec_()
 
 
 if __name__ == "__main__":
