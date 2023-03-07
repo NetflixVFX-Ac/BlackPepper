@@ -168,6 +168,8 @@ class PepperWindow(QMainWindow):
         # event
         template_name = self.all_assets[event.row()]
         self.pepper.asset = template_name
+        self.pepper.entity = 'asset'
+        rev_list = self.pepper.get_every_revision_for_working_file('fx_template')
 
         # set template info label
         name, time, rev = self.pepper.get_working_file_data('simulation', 'asset')
@@ -192,6 +194,7 @@ class PepperWindow(QMainWindow):
             event: Listview click event
         """
         shot_dict = self.all_shots[event.row()]
+        rev_list = self.pepper.get_every_revision_for_output_file('camera_cache', 'layout')
 
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
