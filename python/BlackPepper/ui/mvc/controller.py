@@ -202,22 +202,22 @@ class PepperWindow:
     def render_execute(self):
         houp = HouPepper()
         for precomp in self.pepper.precomp_list:
-<<<<<<< HEAD
-            houp.abc_path = precomp['layout_output_path']
-=======
-            temp_working_path = precomp['temp_working_path']
-            layout_output_path = precomp['layout_output_path']
-            fx_working_path = precomp['fx_working_path']
-            video_output_path = precomp['video_output_path']
-            print(temp_working_path)
-            print(layout_output_path)
-            print(fx_working_path)
-            print(video_output_path)
+            temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
             houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
+        for precomp in self.pepper.precomp_list:
+            temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
             houp.set_mantra_for_render(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
                                        video_output_path)
->>>>>>> dev_ui
+
+    @staticmethod
+    def path_seperator(precomp):
+        temp_working_path = precomp['temp_working_path']
+        layout_output_path = precomp['layout_output_path']
+        fx_working_path = precomp['fx_working_path']
+        video_output_path = precomp['video_output_path']
+        return temp_working_path, layout_output_path, fx_working_path, video_output_path
+
 
 
 def main():
