@@ -579,10 +579,23 @@ class Houpub:
         self.entity = 'shot'
         self.publish_output_file('FX', 'Movie_file', 'test_precomp')
 
-    def get_every_revision_number(self):
-        self.entity = 'asset'
-        wf_list = gazu.files.get_all_working_files_for_entity(self.entity)
-        print(wf_list)
+    def get_every_revision_for_working_file(self, task_name):
+        working_files = gazu.files.get_all_working_files_for_entity(self.entity)
+        revision_list = []
+        for working_file in working_files:
+            if gazu.task.get_task(working_file['task_id'])['entity_type']['name'] == task_name:
+                revision_list.append(working_file['revision'])
+        return revision_list
+
+    def get_every_revision_for_output_file(self, output_type_name, task_type_name):
+        output_type = gazu.files.get_output_type(output_type_name)
+        task_type = gazu.task.get_task_type_by_name(task_type_name)
+        print(output_type)
+        print(task_type)
+        # output_files = gazu.files.all_output_files_for_entity(self.entity, output_type, task_type)
+        # revision_list = []
+        # for output_file in output_files:
+        #     print(output_file)
 
     # -------------------------------------------
     # ----------- get all 관련 메소드들 -----------
