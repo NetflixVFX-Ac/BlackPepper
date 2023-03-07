@@ -5,7 +5,7 @@ from PySide2.QtUiTools import QUiLoader
 from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
-# from BlackPepper.houpepper import HouPepper
+from BlackPepper.houpepper import HouPepper
 
 
 class PepperWindow:

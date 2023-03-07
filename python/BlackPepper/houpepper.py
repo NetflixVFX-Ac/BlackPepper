@@ -2,9 +2,9 @@ import sys
 import os
 import glob
 import numpy as np
-from pepper import Houpub
+from BlackPepper.pepper import Houpub
 import shutil
-from ffmpeg_process_bar import MainWindow
+from BlackPepper.ffmpeg_process_bar import MainWindow
 from PySide2 import QtWidgets
 import hou
 import _alembic_hom_extensions as abc
