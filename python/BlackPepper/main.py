@@ -4,8 +4,6 @@ from houpepper import HouPepper
 
 def main():
     ui = PepperWindow()
-    hp = HouPepper
-
 
 
 if __name__ == "__main__":
