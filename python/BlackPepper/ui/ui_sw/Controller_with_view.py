@@ -16,7 +16,7 @@ from PySide2 import QtCore, QtWidgets
 # from PySide2.QtCore import QFile
 from PySide2.QtUiTools import QUiLoader
 
-from main.python.pepper import Houpub
+from BlackPepper.pepper import Houpub
 from Model import MainModel
 
 
@@ -57,7 +57,7 @@ class MainWindow:
 
         # login Ui loader
         login_ui_file = "/ui/ui_sw/login.ui"
-        login_ui = QtCore.QFile(login_ui_file)
+        login_ui = QtCore.QFile("login.ui")
         login_ui.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
         self.window_login = loader.load(login_ui)
@@ -65,7 +65,7 @@ class MainWindow:
 
         # main Ui loader
         main_ui_file = "/ui/ui_sw/main.ui"
-        main_ui = QtCore.QFile(main_ui_file)
+        main_ui = QtCore.QFile("main.ui")
         main_ui.open(QtCore.QFile.ReadOnly)
         loader = QUiLoader()
         self.window_main = loader.load(main_ui)
@@ -107,12 +107,11 @@ class MainWindow:
         # setModel
         self.window_main.lv_proj.setModel(self.model_proj)
         self.window_main.lv_temp.setModel(self.model_temp)
-        self.temps_selection = self.window_main.lv_temp.selectionModel()
-
         self.window_main.lv_shot.setModel(self.model_shot)
-        self.shots_selection = self.window_main.lv_shot.selectionModel()
-
         self.window_main.lv_render.setModel(self.model_render)
+
+        self.temps_selection = self.window_main.lv_temp.selectionModel()
+        self.shots_selection = self.window_main.lv_shot.selectionModel()
         self.render_selection = self.window_main.lv_render.selectionModel()
 
         # get my project

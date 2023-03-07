@@ -3,9 +3,12 @@ from PySide2.QtCore import Qt
 
 
 class PepperModel(QtCore.QAbstractListModel):
-    def __init__(self):
+    """
+
+    """
+    def __init__(self,  pepperlist=None):
         super(PepperModel, self).__init__()
-        self.pepperlist = []
+        self.pepperlist = pepperlist or []
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
