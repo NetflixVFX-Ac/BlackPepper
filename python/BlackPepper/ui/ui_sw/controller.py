@@ -6,7 +6,7 @@ from PySide2.QtWidgets import QMainWindow
 from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
-# from BlackPepper.houpepper import HouPepper
+from BlackPepper.houpepper import HouPepper
 
 
 class PepperWindow(QMainWindow):
@@ -53,17 +53,19 @@ class PepperWindow(QMainWindow):
         # path.realpath(파일이름) : 현재 파일의  표준 경로+이름 을 반환
         script_path = os.path.dirname(os.path.realpath(__file__))
         # login Ui loader
-        login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login.ui'))
+        login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login_2.ui'))
         login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
+        self.login_window.setWindowTitle('Black Pepper v0.0.1')
         self.login_window.show()
         # main Ui loader
         main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_2.ui'))
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
-        self.main_window.setWindowTitle('Black Pepper')
+
+        self.main_window.setWindowTitle('Black Pepper v0.0.1')
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
@@ -81,6 +83,9 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
+        # set menebar, statusbar to window
+        self.login_window.statusBar().showMessage('kitsu 로그인 하세요!')
+        self.main_window.statusBar().showMessage('project 를 선택하세요 !')
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
         self.app.exec_()
 
@@ -239,6 +244,14 @@ class PepperWindow(QMainWindow):
         self.pepper.precomp_list = []
         self.render_model.pepperlist.clear()
         self.render_model.layoutChanged.emit()
+
+    # self.main_window.
+    def menubar_clear(self):
+
+        pass
+
+    def menubar_open_preset(self):
+        pass
 
     def render_execute(self):
         houp = HouPepper()
