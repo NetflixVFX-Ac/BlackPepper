@@ -1,34 +1,17 @@
 import re
 from PySide2 import QtWidgets, QtCore
-from PySide2.QtCore import *
-from PySide2.QtGui import *
 import os
 import glob
-import shutil
-import hou
-
-
 
 
 class MantraMainWindow(QtWidgets.QMainWindow):
 
-    def __init__(self, next_fx_path, output_path, abc_path, cam_node, total_frame):
+    def __init__(self, cmd, input_pattern):
         super().__init__()
+        self.cmd = cmd
         self.p = None
-        self.total_frame = total_frame
-        self.command = [
-            'python',
-            '/home/rapa/git/hook/python/BlackPepper/mantra_render.py',
-            next_fx_path,
-            output_path,
-            abc_path,
-            cam_node
-        ]
 
-        self.cmd = (' '.join(str(s) for s in self.command))
-
-        # self.btn = QtWidgets.QPushButton("MANTRA SEQUENCE RENDERING")
-        # self.btn.pressed.connect(self.start_process)
+        self.start_process()
         self.text = QtWidgets.QPlainTextEdit()
         self.text.setReadOnly(True)
 
@@ -36,27 +19,23 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.progress.setRange(0, 100)
 
         l = QtWidgets.QVBoxLayout()
-        # l.addWidget(self.btn)
-        # l.setStyleSheet("background-color:rgb(52, 52, 52);")
         l.addWidget(self.progress)
         l.addWidget(self.text)
 
         w = QtWidgets.QWidget()
-        w.setStyleSheet(u"background-color: rgb(45, 45, 45);\n"
-        "selection-background-color: rgb(45, 180, 198);\n"
-        "font: 10pt\"Courier New\";\n"
-        "color: rgb(180, 180, 180);\n")
         w.setLayout(l)
 
         self.setCentralWidget(w)
-        self.start_process()
+
+        self.filecnt = 0
+        self.total_frame = self.tree(input_pattern)
+        print(self.total_frame)
 
     def message(self, s):
         self.text.appendPlainText(s)
 
     def start_process(self):
         if self.p is None:  # No process running.
-            self.message("Executing process")
             self.p = QtCore.QProcess()  # Keep a reference to the QProcess (e.g. on self) while it's running.
             self.p.readyReadStandardOutput.connect(self.handle_stdout)
             self.p.readyReadStandardError.connect(self.handle_stderr)
@@ -76,10 +55,6 @@ class MantraMainWindow(QtWidgets.QMainWindow):
     def handle_stdout(self):
         data = self.p.readAllStandardOutput()
         stdout = bytes(data).decode("utf8")
-        progress = self.simple_percent_parser(stdout, self.total_frame)
-        if progress:
-            self.progress.setValue(progress)
-
         self.message(stdout)
 
     def handle_state(self, state):
@@ -94,15 +69,31 @@ class MantraMainWindow(QtWidgets.QMainWindow):
     def process_finished(self):
         self.message("Process finished.")
         self.p = None
-        self.close()
 
-    def simple_percent_parser(self, output, total):
-        progress_re = re.compile('_(\d+)\.jpg')
+    def tree(self, path):  # 백분율로 나누기 위한 분모를 구하는 함수(분모의 수는 디렉토리 안의 시퀀스 수와 같다.)
+        for x in sorted(glob.glob(path + "/*")):
+            print("tree x :", x)
+            if os.path.isfile(x):
+                self.filecnt += 1
+            else:
+                print("unknown:", x)
+        return int(self.filecnt)
+
+    def simple_percent_parser(self, output, total):# 프로세스바에 시각화 해줄 수치를 만들어 내는 백분율계산기
+        progress_re = re.compile("frame=   (\d+)")
         m = progress_re.search(output)
-        print("m :", m)
+        print("m search :", m)
         if m:
             pc_complete = m.group(1)
             if pc_complete:
                 pc = int(int(pc_complete) / total * 100)
                 return pc
 
+        progress_re2 = re.compile("(\d+) frames successfully")
+        m2 = progress_re2.search(output)
+        if m2:
+            pc_complete = m2.group(1)
+            if pc_complete:
+                print(pc_complete, total)
+                pc = int(int(pc_complete) / total * 100)
+                return pc #백분율을 통해 process bar에 보여질 값
