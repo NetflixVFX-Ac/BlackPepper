@@ -239,6 +239,7 @@ class HouPepper:
                 i.deleteAllKeyframes()
             # n.parmTuple('f').set([self.abc_range[0] * hou.fps(), self.abc_range[1] * hou.fps(), 1])
             n.parmTuple('f').set([self.abc_range[0] * hou.fps(), 3, 1])
+            n.parm('vm_verbose').set(1)
             n.parm("execute").pressButton()
             # while n.isRendering():
             #     print("Rendering frame:", hou.frame())
