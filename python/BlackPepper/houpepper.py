@@ -464,8 +464,8 @@ for shot in casted_shots:
     print("fx_output :", fx_output)
     print("layout_output_path :", layout_output_path)
     print("mov_output :", mov_output)
-    # hou_pepper.set_fx_working_for_shot(simulation_path, layout_output_path,
-    #                                    f'{next_fx_path}.{pepper.software.get("file_extension")}')
-    # hou_pepper.set_mantra_for_render(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output)
+    hou_pepper.set_fx_working_for_shot(simulation_path, layout_output_path,
+                                       f'{next_fx_path}.{pepper.software.get("file_extension")}')
+    hou_pepper.set_mantra_for_render(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output)
     # BlackPepper.publish_working_file(fx_type_name)
     # hou_pepper.set_ffmpeg_seq_to_mov(fx_output, mov_output)
