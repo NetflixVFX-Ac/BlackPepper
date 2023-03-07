@@ -53,7 +53,7 @@ class PepperWindow:
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(self.login_ui)
         self.login_window.show()
-g
+
         # main Ui loader
         self.main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main.ui'))
         self.main_ui.open(QtCore.QFile.ReadOnly)
