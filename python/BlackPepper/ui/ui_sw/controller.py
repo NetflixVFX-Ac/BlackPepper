@@ -2,8 +2,8 @@ import sys
 import os
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
-from BlackPepper.ui.mvc.model import PepperModel
-from BlackPepper.ui.mvc.view import PepperView
+from BlackPepper.ui.model import PepperModel
+from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
 # from BlackPepper.houpepper import HouPepper
 

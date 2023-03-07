@@ -1,4 +1,4 @@
-from BlackPepper.ui.mvc.controller import PepperWindow
+from BlackPepper.ui.controller import PepperWindow
 
 
 def main():
