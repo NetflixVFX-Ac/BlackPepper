@@ -10,6 +10,12 @@ import hou
 import _alembic_hom_extensions as abc
 
 class HouPepper:
+    """
+    이 모듈은 Template으로 정한 Houdini 파일에 Alembic 파일의 카메라값을 불러와 FX working file path에 저장한다. Alembic 파일은
+    Template에 캐스팅 된 샷의 Layout output file path에서 불러온다. Houdini Mantra를 사용하여 JPG의 시퀀스 파일로 컨버팅하는데,
+    Temp 내 복사한 FX working file을 이용한다. FX output file path에 시퀀스 파일을 저장하고 사용한 Temp를 지워주면서 Publish를
+    진행한다.
+    """
     def __init__(self):
         self.cam_list = []
         self.cam_path = []
@@ -47,6 +53,17 @@ class HouPepper:
 
     @abc_path.setter
     def abc_path(self, abc_path):
+        """입력한 Alembic 경로를 저장한다.
+
+        Example:
+            BlackPepper.abc_path = 'path'
+
+        Args:
+            abc_path: (str): Alembic file path
+
+        Returns:
+            Alembic file path
+        """
         self._abc_path = abc_path
 
     @property
@@ -55,6 +72,15 @@ class HouPepper:
 
     @abc_tree_all.setter
     def abc_tree_all(self, abc_tree_all):
+        """
+
+
+        Args:
+            abc_tree_all:
+
+        Returns:
+
+        """
         self._abc_tree_all = abc_tree_all
 
     @property
@@ -63,6 +89,15 @@ class HouPepper:
 
     @abc_tree_path.setter
     def abc_tree_path(self, abc_tree_path):
+        """
+
+
+        Args:
+            abc_tree_path:
+
+        Returns:
+
+        """
         self._abc_tree_path = abc_tree_path
 
     @property
@@ -71,9 +106,27 @@ class HouPepper:
 
     @abc_range.setter
     def abc_range(self, abc_range):
+        """
+
+
+        Args:
+            abc_range:
+
+        Returns:
+
+        """
         self._abc_range = abc_range
 
     def set_abc_cam_tree(self, abc_path):
+        """
+
+
+        Args:
+            abc_path:
+
+        Returns:
+
+        """
         self.abc_path = abc_path
         if len(self.abc_path) > 0:
             self.true = self.check_abc(self.abc_path)
@@ -86,6 +139,15 @@ class HouPepper:
         self.abc_range = abc.alembicTimeRange(self.abc_path)
 
     def get_abc_cam_tree(self, abc_tree_all):
+        """
+
+
+        Args:
+            abc_tree_all:
+
+        Returns:
+
+        """
         node_name = abc_tree_all[0]
         node_type = abc_tree_all[1]
         node_children = abc_tree_all[2]
@@ -114,6 +176,15 @@ class HouPepper:
                 self.get_abc_cam_tree(children)
 
     def check_abc(self, abc_path):
+        """
+
+
+        Args:
+            abc_path:
+
+        Returns:
+
+        """
         file_name = abc_path
         if 'abc' not in file_name[-3:]:
             print('No filename entered for Alembic scene.')
@@ -123,6 +194,15 @@ class HouPepper:
             return True
 
     def set_cam_view(self, cam):
+        """
+
+
+        Args:
+            cam:
+
+        Returns:
+
+        """
         # abc_range : (0.041666666666666664, 10.0)
         # abc_range * hou.fps() : (1, 240)
         for f in range(int(self.abc_range[0] * hou.fps()), int(self.abc_range[1] * hou.fps()) + 1):
@@ -134,6 +214,16 @@ class HouPepper:
                     exec("self.{}.append({})".format(parm_name, camera_dict.get(parm_name)))
 
     def get_cam_resolution(self, cam):
+        """
+
+
+
+        Args:
+            cam:
+
+        Returns:
+
+        """
         # abc_range : (0.041666666666666664, 10.0)
         # abc_range * hou.fps() : (1, 240)
         for f in range(int(self.abc_range[0] * hou.fps()), int(self.abc_range[1] * hou.fps()) + 1):
@@ -143,6 +233,16 @@ class HouPepper:
                 return True
 
     def get_cam_xform(self, cam):
+        """
+
+
+
+        Args:
+            cam:
+
+        Returns:
+
+        """
         # abc_range : (0.041666666666666664, 10.0)
         # abc_range * hou.fps() : (1, 240)
         translate = []
@@ -159,6 +259,18 @@ class HouPepper:
         return translate, rotate, scale
 
     def set_cam_key(self, key, node, parm):
+        """
+
+
+
+        Args:
+            key:
+            node:
+            parm:
+
+        Returns:
+
+        """
         # self.set_cam_key(tr, cam_node, 't')
         J = ['x', 'y', 'z', 'w']
         # key_np : matrix - tr : [[x1, y1 ,z1],
@@ -186,6 +298,16 @@ class HouPepper:
                     node.parm('{}'.format(parm)).setKeyframe(keyframe)
 
     def set_cam_create(self, abc_path):
+        """
+
+
+
+        Args:
+            abc_path:
+
+        Returns:
+
+        """
         self.set_abc_cam_tree(abc_path)
         name = [abc.alembicGetSceneHierarchy(abc_path, i)[0] for i in self.cam_path]
         # cam_list : ['cam1Camera']
@@ -214,6 +336,18 @@ class HouPepper:
                 self.cam_node.parm('resy').set(int(1920 / self.filmaspectratio[0]))
 
     def set_fx_working_for_shot(self, hip_path, abc_path, saved_path):
+        """
+
+
+
+        Args:
+            hip_path:
+            abc_path:
+            saved_path:
+
+        Returns:
+
+        """
         hou.hipFile.load(hip_path)
         self.set_cam_create(abc_path)
         hou.hipFile.save(file_name=saved_path)
@@ -257,7 +391,18 @@ class HouPepper:
         else:
             print("missing sequence frame")
 
-    def set_ffmpeg_seq_to_mp4(self, seq_path, output_path):
+    def set_ffmpeg_seq_to_mov(self, seq_path, output_path):
+        """
+
+
+
+        Args:
+            seq_path:
+            output_path:
+
+        Returns:
+
+        """
         output_dir = os.path.dirname(output_path)
         seq_dir = os.path.dirname(seq_path)
         sequence_path = seq_path[:-8] + '%04d.jpg'
@@ -323,7 +468,7 @@ def main():
         #                                    f'{next_fx_path}.{BlackPepper.software.get("file_extension")}')
         # hou_pepper.set_mantra_for_render(f'{next_fx_path}.{BlackPepper.software.get("file_extension")}', fx_output)
         # BlackPepper.publish_working_file(fx_type_name)
-    # hou_pepper.set_ffmpeg_seq_to_mp4(fx_output, mov_output)
+        # hou_pepper.set_ffmpeg_seq_to_mp4(fx_output, mov_output)
 
 
 if __name__ == "__main__":
