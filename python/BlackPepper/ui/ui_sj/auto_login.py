@@ -1,5 +1,5 @@
 from BlackPepper.log.login_log import Logger
-from BlackPepper.pepper import Houpub as hp
+from BlackPepper.pepper import Houpub
 import os
 import json
 import gazu
@@ -8,7 +8,7 @@ import gazu
 class Autolog:
     def __init__(self):
         self.hklog = Logger()
-        self.pr = hp()
+        self.pr = Houpub()
 
         self.user_dict = None
 
@@ -19,29 +19,28 @@ class Autolog:
         self._valid_host = False
         self._valid_user = False
 
-        self._auto_login = None
+        self._auto_login = False
 
         self.dir_path = os.path.expanduser('~/.config/Hook/')
         self.user_path = os.path.join(self.dir_path, 'user.json')
 
-        if self.access_setting():
-            self.load_setting()
+        self.access_setting()
 
     @property
     def valid_host(self):
         return self._valid_host
 
-    # @valid_host.setter
-    # def valid_host(self, value):
-    #     self._valid_host = value
-    #
+    @valid_host.setter
+    def valid_host(self, value):
+        self._valid_host = value
+
     @property
     def valid_user(self):
         return self._valid_user
 
-    # @valid_user.setter
-    # def valid_user(self, value):
-    #     self._valid_user = value
+    @valid_user.setter
+    def valid_user(self, value):
+        self._valid_user = value
 
     @property
     def host(self):
@@ -88,9 +87,8 @@ class Autolog:
         self.hklog.connect_log(self.host)
         self._valid_host = True
         self.save_setting()
-        self.hklog.connect_log(self.host)
         try:
-            log_in = gazu.log_in(self.user_id, self.user_pw)
+            log_in = self.pr.user
         except gazu.AuthFailedException:
             raise ValueError('Invalid user ID or password.')
         self._user = log_in['user']
@@ -120,8 +118,7 @@ class Autolog:
     def load_setting(self):
         with open(self.user_path, 'r') as json_file:
             self.user_dict = json.load(json_file)
-        if self.user_dict['valid_host'] and self.user_dict['valid_user']:
-            self.connect_gazu()
+        return self.user_dict
 
     def save_setting(self):
         self.user_dict = {
@@ -130,27 +127,29 @@ class Autolog:
             'user_pw': self.user_pw,
             'valid_host': self.valid_host,
             'valid_user': self.valid_user,
+            'auto_login': self.auto_login
         }
         with open(self.user_path, 'w') as json_file:
             json.dump(self.user_dict, json_file)
 
     def reset_setting(self):
-        self._host = ''
-        self._user_id = ''
-        self._user_pw = ''
-        self._valid_host = False
-        self._valid_user = False
+        self.host = ''
+        self.user_id = ''
+        self.user_pw = ''
+        self.valid_host = False
+        self.valid_user = False
+        self.auto_login = False
 
         self.save_setting()
 
 
-def main():
-    auth = Autolog()
-    auth.host = "http://192.168.3.116/api"
-    auth.user_id = "pipeline@rapa.org"
-    auth.user_pw = "netflixacademy"
-    auth.connect_gazu()
-
-
-if __name__ == "__main__":
-    main()
+# def main():
+#     auth = Autolog()
+#     auth.host = "http://192.168.3.116/api"
+#     auth.user_id = "pipeline@rapa.org"
+#     auth.user_pw = "netflixacademy"
+#     auth.connect_gazu()
+#
+#
+# if __name__ == "__main__":
+#     main()

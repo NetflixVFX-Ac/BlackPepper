@@ -18,6 +18,7 @@ class Houpub:
 
     def __init__(self):
         self.identif = None
+        self.user = None
         self.mylog = None
         self.precomp_list = []
         pass
@@ -40,7 +41,7 @@ class Houpub:
             AuthFailedException: id나 password가 맞지 않을 때
         """
         gazu.client.set_host(host)
-        gazu.log_in(identify, password)
+        self.user = gazu.log_in(identify, password)
         self.identif = identify
         self.mylog = make_logger(self.identif)
 
