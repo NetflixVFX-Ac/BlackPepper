@@ -2,13 +2,14 @@ import sys
 import os
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
+from PySide2.QtWidgets import QMainWindow
 from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
 from BlackPepper.houpepper import HouPepper
 
 
-class PepperWindow:
+class PepperWindow(QMainWindow):
     def __init__(self):
         """이 모듈은 pepper를 통해 얻어 온 kitsu 상의 template asset과 casting 된 shot들의 정보들을 UI를 통해 보여준다.
         UI 모듈은 controller, model, view로 분리되어 있고, mvc_login, mvc_main의 .ui 파일이 UI 데이터를 가지고 있다. \n
@@ -56,12 +57,14 @@ class PepperWindow:
         login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
+        self.login_window.setWindowTitle('Login')
         self.login_window.show()
         # main Ui loader
-        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main.ui'))
+        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_2.ui'))
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
+        self.main_window.setWindowTitle('Black Pepper')
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
