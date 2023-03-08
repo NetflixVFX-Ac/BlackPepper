@@ -22,8 +22,8 @@ class MantraMainWindow(QtWidgets.QMainWindow):
 
         self.cmd = (' '.join(str(s) for s in self.command))
 
-        self.btn = QtWidgets.QPushButton("MANTRA SEQUENCE RENDERING")
-        self.btn.pressed.connect(self.start_process)
+        # self.btn = QtWidgets.QPushButton("MANTRA SEQUENCE RENDERING")
+        # self.btn.pressed.connect(self.start_process)
         self.text = QtWidgets.QPlainTextEdit()
         self.text.setReadOnly(True)
 
@@ -31,7 +31,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.progress.setRange(0, 100)
 
         l = QtWidgets.QVBoxLayout()
-        l.addWidget(self.btn)
+        # l.addWidget(self.btn)
         l.addWidget(self.progress)
         l.addWidget(self.text)
 
@@ -39,6 +39,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         w.setLayout(l)
 
         self.setCentralWidget(w)
+        self.start_process()
 
     def message(self, s):
         self.text.appendPlainText(s)
