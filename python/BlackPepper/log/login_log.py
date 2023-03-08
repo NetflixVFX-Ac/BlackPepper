@@ -12,13 +12,13 @@ class Logger:
             except OSError:
                 raise ValueError('Failed to create the directory.')
 
-        self.set_logger()
+        # self.set_logger()
 
-    def set_logger(self):
-        self.log = logging.getLogger('hook')
+    def set_logger(self, ident):
+        self.log = logging.getLogger(ident)
 
         if len(self.log.handlers) == 0:
-            formatting = logging.Formatter('%(asctime)s - %(levelname)s : %(message)s')
+            formatting = logging.Formatter('%(asctime)s - %(name)s %(levelname)s : %(message)s')
             self.log.setLevel(logging.DEBUG)
 
             stream_handler = logging.StreamHandler()
@@ -26,7 +26,7 @@ class Logger:
             stream_handler.setLevel(logging.INFO)
             self.log.addHandler(stream_handler)
 
-            file_handler = logging.FileHandler(os.path.join(self.dir_path, 'hook_log.log'))
+            file_handler = logging.FileHandler(os.path.join(self.dir_path, 'hook_login.log'))
             file_handler.setFormatter(formatting)
             file_handler.setLevel(logging.DEBUG)
             self.log.addHandler(file_handler)

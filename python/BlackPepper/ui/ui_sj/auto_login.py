@@ -80,6 +80,7 @@ class Auto_log:
 
     def connect_gazu(self):
         self.pr.login(self.host, self.user_id, self.user_pw)
+        self.hklog.set_logger(self.user_id)
         if not gazu.client.host_is_valid():
             self.hklog.failed_log()
             raise ValueError('Invalid host URL.')
