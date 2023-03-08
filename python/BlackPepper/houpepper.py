@@ -1,4 +1,3 @@
-import sys
 import os
 import glob
 import numpy as np
@@ -472,12 +471,13 @@ def main():
         # hou_pepper.set_mantra_for_render(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output)
         print("hou_cam_node :", hou_pepper.cam_node)
         app = QtWidgets.QApplication()
-        m = MantraMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output, int(hou.fps()), hou_pepper.cam_node, hou_pepper.abc_range)
+        m = MantraMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output,
+                             layout_output_path, hou_pepper.cam_node, hou_pepper.abc_range[1]*hou.fps())
         m.show()
         app.exec_()
-        f = FFmpegMainWindow(fx_output, mov_output, hou.fps())
-        f.show()
-        app.exec_()
+        # f = FFmpegMainWindow(fx_output, mov_output, hou.fps())
+        # f.show()
+        # app.exec_()
         # BlackPepper.publish_working_file(fx_type_name)
         # hou_pepper.set_ffmpeg_seq_to_mov(fx_output, mov_output)
 
