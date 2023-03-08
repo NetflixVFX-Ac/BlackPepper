@@ -83,6 +83,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
     def process_finished(self):
         self.message("Process finished.")
         self.p = None
+        self.close()
 
     def simple_percent_parser(self, output, total):
         progress_re = re.compile('_(\d+)\.jpg')
