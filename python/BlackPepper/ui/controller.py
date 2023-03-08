@@ -161,7 +161,7 @@ class PepperWindow(QMainWindow):
 
         또, 기존과 다른 template 를 클릭 시 기존 shots_listview 의 shot_model 을 clear 한 뒤 클릭 된
         template 의 shot 들을 shots_listview 에 display 해준다.
-        재 선택 시 Shots, Render files 의 selectionModel 들을 clear 해준다.
+        재 선택 시 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
 
         Args:
             event: Listview click event
@@ -214,10 +214,11 @@ class PepperWindow(QMainWindow):
             self.main_window.temp_rev_cbox.addItem(f'{rev}')
 
     def append_render_list(self):
-        """
-
-        Returns:
-
+        """main window 의 append_btn 에 연결 되어 클릭시 사용 되는 함수 이다.
+        선택된 shot 들의 shot_dict 를  pepper의 make_precomp_dict 를 사용하여 shot 별로 houdini에서 필요한
+        path들을 딕셔너리로 만들고 self.precomp_list에 넣어주고 render_moderl.pepperlist clear 정리해준다.
+        그리고 pepper 의 precomp_list를 render_moderl.pepperlist 에 append 한다.
+        추가로 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
         """
         for idx in self.shots_selection.selectedRows():
             shot_dict = self.all_shots[idx.row()]
@@ -230,10 +231,11 @@ class PepperWindow(QMainWindow):
         self.renderlists_selection.clear()
 
     def delete_render_list(self):
-        """
-
-        Returns:
-
+        """main window 의 del_btn 에 연결 되어 클릭시 사용 되는 함수 이다.
+        renderlists_selection(선택된 render files) 들을 pepper의 delete_precomp_dict를 사용하여 precomp_list에서 remove한다.
+        path들을 딕셔너리로 만들고 self.precomp_list에 넣어주고 render_moderl.pepperlist clear 정리해준다.
+        그리고 pepper 의 precomp_list를 render_moderl.pepperlist 에 append 한다.
+        추가로 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
         """
         for idx in self.renderlists_selection.selectedRows():
             self.pepper.delete_precomp_dict(idx.data())
@@ -244,10 +246,8 @@ class PepperWindow(QMainWindow):
         self.renderlists_selection.clear()
 
     def clear_list(self):
-        """
-
-        Returns:
-
+        """main window 의 reset_btn에 연결 되어 render files list를 reset하는 함수이다.
+        render files list( pepper.precomp_list)를 [] 빈 리스트로 만들고, render_moderl.pepperlist 를 clear 한다.
         """
         self.pepper.precomp_list = []
         self.render_model.pepperlist.clear()
