@@ -20,6 +20,7 @@ class PepperWindow:
         QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
         self.app = QtWidgets.QApplication(sys.argv)
         self.pepper = Houpub()
+        self.login_log = Autolog()
         self.projects_selection = None
         self.templates_selection = None
         self.shots_selection = None
@@ -65,8 +66,10 @@ class PepperWindow:
         self.main_window = self.main_ui_loader.load(main_ui)
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
-        self.login_window.input_id.returnPressed.connect(self.user_login)
-        self.login_window.input_pw.returnPressed.connect(self.user_login)
+        # self.ID_Box = self.login_window.findChild(QtWidgets.QLineEdit, 'input_id')
+        # self.PW_Box = self.login_window.findChild(QtWidgets.QLineEdit, 'input_pw')
+        self.login_window.input_id.returnPressed.connect(self.login_log.user_id)
+        self.login_window.input_pw.returnPressed.connect(self.login_log.user_pw)
         # set connect main Ui
         self.projects_listview.clicked.connect(self.project_selected)
         self.templates_listview.clicked.connect(self.template_selected)
@@ -82,7 +85,6 @@ class PepperWindow:
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
         self.app.exec_()
-        self.login_log = Autolog()
 
     def user_login(self):
         """mvc_login.ui를 디스플레이 해주는 메소드. 유저의 로그인 페이지 UI에서 Login 버튼 클릭, Enter 입력 시 실행된다. \n
@@ -93,18 +95,16 @@ class PepperWindow:
         이후 self.main_window가 바로 실행되어 pepper의 메인 UI가 디스플레이 된다.
         """
 
-        host = "http://192.168.3.116/api"
-        user_id = self.login_window.input_id.text()
-        user_pw = self.login_window.input_pw.text()
-
-        if os.path.exists(self.login_log.user_path):
-            self.login_log.load_setting()
-            user_id = self.login_log.user_dict['user_id']
-            user_pw = self.login_log.user_dict['user_pw']
+        # host = "http://192.168.3.116/api"
+        self.login_log.host = "http://192.168.3.116/api"
+        self.login_log.user_id = self.login_window.input_id.text()
+        self.login_log.user_pw = self.login_window.input_pw.text()
+        # user_id = self.login_window.input_id.text()
+        # user_pw = self.login_window.input_pw.text()
 
         user_software = self.login_window.hipbox.currentText()[1:]
 
-        self.login_log.connect_gazu(host, user_id, user_pw)
+        self.login_log.connect_gazu()
         self.login_log.save_setting()
         self.pepper.software = user_software
         self.login_window.close()
