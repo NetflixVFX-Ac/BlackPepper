@@ -6,7 +6,7 @@ from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
 from BlackPepper.houpepper import HouPepper
-from BlackPepper.ui.ui_sj.auto_login import Autolog
+from BlackPepper.ui.ui_sj.auto_login import Auto_log
 
 
 class PepperWindow:
@@ -20,7 +20,7 @@ class PepperWindow:
         QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
         self.app = QtWidgets.QApplication(sys.argv)
         self.pepper = Houpub()
-        self.login_log = Autolog()
+        self.login_log = Auto_log()
         self.projects_selection = None
         self.templates_selection = None
         self.shots_selection = None
@@ -76,12 +76,12 @@ class PepperWindow:
         self.main_window.render_btn.clicked.connect(self.render_execute)
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
+        self.main_window.logout_btn.clicked.connect(self.user_logout)
         # add listview to ui
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
-
         log_value = self.login_log.load_setting()
         if log_value['valid_host'] and log_value['valid_user']:
             self.login_log.host = log_value['host']
@@ -114,6 +114,12 @@ class PepperWindow:
             self.login_log.save_setting()
             self.login_window.close()
             self.open_main_window()
+
+    def user_logout(self):
+        if self.login_log.connect_gazu():
+            self.login_log.log_out()
+            self.main_window.close()
+            self.login_window.show()
 
     def open_main_window(self):
         """mvc_main.ui를 디스플레이 해주는 메소드. 로그인 성공 시 실행된다. \n

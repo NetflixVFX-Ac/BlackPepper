@@ -26,7 +26,7 @@ class Logger:
             stream_handler.setLevel(logging.INFO)
             self.log.addHandler(stream_handler)
 
-            file_handler = logging.FileHandler(os.path.join(self.dir_path, 'hook_login.log'))
+            file_handler = logging.FileHandler(os.path.join(self.dir_path, 'hook_log.log'))
             file_handler.setFormatter(formatting)
             file_handler.setLevel(logging.DEBUG)
             self.log.addHandler(file_handler)
@@ -41,6 +41,14 @@ class Logger:
 
     def failed_log(self):
         self.log.debug("Failed Connection")
+
+    def tree_log(self, pro):
+        if pro:
+            self.log.debug(f"{pro}'s File Tree updated")
+
+    def publish_working_file_log(self, task_type_name):
+        if task_type_name:
+            self.log.debug()
 
     # def create_working_file_log(self, user_name, working_file):
     #     if os.path.exists(working_file):

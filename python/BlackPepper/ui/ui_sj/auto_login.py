@@ -5,7 +5,7 @@ import json
 import gazu
 
 
-class Autolog:
+class Auto_log:
     def __init__(self):
         self.hklog = Logger()
         self.pr = Houpub()
@@ -97,11 +97,12 @@ class Autolog:
         self.hklog.enter_log(self.user['full_name'])
         return True
 
-    # def log_out(self):
-    #     gazu.log_out()
-    #     self._user = None
-    #     self.reset_setting()
-    #
+    def log_out(self):
+        gazu.log_out()
+        self._user = None
+        self.reset_setting()
+        return True
+
     def access_setting(self):
         if not os.path.exists(self.dir_path):
             try:
@@ -141,15 +142,3 @@ class Autolog:
         self.auto_login = False
 
         self.save_setting()
-
-
-# def main():
-#     auth = Autolog()
-#     auth.host = "http://192.168.3.116/api"
-#     auth.user_id = "pipeline@rapa.org"
-#     auth.user_pw = "netflixacademy"
-#     auth.connect_gazu()
-#
-#
-# if __name__ == "__main__":
-#     main()
