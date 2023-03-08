@@ -5,8 +5,21 @@ import glob
 
 
 class FFmpegMainWindow(QtWidgets.QMainWindow):
+    """
 
+
+
+    """
     def __init__(self, seq_path, output_path, framerate):
+        """
+
+
+
+        Args:
+            seq_path:
+            output_path:
+            framerate:
+        """
         super().__init__()
         self.p = None
         self.output_dir = os.path.dirname(output_path)
@@ -52,9 +65,26 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         self.start_process()
 
     def message(self, s):
+        """
+
+
+
+        Args:
+            s:
+
+        Returns:
+
+        """
         self.text.appendPlainText(s)
 
     def start_process(self):
+        """
+
+
+
+        Returns:
+
+        """
         self.p = QtCore.QProcess()  # Keep a reference to the QProcess (e.g. on self) while it's running.
         self.p.readyReadStandardOutput.connect(self.handle_stdout)
         self.p.readyReadStandardError.connect(self.handle_stderr)
@@ -63,6 +93,13 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         self.p.start(self.cmd)
 
     def handle_stderr(self):
+        """
+
+
+
+        Returns:
+
+        """
         data = self.p.readAllStandardError()
         stderr = bytes(data).decode("utf8")
         progress = self.simple_percent_parser(stderr, self.total_frame)
@@ -71,11 +108,28 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         self.message(stderr)
 
     def handle_stdout(self):
+        """
+
+
+
+        Returns:
+
+        """
         data = self.p.readAllStandardOutput()
         stdout = bytes(data).decode("utf8")
         self.message(stdout)
 
     def handle_state(self, state):
+        """
+
+
+
+        Args:
+            state:
+
+        Returns:
+
+        """
         states = {
             QtCore.QProcess.NotRunning: 'Not running',
             QtCore.QProcess.Starting: 'Starting',
@@ -85,11 +139,29 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         self.message(f"State changed: {state_name}")
 
     def process_finished(self):
+        """
+
+
+
+        Returns:
+
+        """
         self.message("Process finished.")
         self.p = None
         self.close()
 
     def tree(self, path):  # 백분율로 나누기 위한 분모를 구하는 함수(분모의 수는 디렉토리 안의 시퀀스 수와 같다.)
+        """
+
+
+
+
+        Args:
+            path:
+
+        Returns:
+
+        """
         for x in sorted(glob.glob(path + "/*")):
             print("tree x :", x)
             if os.path.isfile(x):
@@ -99,6 +171,18 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         return int(self.filecnt)
 
     def simple_percent_parser(self, output, total):# 프로세스바에 시각화 해줄 수치를 만들어 내는 백분율계산기
+        """
+
+
+
+
+        Args:
+            output:
+            total:
+
+        Returns:
+
+        """
         progress_re = re.compile("frame=   (\d+)")
         m = progress_re.search(output)
         print("m search :", m)

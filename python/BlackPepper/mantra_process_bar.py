@@ -6,8 +6,23 @@ import shutil
 import hou
 
 class MantraMainWindow(QtWidgets.QMainWindow):
+    """
 
+
+
+    """
     def __init__(self, next_fx_path, output_path, abc_path, cam_node, total_frame):
+        """
+
+
+
+        Args:
+            next_fx_path:
+            output_path:
+            abc_path:
+            cam_node:
+            total_frame:
+        """
         super().__init__()
         self.p = None
         self.total_frame = total_frame
@@ -42,9 +57,25 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.start_process()
 
     def message(self, s):
+        """
+
+
+        Args:
+            s:
+
+        Returns:
+
+        """
         self.text.appendPlainText(s)
 
     def start_process(self):
+        """
+
+
+
+        Returns:
+
+        """
         if self.p is None:  # No process running.
             self.message("Executing process")
             self.p = QtCore.QProcess()  # Keep a reference to the QProcess (e.g. on self) while it's running.
@@ -55,6 +86,13 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             self.p.start(self.cmd)
 
     def handle_stderr(self):
+        """
+
+
+
+        Returns:
+
+        """
         data = self.p.readAllStandardError()
         stderr = bytes(data).decode("utf8")
         progress = self.simple_percent_parser(stderr, self.total_frame)
@@ -64,6 +102,13 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.message(stderr)
 
     def handle_stdout(self):
+        """
+
+
+
+        Returns:
+
+        """
         data = self.p.readAllStandardOutput()
         stdout = bytes(data).decode("utf8")
         progress = self.simple_percent_parser(stdout, self.total_frame)
@@ -73,6 +118,16 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.message(stdout)
 
     def handle_state(self, state):
+        """
+
+
+
+        Args:
+            state:
+
+        Returns:
+
+        """
         states = {
             QtCore.QProcess.NotRunning: 'Not running',
             QtCore.QProcess.Starting: 'Starting',
@@ -82,11 +137,29 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.message(f"State changed: {state_name}")
 
     def process_finished(self):
+        """
+
+
+
+        Returns:
+
+        """
         self.message("Process finished.")
         self.p = None
         self.close()
 
     def simple_percent_parser(self, output, total):
+        """
+
+
+
+        Args:
+            output:
+            total:
+
+        Returns:
+
+        """
         progress_re = re.compile('_(\d+)\.jpg')
         m = progress_re.search(output)
         print("m :", m)

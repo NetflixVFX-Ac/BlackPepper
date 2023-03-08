@@ -73,11 +73,11 @@ class HouPepper:
 
     @abc_tree_all.setter
     def abc_tree_all(self, abc_tree_all):
-        """
+        """Alembic내 노드를 저장한다.
 
 
         Args:
-            abc_tree_all:
+            abc_tree_all (list):
 
         Returns:
 
@@ -437,7 +437,7 @@ def main():
     pepper = Houpub()
     pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
     pepper.project = 'PEPPER'
-    pepper.asset = 'temp_fire'
+    pepper.asset = 'temp_breaking_glass'
     pepper.entity = 'asset'
     # need software handling method
     pepper.software = 'hipnc'
