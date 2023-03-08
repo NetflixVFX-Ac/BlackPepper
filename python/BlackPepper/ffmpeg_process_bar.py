@@ -92,7 +92,6 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
     def process_finished(self):
         self.message("Process finished.")
         self.p = None
-        self.close()
 
     def tree(self, path):  # 백분율로 나누기 위한 분모를 구하는 함수(분모의 수는 디렉토리 안의 시퀀스 수와 같다.)
         for x in sorted(glob.glob(path + "/*")):
