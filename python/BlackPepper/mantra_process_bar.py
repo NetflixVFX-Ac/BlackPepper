@@ -4,7 +4,7 @@ import os
 import glob
 
 
-class FFmpegMainWindow(QtWidgets.QMainWindow):
+class MantraMainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, cmd, input_pattern):
         super().__init__()
