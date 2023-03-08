@@ -33,7 +33,6 @@
        <property name="font">
         <font>
          <pointsize>16</pointsize>
-         <weight>50</weight>
          <bold>false</bold>
         </font>
        </property>
@@ -81,6 +80,9 @@
          <height>30</height>
         </size>
        </property>
+       <property name="text">
+        <string>pipeline@rapa.org</string>
+       </property>
       </widget>
      </item>
      <item>
@@ -115,6 +117,9 @@
          <width>0</width>
          <height>30</height>
         </size>
+       </property>
+       <property name="text">
+        <string>netflixacademy</string>
        </property>
        <property name="echoMode">
         <enum>QLineEdit::PasswordEchoOnEdit</enum>
