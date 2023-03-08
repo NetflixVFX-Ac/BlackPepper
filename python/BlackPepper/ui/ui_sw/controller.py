@@ -1,5 +1,6 @@
 import sys
 import os
+import webbrowser
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow
@@ -58,13 +59,14 @@ class PepperWindow(QMainWindow):
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
         self.login_window.setWindowTitle('Black Pepper v0.0.1')
+        self.login_window.move(1000, 300)
         self.login_window.show()
         # main Ui loader
         main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_2.ui'))
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
-
+        self.main_window.move(700, 250)
         self.main_window.setWindowTitle('Black Pepper v0.0.1')
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
@@ -83,9 +85,15 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
+
         # set menebar, statusbar to window
-        self.login_window.statusBar().showMessage('kitsu 로그인 하세요!')
+        self.login_window.statusBar().showMessage('kitsu 로그인 하세요!  houdini 확장자 선택하세요!')
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
+        # 버튼에 링크 추가하기
+        self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        self.main_window.actionGazu.triggered.connect(lambda: webbrowser.open('https://gazu.cg-wire.com/index.html'))
+        self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
+
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
         self.app.exec_()
 
@@ -154,6 +162,7 @@ class PepperWindow(QMainWindow):
         self.templates_selection.clear()
         self.shots_selection.clear()
         self.renderlists_selection.clear()
+        self.main_window.statusBar().showMessage('temp 를 선택하세요 !')
 
     def template_selected(self, event):
         """templates_listview 의 template 를 클릭 시 실행 되는 메소드. \n
@@ -187,6 +196,7 @@ class PepperWindow(QMainWindow):
         self.shot_model.layoutChanged.emit()
         self.shots_selection.clear()
         self.renderlists_selection.clear()
+        self.main_window.statusBar().showMessage('shots 를 선택하세요 ! 다중선택가능 ! ')
 
     def shot_selected(self, event):
         """Shots 를 선택 시 선택한 shot 의 정보(dict)를 self.all_shots = [] 에 담는 함수 이다.\n
