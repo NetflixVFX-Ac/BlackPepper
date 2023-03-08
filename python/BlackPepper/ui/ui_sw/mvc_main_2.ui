@@ -353,9 +353,10 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionKitsu_site"/>
-    <addaction name="actionGazu_document_site"/>
-    <addaction name="actionPepper_document"/>
+    <addaction name="actionKitsu"/>
+    <addaction name="actionGazu"/>
+    <addaction name="actionPepper"/>
+    <addaction name="actionSidefx"/>
    </widget>
    <addaction name="Menu"/>
    <addaction name="menuHelp"/>
@@ -411,24 +412,29 @@
     <string>Save as</string>
    </property>
   </action>
-  <action name="actionKitsu_site">
+  <action name="actionKitsu">
    <property name="text">
     <string>Kitsu site             F1</string>
    </property>
   </action>
-  <action name="actionGazu_document_site">
+  <action name="actionGazu">
    <property name="text">
-    <string>Gazu`s documentation</string>
+    <string>Gazu`s documentation site</string>
    </property>
   </action>
   <action name="actionOpeb">
    <property name="text">
-    <string>Open</string>
+    <string>Open  open 이랑 save 너무 과하다</string>
    </property>
   </action>
-  <action name="actionPepper_document">
+  <action name="actionPepper">
    <property name="text">
     <string>Pepper document</string>
+   </property>
+  </action>
+  <action name="actionSidefx">
+   <property name="text">
+    <string>Side fx site</string>
    </property>
   </action>
  </widget>
