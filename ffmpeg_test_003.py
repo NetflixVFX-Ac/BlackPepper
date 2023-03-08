@@ -49,11 +49,11 @@ def simple_percent_parser(output, total):  # 프로세스바에 시각화 해줄
     progress_re = re.compile("frame= (\d+)")  # re.compile은 문자열을 컴파일(형태저장)하여
     # 패턴 객체를 반환(re.compile모듈안에 search(), match(), findall() 등과 같은 다양한 메소드를 지원)
     m = progress_re.search(output)  # 'output'안에 're.compile'로 저장한 문자열이 있다면 're.search'모듈을 사용해 're.compile'로 저장한 문자열을 반환
-    print("ssssss", m)
+    print("sssssdas", m)
     if m: # m == 존재하거나 True 일때
         pc_complete = m.group(1)  # re.search()로 검색된 패턴에서 첫 번째 괄호 안에 매칭된 문자열을 반환 ->("frame= (\d+)")의 (\d+)
         if pc_complete: # pc_complete == 존재하거나 True 일때
-            print("xxxx", pc_complete)
+            print("xxasdxx", pc_complete)
             pc = int(int(pc_complete) / total * 100)  # pc_complete==실시간 frame값 / total==시퀀스 전체숫자값 * 100 ->퍼센테이지
             return pc  # gui인터페이스에 쓰여질 퍼센테이지 값
 
