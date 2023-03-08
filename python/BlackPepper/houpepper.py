@@ -375,7 +375,10 @@ class HouPepper:
             n.parmTuple('f').set([self.abc_range[0] * hou.fps(), 3, 1])
             n.parm('vm_verbose').set(1)
             n.parm("execute").pressButton()
-
+            app = QtWidgets.QApplication()
+            w = MantraMainWindow(n.parm('vm_verbose').set(1), self.abc_range[1] * hou.fps())
+            w.show()
+            app.exec_()
 
         output_dir = os.path.dirname(output_path) + '/*.jpg'
         error_dir = os.path.dirname(output_path) + '/*.jpg.mantra_checkpoint'
@@ -466,7 +469,15 @@ def main():
         print("mov_output :", mov_output)
         hou_pepper.set_fx_working_for_shot(simulation_path, layout_output_path,
                                            f'{next_fx_path}.{pepper.software.get("file_extension")}')
-        hou_pepper.set_mantra_for_render(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output)
+        # hou_pepper.set_mantra_for_render(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output)
+        print("hou_cam_node :", hou_pepper.cam_node)
+        app = QtWidgets.QApplication()
+        m = MantraMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output, int(hou.fps()), hou_pepper.cam_node, hou_pepper.abc_range)
+        m.show()
+        app.exec_()
+        f = FFmpegMainWindow(fx_output, mov_output, hou.fps())
+        f.show()
+        app.exec_()
         # BlackPepper.publish_working_file(fx_type_name)
         # hou_pepper.set_ffmpeg_seq_to_mov(fx_output, mov_output)
 
