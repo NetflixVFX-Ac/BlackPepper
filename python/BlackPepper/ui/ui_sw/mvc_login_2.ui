@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(58, 58, 58);</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -50,6 +53,9 @@
          <weight>50</weight>
          <bold>false</bold>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);</string>
        </property>
        <property name="text">
         <string>Login</string>
@@ -95,6 +101,10 @@
          <height>30</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(46, 46, 46);
+color: rgb(255, 255, 255);</string>
+       </property>
        <property name="text">
         <string>pipeline@rapa.org</string>
        </property>
@@ -132,6 +142,10 @@
          <width>0</width>
          <height>30</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(46, 46, 46);
+color: rgb(255, 255, 255);</string>
        </property>
        <property name="text">
         <string>netflixacademy</string>
@@ -176,6 +190,9 @@
            <width>150</width>
            <height>0</height>
           </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(255, 255, 255);</string>
          </property>
          <item>
           <property name="text">
@@ -229,6 +246,9 @@
            <weight>75</weight>
            <bold>true</bold>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(255, 255, 255);</string>
          </property>
          <property name="text">
           <string>Login</string>

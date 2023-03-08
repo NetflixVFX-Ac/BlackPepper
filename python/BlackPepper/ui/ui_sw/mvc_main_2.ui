@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <property name="leftMargin">
@@ -39,7 +42,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Black Pepper v0.0.1</string>
+           <string>sw mvc main v2</string>
           </property>
          </widget>
         </item>
@@ -324,11 +327,11 @@
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="Menu">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>Menu</string>
+     <string>File</string>
     </property>
-    <widget class="QMenu" name="menu">
+    <widget class="QMenu" name="actionRecent">
      <property name="title">
       <string>Open Recent Render files Preset</string>
      </property>
@@ -340,14 +343,17 @@
     </widget>
     <addaction name="separator"/>
     <addaction name="actionClear"/>
-    <addaction name="actionOpeb"/>
-    <addaction name="menu"/>
+    <addaction name="actionOpe"/>
+    <addaction name="actionRecent"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_as"/>
     <addaction name="separator"/>
     <addaction name="actionQuit_Application"/>
     <addaction name="separator"/>
+    <addaction name="action1_id_renderfiles_list"/>
+    <addaction name="action2_id_renderfiles_list"/>
+    <addaction name="action3_id_renderfiles_list"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -358,7 +364,7 @@
     <addaction name="actionPepper"/>
     <addaction name="actionSidefx"/>
    </widget>
-   <addaction name="Menu"/>
+   <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -422,7 +428,7 @@
     <string>Gazu`s documentation site</string>
    </property>
   </action>
-  <action name="actionOpeb">
+  <action name="actionOpe">
    <property name="text">
     <string>Open  open 이랑 save 너무 과하다</string>
    </property>
@@ -435,6 +441,21 @@
   <action name="actionSidefx">
    <property name="text">
     <string>Side fx site</string>
+   </property>
+  </action>
+  <action name="action1_id_renderfiles_list">
+   <property name="text">
+    <string>1. id_renderfiles list </string>
+   </property>
+  </action>
+  <action name="action2_id_renderfiles_list">
+   <property name="text">
+    <string>2. id_renderfiles list </string>
+   </property>
+  </action>
+  <action name="action3_id_renderfiles_list">
+   <property name="text">
+    <string>3. id_renderfiles list </string>
    </property>
   </action>
  </widget>

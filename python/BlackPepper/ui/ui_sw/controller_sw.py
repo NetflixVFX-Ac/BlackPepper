@@ -9,6 +9,9 @@ from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
 from BlackPepper.houpepper import HouPepper
 
+from PySide2.QtGui import QKeySequence
+from PySide2.QtWidgets import QAction, QMenu
+
 
 class PepperWindow(QMainWindow):
     def __init__(self):
@@ -86,14 +89,25 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
 
-        # set menebar, statusbar to window
+        # set statusbar to window
         self.login_window.statusBar().showMessage('kitsu 로그인 하세요!  houdini 확장자 선택하세요!')
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
-        # 버튼에 링크 추가하기
+        # menubar help 버튼에 링크 추가하기
         self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
         self.main_window.actionGazu.triggered.connect(lambda: webbrowser.open('https://gazu.cg-wire.com/index.html'))
         self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
-
+        # set menubar
+        # recent_file_menu = QMenu("Menu1")
+        # recent_files = self.pepper.precomp_list
+        # print(recent_files)
+        # for file_name in recent_files:
+        #     action = QAction(file_name, recent_file_menu)
+        #     action.triggered.connect(lambda checked, file_name=file_name: self.open_recent_file(file_name))
+        #     recent_file_menu.addAction(action)
+        # menu_bar = self.menuBar()
+        # menu_bar.addMenu(recent_file_menu)
+        # self.createActions()
+        # self.createMenus()
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
         self.app.exec_()
 
@@ -255,13 +269,74 @@ class PepperWindow(QMainWindow):
         self.render_model.pepperlist.clear()
         self.render_model.layoutChanged.emit()
 
-    # self.main_window.
+    # menu bar
+    def createActions(self):
+        self.newAct = QAction("&New", self, shortcut=QKeySequence.New,
+                statusTip="Create a new file", triggered=self.newFile)
+
+        self.openAct = QAction("&Open...", self, shortcut=QKeySequence.Open,
+                statusTip="Open an existing file", triggered=self.open)
+
+        self.saveAct = QAction("&Save", self, shortcut=QKeySequence.Save,
+                statusTip="Save the document to disk", triggered=self.save)
+
+        self.saveAsAct = QAction("Save &As...", self,
+                shortcut=QKeySequence.SaveAs,
+                statusTip="Save the document under a new name",
+                triggered=self.saveAs)
+
+        # for i in range(MainWindow.MaxRecentFiles):
+        #     self.recentFileActs.append(
+        #             QAction(self, visible=False,
+        #                     triggered=self.openRecentFile))
+
+        # self.exitAct = QAction("E&xit", self, shortcut="Ctrl+Q",
+        #         statusTip="Exit the application",
+        #         triggered=QApplication.instance().closeAllWindows)
+
+        self.aboutAct = QAction("&About", self,
+                statusTip="Show the application's About box",
+                triggered=self.about)
+
+        # self.aboutQtAct = QAction("About &Qt", self,
+        #         statusTip="Show the Qt library's About box",
+        #         triggered=QApplication.instance().aboutQt)
+
+
+    def createMenus(self):
+        self.fileMenu = self.main_window.menuBar().addMenu("&File")
+        self.fileMenu.addAction(self.newAct)
+        self.fileMenu.addAction(self.openAct)
+        self.fileMenu.addAction(self.saveAct)
+        self.fileMenu.addAction(self.saveAsAct)
+        self.separatorAct = self.fileMenu.addSeparator()
+        # for i in range(MainWindow.MaxRecentFiles):
+        #     self.fileMenu.addAction(self.recentFileActs[i])
+        self.fileMenu.addSeparator()
+        self.fileMenu.addAction(self.exitAct)
+        self.updateRecentFileActions()
+
+        self.menuBar().addSeparator()
+
+        self.helpMenu = self.menuBar().addMenu("&Help")
+        self.helpMenu.addAction(self.aboutAct)
+        self.helpMenu.addAction(self.aboutQtAct)
+
     def menubar_clear(self):
 
         pass
 
-    def menubar_open_preset(self):
+    def menubar_open_preset(self, file_name):
+        # 파일을 열거나 처리하는 코드
         pass
+
+    def recent_precomp(self):
+        self.render_model.pepperlist.clear()
+        for render in self.pepper.precomp_list:
+            self.render_model.pepperlist.append(render['name'])
+        self.render_model.layoutChanged.emit()
+        self.shots_selection.clear()
+        self.renderlists_selection.clear()
 
     def render_execute(self):
         houp = HouPepper()
