@@ -2,13 +2,14 @@ import sys
 import os
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
+from PySide2.QtWidgets import QMainWindow
 from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
 from BlackPepper.houpepper import HouPepper
 
 
-class PepperWindow:
+class PepperWindow(QMainWindow):
     def __init__(self):
         """이 모듈은 pepper를 통해 얻어 온 kitsu 상의 template asset과 casting 된 shot들의 정보들을 UI를 통해 보여준다.
         UI 모듈은 controller, model, view로 분리되어 있고, mvc_login, mvc_main의 .ui 파일이 UI 데이터를 가지고 있다. \n
@@ -56,12 +57,14 @@ class PepperWindow:
         login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
+        self.login_window.setWindowTitle('Login')
         self.login_window.show()
         # main Ui loader
-        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main.ui'))
+        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_2.ui'))
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
+        self.main_window.setWindowTitle('Black Pepper')
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
@@ -156,7 +159,7 @@ class PepperWindow:
 
         또, 기존과 다른 template 를 클릭 시 기존 shots_listview 의 shot_model 을 clear 한 뒤 클릭 된
         template 의 shot 들을 shots_listview 에 display 해준다.
-        재 선택 시 Shots, Render files 의 selectionModel 들을 clear 해준다.
+        재 선택 시 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
 
         Args:
             event: Listview click event
@@ -199,10 +202,11 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def append_render_list(self):
-        """
-
-        Returns:
-
+        """main window 의 append_btn 에 연결 되어 클릭시 사용 되는 함수 이다.
+        선택된 shot 들의 shot_dict 를  pepper의 make_precomp_dict 를 사용하여 shot 별로 houdini에서 필요한
+        path들을 딕셔너리로 만들고 self.precomp_list에 넣어주고 render_moderl.pepperlist clear 정리해준다.
+        그리고 pepper 의 precomp_list를 render_moderl.pepperlist 에 append 한다.
+        추가로 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
         """
         for idx in self.shots_selection.selectedRows():
             shot_dict = self.all_shots[idx.row()]
@@ -215,10 +219,11 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def delete_render_list(self):
-        """
-
-        Returns:
-
+        """main window 의 del_btn 에 연결 되어 클릭시 사용 되는 함수 이다.
+        renderlists_selection(선택된 render files) 들을 pepper의 delete_precomp_dict를 사용하여 precomp_list에서 remove한다.
+        path들을 딕셔너리로 만들고 self.precomp_list에 넣어주고 render_moderl.pepperlist clear 정리해준다.
+        그리고 pepper 의 precomp_list를 render_moderl.pepperlist 에 append 한다.
+        추가로 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
         """
         for idx in self.renderlists_selection.selectedRows():
             self.pepper.delete_precomp_dict(idx.data())
@@ -229,10 +234,8 @@ class PepperWindow:
         self.renderlists_selection.clear()
 
     def clear_list(self):
-        """
-
-        Returns:
-
+        """main window 의 reset_btn에 연결 되어 render files list를 reset하는 함수이다.
+        render files list( pepper.precomp_list)를 [] 빈 리스트로 만들고, render_moderl.pepperlist 를 clear 한다.
         """
         self.pepper.precomp_list = []
         self.render_model.pepperlist.clear()
