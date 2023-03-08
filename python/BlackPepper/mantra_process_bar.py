@@ -2,16 +2,21 @@ import re
 from PySide2 import QtWidgets, QtCore
 import os
 import glob
-
+import shutil
+import hou
 
 class MantraMainWindow(QtWidgets.QMainWindow):
 
-    def __init__(self, cmd, input_pattern):
+    def __init__(self, hip_path, output_path, total_frame, cam_node, abc_range):
         super().__init__()
-        self.cmd = cmd
+        self.hip_path = hip_path
+        self.output_path = output_path
+        self.total_frame = total_frame
+        self.cam_node = cam_node
+        self.abc_range = abc_range
         self.p = None
-
-        self.start_process()
+        self.btn = QtWidgets.QPushButton("Are you sure?")
+        self.btn.pressed.connect(self.start_process)
         self.text = QtWidgets.QPlainTextEdit()
         self.text.setReadOnly(True)
 
@@ -19,6 +24,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.progress.setRange(0, 100)
 
         l = QtWidgets.QVBoxLayout()
+        l.addWidget(self.btn)
         l.addWidget(self.progress)
         l.addWidget(self.text)
 
@@ -26,10 +32,6 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         w.setLayout(l)
 
         self.setCentralWidget(w)
-
-        self.filecnt = 0
-        self.total_frame = self.tree(input_pattern)
-        print(self.total_frame)
 
     def message(self, s):
         self.text.appendPlainText(s)
@@ -41,7 +43,40 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             self.p.readyReadStandardError.connect(self.handle_stderr)
             self.p.stateChanged.connect(self.handle_state)
             self.p.finished.connect(self.process_finished)  # Clean up once complete.
-            self.p.start(self.cmd)
+            self.p.start(self.set_mantra_for_render(self.hip_path, self.output_path))
+
+    def set_mantra_for_render(self, hip_path, output_path):
+        cam_setting = f'/obj/{self.cam_node}/'
+        basename = os.path.basename(hip_path)
+        home_path = os.path.expanduser('~')
+        temp_path = os.path.join(home_path+'/temp', basename)
+        if not os.path.isdir(home_path+'/temp'):
+            os.makedirs(home_path+'/temp')
+        shutil.copyfile(hip_path, temp_path)
+        hou.hipFile.load(temp_path)
+        root = hou.node('/out')
+        if root is not None:
+            n = root.createNode('ifd')
+            n.parm('camera').set(cam_setting)
+            n.parm('vm_picture').set(f'{output_path[:-8]}$F4.jpg')
+            n.parm('trange').set(1)
+            for i in n.parmTuple('f'):
+                i.deleteAllKeyframes()
+            n.parmTuple('f').set([self.abc_range[0] * hou.fps(), self.abc_range[1] * hou.fps(), 1])
+            n.parm('vm_verbose').set(1)
+            n.parm("execute").pressButton()
+        output_dir = os.path.dirname(output_path) + '/*.jpg'
+        error_dir = os.path.dirname(output_path) + '/*.jpg.mantra_checkpoint'
+        file_list = glob.glob(output_dir)
+        error_list = glob.glob(error_dir)
+        if len(file_list) == self.abc_range[1] * hou.fps():
+            if len(error_list) == 0:
+                shutil.rmtree(home_path+'/temp')
+            else:
+                print("render error")
+        else:
+            print("missing sequence frame")
+            # self.close()
 
     def handle_stderr(self):
         data = self.p.readAllStandardError()
@@ -70,17 +105,9 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.message("Process finished.")
         self.p = None
 
-    def tree(self, path):  # 백분율로 나누기 위한 분모를 구하는 함수(분모의 수는 디렉토리 안의 시퀀스 수와 같다.)
-        for x in sorted(glob.glob(path + "/*")):
-            print("tree x :", x)
-            if os.path.isfile(x):
-                self.filecnt += 1
-            else:
-                print("unknown:", x)
-        return int(self.filecnt)
 
     def simple_percent_parser(self, output, total):# 프로세스바에 시각화 해줄 수치를 만들어 내는 백분율계산기
-        progress_re = re.compile("frame=   (\d+)")
+        progress_re = re.compile("_(\d+).jpg")
         m = progress_re.search(output)
         print("m search :", m)
         if m:
@@ -89,11 +116,12 @@ class MantraMainWindow(QtWidgets.QMainWindow):
                 pc = int(int(pc_complete) / total * 100)
                 return pc
 
-        progress_re2 = re.compile("(\d+) frames successfully")
-        m2 = progress_re2.search(output)
-        if m2:
-            pc_complete = m2.group(1)
-            if pc_complete:
-                print(pc_complete, total)
-                pc = int(int(pc_complete) / total * 100)
-                return pc #백분율을 통해 process bar에 보여질 값
+
+        # progress_re2 = re.compile("(\d+) frames successfully")
+        # m2 = progress_re2.search(output)
+        # if m2:
+        #     pc_complete = m2.group(1)
+        #     if pc_complete:
+        #         print(pc_complete, total)
+        #         pc = int(int(pc_complete) / total * 100)
+        #         return pc #백분율을 통해 process bar에 보여질 값
