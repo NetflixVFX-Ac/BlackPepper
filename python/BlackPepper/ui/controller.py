@@ -91,6 +91,7 @@ class PepperWindow(QMainWindow):
         self.main_window.render_btn.clicked.connect(self.render_execute)
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
+        self.main_window.logout_btn.clicked.connect(self.user_logout)
         # add listview to ui
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
@@ -107,15 +108,23 @@ class PepperWindow(QMainWindow):
         로그인 성공 시 입력받은 Houdini license 종류가 pepper의 self.software에 set 된다.
         이후 self.main_window가 바로 실행되어 pepper의 메인 UI가 디스플레이 된다.
         """
-        user_id = self.login_window.input_id.text()
-        user_pw = self.login_window.input_pw.text()
+        self.login_log.host = "http://192.168.3.116/api"
+        self.login_log.user_id = self.login_window.input_id.text()
+        self.login_log.user_pw = self.login_window.input_pw.text()
         user_software = self.login_window.hipbox.currentText()[1:]
-        host = "http://192.168.3.116/api"
 
-        self.pepper.login(host, user_id, user_pw)
-        self.pepper.software = user_software
-        self.login_window.close()
-        self.open_main_window()
+        if self.login_log.connect_gazu():
+            self.pepper.software = user_software
+            self.login_log.auto_login = True
+            self.login_log.save_setting()
+            self.login_window.close()
+            self.open_main_window()
+
+    def user_logout(self):
+        if self.login_log.connect_gazu():
+            self.login_log.log_out()
+            self.main_window.close()
+            self.login_window.show()
 
     def open_main_window(self):
         """mvc_main.ui를 디스플레이 해주는 메소드. 로그인 성공 시 실행된다. \n
