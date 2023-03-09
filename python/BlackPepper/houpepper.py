@@ -70,13 +70,13 @@ class HouPepper:
 
     @abc_tree_all.setter
     def abc_tree_all(self, abc_tree_all):
-        """
+        """Alembic 파일 내 노드 정보를 받는다.
 
 
         Args:
-            abc_tree_all:
+            abc_tree_all (list): node in .abc
 
-        Returns:
+        Returns: node list
 
         """
         self._abc_tree_all = abc_tree_all
@@ -87,13 +87,13 @@ class HouPepper:
 
     @abc_tree_path.setter
     def abc_tree_path(self, abc_tree_path):
-        """
+        """Alembic 파일 내 노드의 경로를 받는다.
 
 
         Args:
-            abc_tree_path:
+            abc_tree_path: node path in .abc
 
-        Returns:
+        Returns: node path
 
         """
         self._abc_tree_path = abc_tree_path
@@ -104,25 +104,23 @@ class HouPepper:
 
     @abc_range.setter
     def abc_range(self, abc_range):
-        """
+        """ Alembic 파일 내 Camera가 가지고 있는 frame range를 받는다
 
 
         Args:
-            abc_range:
+            abc_range(list): camera in, out frame
 
-        Returns:
+        Returns: camera in, out frame
 
         """
         self._abc_range = abc_range
 
     def set_abc_cam_tree(self, abc_path):
-        """
-
+        """ Alembic file에 포함된 node, node path, camera in/out frame을 설정한다. /n
+        Alembic file 내, Camera node를 찾아 cam list, cam path를 구한다.
 
         Args:
-            abc_path:
-
-        Returns:
+            abc_path (str): Alembic file path
 
         """
         self.abc_path = abc_path
