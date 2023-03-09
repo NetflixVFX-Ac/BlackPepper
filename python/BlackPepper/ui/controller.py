@@ -21,8 +21,7 @@ class PepperWindow(QMainWindow):
         여러 개의 shot들을 한번에 선택해 조정할 수 있도록 shots와 rendelistes의 view는 ExtendedSelection으로 설정했다. \n
         PepperWindow 실행 시 self.login_ui가 우선 실행된다.
         """
-        QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-        self.app = QtWidgets.QApplication(sys.argv)
+
         self.pepper = Houpub()
         self.login_log = Auto_log()
         self.projects_selection = None
@@ -97,6 +96,7 @@ class PepperWindow(QMainWindow):
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
         self.main_window.logout_btn.clicked.connect(self.user_logout)
+        self.main_window.temp_rev_cbox.currentTextChanged.connect(self.renew_template_info)
         # add listview to ui
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
@@ -104,7 +104,6 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
         self.set_auto_login()
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
-        self.app.exec_()
 
     def set_auto_login(self):
         log_value = self.login_log.load_setting()
@@ -220,11 +219,12 @@ class PepperWindow(QMainWindow):
         self.pepper.asset = template_name
         self.pepper.entity = 'asset'
         rev_list = self.pepper.get_every_revision_for_working_file('fx_template')
-        self.get_every_revision(rev_list)
+        self.renew_template_cbox(rev_list)
 
+        self.renew_template_info()
         # set template info label
-        name, time, rev = self.pepper.get_working_file_data('simulation', 'asset')
-        self.main_window.template_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
+        # name, time, rev = self.pepper.get_working_file_data('simulation', 'asset')
+        # self.main_window.template_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
         self.all_shots = self.pepper.get_casting_path_for_asset()
 
         self.shot_model.pepperlist.clear()
@@ -236,6 +236,12 @@ class PepperWindow(QMainWindow):
         self.shot_model.layoutChanged.emit()
         self.shots_selection.clear()
         self.renderlists_selection.clear()
+
+    def renew_template_info(self):
+        revision = self.main_window.temp_rev_cbox.currentText()
+        print(revision)
+        name, time, rev = self.pepper.get_working_file_data('simulation', revision, 'asset')
+        self.main_window.template_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
 
     def shot_selected(self, event):
         """Shots 를 선택 시 선택한 shot 의 정보(dict)를 self.all_shots = [] 에 담는 함수 이다.\n
@@ -250,32 +256,50 @@ class PepperWindow(QMainWindow):
         self.pepper.shot = shot_dict['shot_name']
         self.pepper.entity = 'shot'
         rev_list = self.pepper.get_every_revision_for_output_file('Camera_cache', 'layout')
+        self.renew_shot_cbox(rev_list)
 
         name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', 'shot')
         self.main_window.shot_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
 
         self.renderlists_selection.clear()
 
-    def get_every_revision(self, rev_list):
+    def renew_template_cbox(self, rev_list):
         self.main_window.temp_rev_cbox.clear()
         for rev in rev_list:
             self.main_window.temp_rev_cbox.addItem(f'{rev}')
 
-    def append_render_list(self):
+    def renew_shot_cbox(self, rev_list):
+        self.main_window.shot_rev_cbox.clear()
+        for rev in rev_list:
+            self.main_window.shot_rev_cbox.addItem(f'{rev}')
+
+    def append_render_list(self, event):
         """main window 의 append_btn 에 연결 되어 클릭시 사용 되는 함수 이다.
         선택된 shot 들의 shot_dict 를  pepper의 make_precomp_dict 를 사용하여 shot 별로 houdini에서 필요한
         path들을 딕셔너리로 만들고 self.precomp_list에 넣어주고 render_moderl.pepperlist clear 정리해준다.
         그리고 pepper 의 precomp_list를 render_moderl.pepperlist 에 append 한다.
         추가로 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
         """
-        for idx in self.shots_selection.selectedRows():
+        temp_rev = int(self.main_window.temp_rev_cbox.currentText())
+        shot_rev = int(self.main_window.shot_rev_cbox.currentText())
+        selections = self.shots_selection.selectedRows()
+        if len(selections) == 1:
+            shot_dict = self.all_shots[selections[0].row()]
+            self.pepper.make_precomp_dict(shot_dict, temp_revision=temp_rev, cam_revision=shot_rev)
+            self.renew_render_list()
+            self.shots_selection.clear()
+            return
+        for idx in selections:
             shot_dict = self.all_shots[idx.row()]
-            self.pepper.make_precomp_dict(shot_dict, temp_revision=self.temp_rev)
+            self.pepper.make_precomp_dict(shot_dict, temp_revision=temp_rev)
+            self.shots_selection.clear()
+        self.renew_render_list()
+
+    def renew_render_list(self):
         self.render_model.pepperlist.clear()
         for render in self.pepper.precomp_list:
             self.render_model.pepperlist.append(render['name'])
         self.render_model.layoutChanged.emit()
-        self.shots_selection.clear()
         self.renderlists_selection.clear()
 
     def delete_render_list(self):
@@ -287,11 +311,7 @@ class PepperWindow(QMainWindow):
         """
         for idx in self.renderlists_selection.selectedRows():
             self.pepper.delete_precomp_dict(idx.data())
-        self.render_model.pepperlist.clear()
-        for render in self.pepper.precomp_list:
-            self.render_model.pepperlist.append(render['name'])
-        self.render_model.layoutChanged.emit()
-        self.renderlists_selection.clear()
+        self.renew_render_list()
 
     def clear_list(self):
         """main window 의 reset_btn에 연결 되어 render files list를 reset하는 함수이다.
@@ -310,21 +330,19 @@ class PepperWindow(QMainWindow):
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
         for precomp in self.pepper.precomp_list:
             temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path = self.path_seperator(precomp)
-            if not QtWidgets.QApplication.instance():
-                app = QtWidgets.QApplication(sys.argv)
-            else:
-                app = QtWidgets.QApplication.instance()
+            # if not QtWidgets.QApplication.instance():
+            #     app = QtWidgets.QApplication(sys.argv)
+            # else:
+            #     app = QtWidgets.QApplication.instance()
             m = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}', jpg_output_path,
                                  layout_output_path, houp.cam_node, houp.abc_range[1] * hou.fps())
             m.resize(800, 600)
             m.move(1000, 250)
             m.show()
-            app.exec_()
             # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
             # f.resize(800, 600)
             # f.move(1000, 250)
             # f.show()
-            # app.exec_()
 
     @staticmethod
     def path_seperator(precomp):
@@ -337,7 +355,10 @@ class PepperWindow(QMainWindow):
 
 
 def main():
+    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
+    app = QtWidgets.QApplication(sys.argv)
     window = PepperWindow()
+    app.exec_()
 
 
 if __name__ == "__main__":
