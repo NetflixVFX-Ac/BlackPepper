@@ -6,6 +6,19 @@ import glob
 import sys
 
 def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
+    """
+
+
+
+    Args:
+        hip_path:
+        output_path:
+        abc_path:
+        cam_node:
+
+    Returns:
+
+    """
     abc_range = abc.alembicTimeRange(abc_path)
     cam_setting = f'/obj/{cam_node}/'
     basename = os.path.basename(hip_path)
