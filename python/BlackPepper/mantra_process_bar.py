@@ -167,3 +167,16 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             if pc_complete:
                 pc = int(int(pc_complete) / total * 100)
                 return pc
+
+
+# def main():
+#     app = QtWidgets.QApplication()
+#     fx_working_path =
+#     jpg_output_path =
+#     layout_output_path =
+#     m = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}', jpg_output_path,
+#                          layout_output_path, cam_node, abc_range[1] * hou.fps())
+#     m.show()
+#
+# if __name__ == '__main__':
+#     main()
