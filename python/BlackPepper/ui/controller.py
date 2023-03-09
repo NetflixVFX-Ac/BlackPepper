@@ -131,6 +131,7 @@ class PepperWindow(QMainWindow):
         self.login_log.user_ext = self.login_window.hipbox.currentText()[1:]
 
         if self.login_log.connect_login():
+            self.pepper.software = self.login_log.user_ext
             self.login_log.auto_login = True
             self.login_log.save_setting()
             self.login_window.close()
