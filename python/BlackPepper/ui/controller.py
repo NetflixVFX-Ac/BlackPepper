@@ -94,7 +94,6 @@ class PepperWindow(QMainWindow):
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
         self.main_window.logout_btn.clicked.connect(self.user_logout)
-        self.main_window.temp_rev_cbox.currentTextChanged.connect(self.renew_template_info)
         # add listview to ui
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
@@ -107,7 +106,9 @@ class PepperWindow(QMainWindow):
             self.login_log.host = log_value['host']
             self.login_log.user_id = log_value['user_id']
             self.login_log.user_pw = log_value['user_pw']
+            self.login_log.user_ext = log_value['user_ext']
             self.pepper.login(self.login_log.host, self.login_log.user_id, self.login_log.user_pw)
+            self.pepper.software = self.login_log.user_ext
             self.login_window.close()
             self.open_main_window()
         else:
@@ -302,6 +303,7 @@ class PepperWindow(QMainWindow):
         for render in self.pepper.precomp_list:
             self.render_model.pepperlist.append(render['name'])
         self.render_model.layoutChanged.emit()
+        self.shots_selection.clear()
         self.renderlists_selection.clear()
 
     def delete_render_list(self):
