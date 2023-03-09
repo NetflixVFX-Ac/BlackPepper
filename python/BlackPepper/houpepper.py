@@ -1,8 +1,5 @@
-import os
-import glob
 import numpy as np
 from BlackPepper.pepper import Houpub
-import shutil
 from BlackPepper.ffmpeg_process_bar import FFmpegMainWindow
 from BlackPepper.mantra_process_bar import MantraMainWindow
 from PySide2 import QtWidgets
@@ -73,13 +70,13 @@ class HouPepper:
 
     @abc_tree_all.setter
     def abc_tree_all(self, abc_tree_all):
-        """
+        """Alembic 파일 내 노드 정보를 받는다.
 
 
         Args:
-            abc_tree_all:
+            abc_tree_all (tuple): node in .abc
 
-        Returns:
+        Returns: node list
 
         """
         self._abc_tree_all = abc_tree_all
@@ -90,13 +87,13 @@ class HouPepper:
 
     @abc_tree_path.setter
     def abc_tree_path(self, abc_tree_path):
-        """
+        """Alembic 파일 내 노드의 경로를 받는다.
 
 
         Args:
-            abc_tree_path:
+            abc_tree_path: node path in .abc
 
-        Returns:
+        Returns: node path
 
         """
         self._abc_tree_path = abc_tree_path
@@ -107,25 +104,23 @@ class HouPepper:
 
     @abc_range.setter
     def abc_range(self, abc_range):
-        """
+        """ Alembic 파일 내 Camera가 가지고 있는 frame range를 받는다
 
 
         Args:
-            abc_range:
+            abc_range(list): camera in, out frame
 
-        Returns:
+        Returns: camera in, out frame
 
         """
         self._abc_range = abc_range
 
     def set_abc_cam_tree(self, abc_path):
-        """
-
+        """ Alembic file에 포함된 node, node path, camera in/out frame을 설정한다. \n
+        Alembic file 내, Camera node를 찾아 cam list, cam path를 구한다.
 
         Args:
-            abc_path:
-
-        Returns:
+            abc_path (str): Alembic file path
 
         """
         self.abc_path = abc_path
@@ -140,7 +135,7 @@ class HouPepper:
         self.abc_range = abc.alembicTimeRange(self.abc_path)
 
     def get_abc_cam_tree(self, abc_tree_all):
-        """
+        """Alembic 파일 내 Node에서 이름이 camera인 노드를 찾는다.
 
 
         Args:
@@ -355,89 +350,12 @@ class HouPepper:
         self.cam_list.clear()
         self.cam_path.clear()
 
-    def set_mantra_for_render(self, hip_path, output_path):
-        cam_setting = f'/obj/{self.cam_node}/'
-        basename = os.path.basename(hip_path)
-        home_path = os.path.expanduser('~')
-        temp_path = os.path.join(home_path+'/temp', basename)
-        if not os.path.isdir(home_path+'/temp'):
-            os.makedirs(home_path+'/temp')
-        shutil.copyfile(hip_path, temp_path)
-        hou.hipFile.load(temp_path)
-        root = hou.node('/out')
-        if root is not None:
-            n = root.createNode('ifd')
-            n.parm('camera').set(cam_setting)
-            n.parm('vm_picture').set(f'{output_path[:-8]}$F4.jpg')
-            n.parm('trange').set(1)
-            for i in n.parmTuple('f'):
-                i.deleteAllKeyframes()
-            n.parmTuple('f').set([self.abc_range[0] * hou.fps(), 3, 1])
-            n.parm('vm_verbose').set(1)
-            n.parm("execute").pressButton()
-            app = QtWidgets.QApplication()
-            w = MantraMainWindow(n.parm('vm_verbose').set(1), self.abc_range[1] * hou.fps())
-            w.show()
-            app.exec_()
-
-        output_dir = os.path.dirname(output_path) + '/*.jpg'
-        error_dir = os.path.dirname(output_path) + '/*.jpg.mantra_checkpoint'
-        file_list = glob.glob(output_dir)
-        error_list = glob.glob(error_dir)
-        if len(file_list) == self.abc_range[1] * hou.fps():
-            if len(error_list) == 0:
-                shutil.rmtree(home_path+'/temp')
-            else:
-                print("render error")
-        else:
-            print("missing sequence frame")
-
-
-    def set_ffmpeg_seq_to_mov(self, seq_path, output_path):
-        """
-
-
-
-        Args:
-            seq_path:
-            output_path:
-
-        Returns:
-
-        """
-        output_dir = os.path.dirname(output_path)
-        seq_dir = os.path.dirname(seq_path)
-        sequence_path = seq_path[:-8] + '%04d.jpg'
-        print('seq_dir :', seq_dir)
-        print('sequence_path :', sequence_path)
-        command = [
-            'ffmpeg',
-            "-framerate", str(hou.fps()),  # 초당프레임
-            "-i", sequence_path,  # 입력할 파일 이름
-            "-q 0",  # 출력품질 정함(숫자가 높을 수록 품질이 떨어짐)
-            "-threads 8",  # 속도향상을 위해 멀티쓰레드를 지정
-            "-c:v", "prores_ks",  # 코덱
-            "-pix_fmt", "yuv420p",  # 포맷양식
-            "-y",  # 출력파일을 쓸 때 같은 이름의 파일이 있어도 확인없이 덮어씀
-            "-loglevel", "debug",  # 인코딩 과정로그를 보여줌
-            output_path
-        ]
-        cmd = (' '.join(str(s) for s in command))
-        print(cmd)
-        print("output_dir :", output_dir)
-        if not os.path.isdir(output_dir):
-            os.makedirs(output_dir)
-        app = QtWidgets.QApplication()
-        w = FFmpegMainWindow(cmd, seq_dir)
-        w.show()
-        app.exec_()
-
 
 def main():
     pepper = Houpub()
     pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
     pepper.project = 'PEPPER'
-    pepper.asset = 'temp_breaking_glass'
+    pepper.asset = 'temp_fire'
     pepper.entity = 'asset'
     # need software handling method
     pepper.software = 'hipnc'
@@ -458,15 +376,19 @@ def main():
         # BlackPepper.publish_working_file(fx_type_name)
         fx_path = pepper.working_file_path(fx_type_name)
         next_fx_path = pepper.make_next_working_path(fx_type_name)
-        output_type_name = 'JPG'
+        output_type_name = 'jpg_sequence'
         fx_output = pepper.output_file_path(output_type_name, fx_type_name)
+        fx_next_output = pepper.make_next_output_path(output_type_name, fx_type_name)
         output_type_name = 'movie_file'
         mov_output = pepper.output_file_path(output_type_name, fx_type_name)
+        mov_next_output = pepper.make_next_output_path(output_type_name, fx_type_name)
         print("fx_path :", fx_path)
         print("next_fx_path :", next_fx_path)
         print("fx_output :", fx_output)
         print("layout_output_path :", layout_output_path)
         print("mov_output :", mov_output)
+        print("fx_next_output :", fx_next_output)
+        print("mov_next_output :", mov_next_output)
         hou_pepper.set_fx_working_for_shot(simulation_path, layout_output_path,
                                            f'{next_fx_path}.{pepper.software.get("file_extension")}')
         # hou_pepper.set_mantra_for_render(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output)
@@ -475,13 +397,13 @@ def main():
             app = QtWidgets.QApplication(sys.argv)
         else:
             app = QtWidgets.QApplication.instance()
-        m = MantraMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output,
+        m = MantraMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_next_output,
                              layout_output_path, hou_pepper.cam_node, hou_pepper.abc_range[1]*hou.fps())
         m.resize(800, 600)
         m.move(1000, 250)
         m.show()
         app.exec_()
-        f = FFmpegMainWindow(fx_output, mov_output, hou.fps())
+        f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
         f.resize(800, 600)
         f.move(1000, 250)
         f.show()
