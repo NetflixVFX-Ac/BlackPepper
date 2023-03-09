@@ -262,7 +262,7 @@ class Houpub:
         }
         self.dict_check(self.project, 'no_project')
         gazu.files.update_project_file_tree(self.project, file_tree)
-        self.mylog.debug(self.project, "File tree updated")
+        self.mylog.tree_log(self.project)
 
     def publish_working_file(self, task_type_name):
         """task_type_name과 self.entity를 통해 해당 entity의 입력된 task_type을 가진 task를 받아온다.\n
@@ -283,7 +283,7 @@ class Houpub:
         self.args_str_check(task_type_name)
         _, task = self.get_task(task_type_name)
         gazu.files.new_working_file(task, software=self.software)
-        self.mylog.debug("publish working file, last revision up")
+        self.mylog.publish_working_file_log(task_type_name)
 
     def publish_output_file(self, task_type_name, output_type_name, comments):
         """task_type_name과 output_type_name, self.entity를 통해 해당 entity의 입력된 task_type을 가진 task를 받아온다.\n
@@ -312,7 +312,7 @@ class Houpub:
         self.dict_check(task_type, f'no_task_type{output_type_name}')
         gazu.files.new_entity_output_file(self.entity, output_type, task_type, working_file=work_file,
                                           representation=output_type['short_name'], comment=comments)
-        self.mylog.debug("publish output file, last revision up")
+        self.mylog.publish_output_file_log(task_type_name, output_type_name)
 
     def working_file_path(self, task_type_name, input_num=None):
         """self.entity에 해당된 task_type_name을 가진 task의 working file 중 input_num의 revision을 반환한다. \n
@@ -508,7 +508,7 @@ class Houpub:
         # fx_tasks = [gazu.task.get_task_by_name(shot['shot_id'], fx_task_type) for shot in casted_shots]
         return casted_shots
 
-    def make_precomp_dict(self, casted_shot):
+    def make_precomp_dict(self, casted_shot, temp_revision=None, cam_revision=None):
         """shot 별로 houdini에서 필요한 path들을 딕셔너리로 만들어준다. \n
         이 딕셔너리들은 self.precomp_list에 들어가며,
         render list가 모두 정리된 뒤 self.precomp_list를 받아서 houdini에서 작업할 수 있다. \n
@@ -520,16 +520,18 @@ class Houpub:
 
         Args:
             casted_shot(dict): shot dict
+            temp_revision(int):
+            cam_revision(int):
         """
         sequence_name = casted_shot['sequence_name']
         shot_name = casted_shot['shot_name']
         name = '_'.join([self.project['name'], self.asset['name'][5:], sequence_name, shot_name])
         self.entity = 'asset'
-        temp_working_path = self.working_file_path('simulation')
+        temp_working_path = self.working_file_path('simulation', input_num=temp_revision)
         self.sequence = sequence_name
         self.shot = shot_name
         self.entity = 'shot'
-        layout_output_path = self.output_file_path('camera_cache', 'layout')
+        layout_output_path = self.output_file_path('camera_cache', 'layout', input_num=cam_revision)
         fx_working_path = self.make_next_working_path('FX')
         video_output_path = self.make_next_output_path('jpg_sequence', 'FX')
         precomp = {'name': name, 'temp_working_path': temp_working_path,
@@ -590,14 +592,12 @@ class Houpub:
         return revision_list
 
     def get_every_revision_for_output_file(self, output_type_name, task_type_name):
-        output_type = gazu.files.get_output_type(output_type_name)
+        output_type = gazu.files.get_output_type_by_name(output_type_name)
         task_type = gazu.task.get_task_type_by_name(task_type_name)
-        print(output_type)
-        print(task_type)
-        # output_files = gazu.files.all_output_files_for_entity(self.entity, output_type, task_type)
-        # revision_list = []
-        # for output_file in output_files:
-        #     print(output_file)
+        output_files = gazu.files.all_output_files_for_entity(self.entity, output_type, task_type)
+        revision_list = [output_file['revision'] for output_file in output_files]
+        return revision_list
+        # self.publish_output_file(task_type_name, output_type_name, "test publish for getting every rev")
 
     # -------------------------------------------
     # ----------- get all 관련 메소드들 -----------
