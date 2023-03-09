@@ -54,6 +54,12 @@ class PepperWindow(QMainWindow):
         self.renderlists_listview.setModel(self.render_model)
         self.renderlists_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
         self.renderlists_listview.setSpacing(2)
+
+        self.projects_selection = self.projects_listview.selectionModel()
+        self.templates_selection = self.templates_listview.selectionModel()
+        self.shots_selection = self.shots_listview.selectionModel()
+        self.renderlists_selection = self.renderlists_listview.selectionModel()
+
         # get script_path
         # __file__ (전역변수) : 현재 열려있는 파일의 위치와 이름을 가지고 있는 문자열 변수
         # path.realpath(파일이름) : 현재 파일의  표준 경로+이름 을 반환
