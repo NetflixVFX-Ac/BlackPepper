@@ -7,7 +7,7 @@ from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
 from BlackPepper.houpepper import HouPepper
-from BlackPepper.ui.ui_sj.auto_login import Auto_log
+from BlackPepper.ui.auto_login import Auto_log
 
 
 class PepperWindow(QMainWindow):
@@ -99,18 +99,23 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
+        self.set_auto_login()
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
+        self.app.exec_()
+
+    def set_auto_login(self):
         log_value = self.login_log.load_setting()
         if log_value['valid_host'] and log_value['valid_user']:
             self.login_log.host = log_value['host']
             self.login_log.user_id = log_value['user_id']
             self.login_log.user_pw = log_value['user_pw']
+            self.login_log.user_ext = log_value['user_ext']
             self.pepper.login(self.login_log.host, self.login_log.user_id, self.login_log.user_pw)
+            self.pepper.software = self.login_log.user_ext
             self.login_window.close()
             self.open_main_window()
         else:
             pass
-        self.app.exec_()
 
     def user_login(self):
         """mvc_login.ui를 디스플레이 해주는 메소드. 유저의 로그인 페이지 UI에서 Login 버튼 클릭, Enter 입력 시 실행된다. \n
@@ -123,17 +128,17 @@ class PepperWindow(QMainWindow):
         self.login_log.host = "http://192.168.3.116/api"
         self.login_log.user_id = self.login_window.input_id.text()
         self.login_log.user_pw = self.login_window.input_pw.text()
-        user_software = self.login_window.hipbox.currentText()[1:]
+        self.login_log.user_ext = self.login_window.hipbox.currentText()[1:]
 
-        if self.login_log.connect_gazu():
-            self.pepper.software = user_software
+        if self.login_log.connect_login():
+            self.pepper.software = self.login_log.user_ext
             self.login_log.auto_login = True
             self.login_log.save_setting()
             self.login_window.close()
             self.open_main_window()
 
     def user_logout(self):
-        if self.login_log.connect_gazu():
+        if self.login_log.connect_login():
             self.login_log.log_out()
             self.main_window.close()
             self.login_window.show()
