@@ -24,6 +24,8 @@ class PepperWindow(QMainWindow):
         self.templates_selection = None
         self.shots_selection = None
         self.renderlists_selection = None
+        self.temp_rev = None
+        self.cam_rev = None
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
@@ -170,6 +172,7 @@ class PepperWindow(QMainWindow):
         self.pepper.asset = template_name
         self.pepper.entity = 'asset'
         rev_list = self.pepper.get_every_revision_for_working_file('fx_template')
+        self.get_every_revision(rev_list)
 
         # set template info label
         name, time, rev = self.pepper.get_working_file_data('simulation', 'asset')
@@ -194,15 +197,21 @@ class PepperWindow(QMainWindow):
             event: Listview click event
         """
         shot_dict = self.all_shots[event.row()]
-        rev_list = self.pepper.get_every_revision_for_output_file('camera_cache', 'layout')
 
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
+        self.pepper.entity = 'shot'
+        rev_list = self.pepper.get_every_revision_for_output_file('Camera_cache', 'layout')
 
         name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', 'shot')
         self.main_window.shot_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
 
         self.renderlists_selection.clear()
+
+    def get_every_revision(self, rev_list):
+        self.main_window.temp_rev_cbox.clear()
+        for rev in rev_list:
+            self.main_window.temp_rev_cbox.addItem(f'{rev}')
 
     def append_render_list(self):
         """
@@ -212,7 +221,7 @@ class PepperWindow(QMainWindow):
         """
         for idx in self.shots_selection.selectedRows():
             shot_dict = self.all_shots[idx.row()]
-            self.pepper.make_precomp_dict(shot_dict)
+            self.pepper.make_precomp_dict(shot_dict, temp_revision=self.temp_rev)
         self.render_model.pepperlist.clear()
         for render in self.pepper.precomp_list:
             self.render_model.pepperlist.append(render['name'])

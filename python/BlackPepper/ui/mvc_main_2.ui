@@ -222,6 +222,9 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QComboBox" name="temp_rev_cbox"/>
+            </item>
            </layout>
           </item>
           <item>
@@ -263,6 +266,9 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QComboBox" name="shot_rev_cbox"/>
+            </item>
            </layout>
           </item>
          </layout>
@@ -300,7 +306,6 @@
           <property name="font">
            <font>
             <pointsize>15</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -321,7 +326,7 @@
      <x>0</x>
      <y>0</y>
      <width>1016</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSeleted_Shots_save">
