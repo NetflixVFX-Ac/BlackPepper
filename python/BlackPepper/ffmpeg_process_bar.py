@@ -69,7 +69,7 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         self.start_process()
 
     def message(self, s):
-        """  Tex Widget에 메시지를 출력한다
+        """  Text Widget에 메시지를 출력한다
 
         Args:
             s(str): text
@@ -80,8 +80,6 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         """ Qprocess를 활용하여 터미널에 명령을 내려주고 터미널 신호에 따라 출력하는 내용을 달리한다. /n
         진행 중, 오류, 변동, 마무리 단계마다 Text Widget에 상태를 Handling 한다.
 
-        Returns:
-
         """
         self.p = QtCore.QProcess()  # Keep a reference to the QProcess (e.g. on self) while it's running.
         self.p.readyReadStandardOutput.connect(self.handle_stdout)
@@ -91,11 +89,7 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         self.p.start(self.cmd)
 
     def handle_stderr(self):
-        """
-
-
-
-        Returns:
+        """ QProcess Error정보를 받아온다. 바이트 신호를 번역하고 백분율 계산 함수를 실행시키고 컴퓨터가 보낸 정보를 Text에 출력한다.
 
         """
         data = self.p.readAllStandardError()
@@ -106,11 +100,7 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         self.message(stderr)
 
     def handle_stdout(self):
-        """
-
-
-
-        Returns:
+        """ QProcess Output정보를 받아온다. 바이트 신호를 번역한 정보를 Text에 출력한다.
 
         """
         data = self.p.readAllStandardOutput()
@@ -118,14 +108,7 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         self.message(stdout)
 
     def handle_state(self, state):
-        """
-
-
-
-        Args:
-            state:
-
-        Returns:
+        """Qprocess state에 변동이 있을 경우, 해당 변화 정보를 출력한다.
 
         """
         states = {
@@ -137,26 +120,20 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         self.message(f"State changed: {state_name}")
 
     def process_finished(self):
-        """
-
-
-
-        Returns:
+        """Qprocess finish가 날 경우, 바이트 신호를 번역한 정보를 Text에 출력한다.
 
         """
         self.message("Process finished.")
         self.p = None
         self.close()
 
-    def tree(self, path):  # 백분율로 나누기 위한 분모를 구하는 함수(분모의 수는 디렉토리 안의 시퀀스 수와 같다.)
-        """
-
-
+    def tree(self, path):
+        """ Sequence file이 있는 경로 내 파일의 갯수를 파악하여 Total frame을 계산한다.
 
         Args:
-            path:
+            path (str): Sequence file path
 
-        Returns:
+        Returns: filecnt
 
         """
         for x in sorted(glob.glob(path + "/*")):
@@ -167,7 +144,19 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
                 print("unknown:", x)
         return int(self.filecnt)
 
-    def simple_percent_parser(self, output, total):  # 프로세스바에 시각화 해줄 수치를 만들어 내는 백분율계산기
+    def simple_percent_parser(self, output, total):
+        """Progress bar에 넣을 정보를 백분율로 계산한다. /n
+        컨버팅이 끝난 frame은 Text Widget에 표시되고, 정규표현식을 사용하여 Text Widget에서 해당 frame을 파악한다. /n
+        tree 함수를 사용하여 구한 전체 frame을 분모로 설정하고 컨버팅이 끝난 frame을 분자로 설정하여 백분율을 계싼한다. /n
+        Text Widget에 성공적으로 컨버팅이 끝난 정보가 출력될 때, 100 %를 출력해준다.
+
+        Args:
+            output (str): Text in Text Widget
+            total (int): Total frame
+
+        Returns: pc(progress percent)
+
+        """
         progress_re = re.compile("frame=   (\d+)")
         m = progress_re.search(output)
         print("m search :", m)
