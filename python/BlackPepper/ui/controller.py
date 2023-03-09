@@ -7,7 +7,7 @@ from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
 from BlackPepper.houpepper import HouPepper
-from BlackPepper.ui.ui_sj.auto_login import Auto_log
+from BlackPepper.ui.auto_login import Auto_log
 
 
 class PepperWindow(QMainWindow):
@@ -56,6 +56,12 @@ class PepperWindow(QMainWindow):
         self.renderlists_listview.setModel(self.render_model)
         self.renderlists_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
         self.renderlists_listview.setSpacing(2)
+
+        self.projects_selection = self.projects_listview.selectionModel()
+        self.templates_selection = self.templates_listview.selectionModel()
+        self.shots_selection = self.shots_listview.selectionModel()
+        self.renderlists_selection = self.renderlists_listview.selectionModel()
+
         # get script_path
         # __file__ (전역변수) : 현재 열려있는 파일의 위치와 이름을 가지고 있는 문자열 변수
         # path.realpath(파일이름) : 현재 파일의  표준 경로+이름 을 반환
@@ -87,6 +93,7 @@ class PepperWindow(QMainWindow):
         self.main_window.render_btn.clicked.connect(self.render_execute)
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
+        self.main_window.logout_btn.clicked.connect(self.user_logout)
         # add listview to ui
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
@@ -98,7 +105,9 @@ class PepperWindow(QMainWindow):
             self.login_log.host = log_value['host']
             self.login_log.user_id = log_value['user_id']
             self.login_log.user_pw = log_value['user_pw']
+            self.login_log.user_ext = log_value['user_ext']
             self.pepper.login(self.login_log.host, self.login_log.user_id, self.login_log.user_pw)
+            self.pepper.software = self.login_log.user_ext
             self.login_window.close()
             self.open_main_window()
         else:
@@ -113,15 +122,22 @@ class PepperWindow(QMainWindow):
         로그인 성공 시 입력받은 Houdini license 종류가 pepper의 self.software에 set 된다.
         이후 self.main_window가 바로 실행되어 pepper의 메인 UI가 디스플레이 된다.
         """
-        user_id = self.login_window.input_id.text()
-        user_pw = self.login_window.input_pw.text()
-        user_software = self.login_window.hipbox.currentText()[1:]
-        host = "http://192.168.3.116/api"
+        self.login_log.host = "http://192.168.3.116/api"
+        self.login_log.user_id = self.login_window.input_id.text()
+        self.login_log.user_pw = self.login_window.input_pw.text()
+        self.login_log.user_ext = self.login_window.hipbox.currentText()[1:]
 
-        self.pepper.login(host, user_id, user_pw)
-        self.pepper.software = user_software
-        self.login_window.close()
-        self.open_main_window()
+        if self.login_log.connect_login():
+            self.login_log.auto_login = True
+            self.login_log.save_setting()
+            self.login_window.close()
+            self.open_main_window()
+
+    def user_logout(self):
+        if self.login_log.connect_login():
+            self.login_log.log_out()
+            self.main_window.close()
+            self.login_window.show()
 
     def open_main_window(self):
         """mvc_main.ui를 디스플레이 해주는 메소드. 로그인 성공 시 실행된다. \n
