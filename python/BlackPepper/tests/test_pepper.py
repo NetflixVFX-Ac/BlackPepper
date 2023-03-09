@@ -1,12 +1,11 @@
 from unittest import TestCase
-from main.python.pepper import Houpub
+from BlackPepper.pepper import Houpub
 import gazu
 import os
 import pprint
 
 
 class TestHoupub(TestCase):
-
 
     def setUp(self):
         """
@@ -392,7 +391,7 @@ class TestHoupub(TestCase):
         """
         assets = []
         for asset in self.pepper.get_all_assets():
-           assets.append(asset)
+            assets.append(asset)
         self.assertIn('temp_explosion', assets)
         self.assertIn('temp_thunder', assets)
         self.assertIn('temp_waterfall', assets)
