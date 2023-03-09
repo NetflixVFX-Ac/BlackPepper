@@ -5,6 +5,7 @@ import shutil
 import glob
 import sys
 
+
 def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
     """
 
@@ -52,6 +53,13 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
         print("missing sequence frame")
 
 def main():
+    """
+
+
+
+    Returns:
+
+    """
     args = sys.argv
     if len(args) != 5:
         print('Insufficient arguments')

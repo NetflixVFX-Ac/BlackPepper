@@ -7,18 +7,17 @@ import glob
 class FFmpegMainWindow(QtWidgets.QMainWindow):
     """
     FFmpeg으로 Sequence file을 mov로 컨버팅하는 UI이다. 터미널에 명령하고 출력되는 정보를 Text Widget에 보여준다.
-    정규표현을 활용하여 터미널에 출력되는 정보에서 컨버팅 중인 프레임을 파악하고 전체 프레임과 비교하여 Progress Widget을
-    활용하여 시각적으로 진행사항을 유저에게 알려준다.
+    정규표현을 활용하여 터미널에 출력되는 정보에서 컨버팅 중인 프레임을 파악하고 전체 프레임과 비교하여 Progress Widget으로
+    진행사항을 유저에게 시각적으로 알려준다.
     """
     def __init__(self, seq_path, output_path, framerate):
-        """Pepper에서 출력받은
-
+        """Sequence file이 있는 경로와 mov파일이 저장될 경로, fps를 지정한다. 해당 인자들은 터미널에 명령내릴 command에 입력된다.
 
 
         Args:
-            seq_path:
-            output_path:
-            framerate:
+            seq_path (str): Sequence file path
+            output_path (str): output file path
+            framerate (int): fps
         """
         super().__init__()
         self.p = None
@@ -65,22 +64,16 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         self.start_process()
 
     def message(self, s):
-        """
-
-
+        """  Tex Widget에 메시지를 출력한다
 
         Args:
-            s:
-
-        Returns:
-
+            s(str): text
         """
         self.text.appendPlainText(s)
 
     def start_process(self):
-        """
-
-
+        """ Qprocess를 활용하여 터미널에 명령을 내려주고 터미널 신호에 따라 출력하는 내용을 달리한다. /n
+        진행 중, 오류, 변동, 마무리 단계마다 Text Widget에 상태를 Handling 한다.
 
         Returns:
 

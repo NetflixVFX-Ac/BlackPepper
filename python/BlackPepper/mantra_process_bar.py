@@ -4,9 +4,10 @@ from PySide2 import QtWidgets, QtCore
 
 class MantraMainWindow(QtWidgets.QMainWindow):
     """
-
-
-
+    Houdini Mantra를 활용하여 Template에 Alembic 카메라 값이 추가 된 Hip 파일을 Sequence file(.jpg)로 추출한다.
+    터미널에서 mantra_render.py 를 실행하고, 터미널에 출력되는 정보를 Text Widget으로 보여준다.
+    정규표현을 활용하여 터미널에 출력되는 정보에서 컨버팅 중인 프레임을 파악하고 전체 프레임과 비교하여 Progress Widget으로
+    진행사항을 유저에게 시각적으로 알려준다.
     """
     def __init__(self, next_fx_path, output_path, abc_path, cam_node, total_frame):
         """
