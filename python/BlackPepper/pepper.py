@@ -312,7 +312,7 @@ class Houpub:
         self.dict_check(task_type, f'no_task_type{output_type_name}')
         gazu.files.new_entity_output_file(self.entity, output_type, task_type, working_file=work_file,
                                           representation=output_type['short_name'], comment=comments)
-        self.mylog.debug("publish output file, last revision up")
+        self.mylog.publish_output_file_log(task_type_name, output_type_name)
 
     def working_file_path(self, task_type_name, input_num=None):
         """self.entity에 해당된 task_type_name을 가진 task의 working file 중 input_num의 revision을 반환한다. \n
