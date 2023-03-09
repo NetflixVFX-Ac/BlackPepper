@@ -1,9 +1,14 @@
 import re
 from PySide2 import QtWidgets, QtCore
+from PySide2.QtCore import *
+from PySide2.QtGui import *
 import os
 import glob
 import shutil
 import hou
+
+
+
 
 class MantraMainWindow(QtWidgets.QMainWindow):
 
@@ -22,8 +27,8 @@ class MantraMainWindow(QtWidgets.QMainWindow):
 
         self.cmd = (' '.join(str(s) for s in self.command))
 
-        self.btn = QtWidgets.QPushButton("MANTRA SEQUENCE RENDERING")
-        self.btn.pressed.connect(self.start_process)
+        # self.btn = QtWidgets.QPushButton("MANTRA SEQUENCE RENDERING")
+        # self.btn.pressed.connect(self.start_process)
         self.text = QtWidgets.QPlainTextEdit()
         self.text.setReadOnly(True)
 
@@ -31,14 +36,20 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.progress.setRange(0, 100)
 
         l = QtWidgets.QVBoxLayout()
-        l.addWidget(self.btn)
+        # l.addWidget(self.btn)
+        # l.setStyleSheet("background-color:rgb(52, 52, 52);")
         l.addWidget(self.progress)
         l.addWidget(self.text)
 
         w = QtWidgets.QWidget()
+        w.setStyleSheet(u"background-color: rgb(45, 45, 45);\n"
+        "selection-background-color: rgb(45, 180, 198);\n"
+        "font: 10pt\"Courier New\";\n"
+        "color: rgb(180, 180, 180);\n")
         w.setLayout(l)
 
         self.setCentralWidget(w)
+        self.start_process()
 
     def message(self, s):
         self.text.appendPlainText(s)
@@ -94,3 +105,4 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             if pc_complete:
                 pc = int(int(pc_complete) / total * 100)
                 return pc
+
