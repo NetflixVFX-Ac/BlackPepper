@@ -7,6 +7,7 @@ from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
 from BlackPepper.houpepper import HouPepper
+from BlackPepper.ui.ui_sj.auto_login import Auto_log
 
 
 class PepperWindow(QMainWindow):
@@ -20,6 +21,7 @@ class PepperWindow(QMainWindow):
         QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
         self.app = QtWidgets.QApplication(sys.argv)
         self.pepper = Houpub()
+        self.login_log = Auto_log()
         self.projects_selection = None
         self.templates_selection = None
         self.shots_selection = None
