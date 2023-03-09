@@ -25,7 +25,6 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.p = None
         self.is_interrupted = False
-        # self.is_interrupted = None
         self.total_frame = total_frame
         self.command = [
             'python',
@@ -46,6 +45,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         # self.btn = QtWidgets.QPushButton("MANTRA SEQUENCE RENDERING")
         # self.btn.pressed.connect(self.start_process)
         self.btn_interrupt = QtWidgets.QPushButton("Interrupt")
+        self.btn_interrupt.clicked.connect(self.handle_interrupt)
 
         l = QtWidgets.QVBoxLayout()
         # l.addWidget(self.btn)
@@ -60,12 +60,9 @@ class MantraMainWindow(QtWidgets.QMainWindow):
                         "font: 10pt\"Courier New\";\n"
                         "color: rgb(180, 180, 180);\n")
         w.setLayout(l)
-
-        # self.btn_interrupt = False
-
         self.setCentralWidget(w)
         self.start_process()
-        self.handle_interrupt()
+
 
     def message(self, s):
         """
@@ -153,8 +150,6 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         }
         state_name = states[state]
         self.message(f"State changed: {state_name}")
-        if self.is_interrupted and state == QtCore.QProcess.NotRunning:
-            self.start_process()
 
     def process_finished(self):
         """
@@ -165,9 +160,10 @@ class MantraMainWindow(QtWidgets.QMainWindow):
 
         """
         self.message("Process finished.")
+        self.btn_interrupt.setText("Restart")
         # self.btn_interrupt.setText("Interrupt")
         self.p = None
-        self.is_interrupted = False
+        # self.is_interrupted = False
 
     def simple_percent_parser(self, output, total):
         """
@@ -190,11 +186,28 @@ class MantraMainWindow(QtWidgets.QMainWindow):
                 pc = int(int(pc_complete) / total * 100)
                 return pc
 
+    def restart_process(self):
+        self.progress.setValue(0)
+        self.start_process()
+        self.btn_interrupt.setText("Interrupt")
+
     def handle_interrupt(self):
-        self.btn_interrupt.setCheckable(True)
-        if self.btn_interrupt is True:
-            self.btn_interrupt = QtWidgets.QPushButton("Restart")
-            self.btn_interrupt.setCheckable(False)
+        if self.p is not None:
+            self.p.kill()
+            self.btn_interrupt.setText("Restart")
+            self.btn_interrupt.clicked.connect(self.restart_process)
+        else:
+            self.btn_interrupt.setText("Interrupt")
+            self.start_process()
+        #     if self.is_interrupted:
+        #         self.btn_interrupt.setText("Interrupt")
+        #         self.is_interrupted = False
+        #         self.p.write(b'c')
+        #     else:
+        #         self.btn_interrupt.setText("Restart")
+        #         self.is_interrupted = True
+        #
+        # self.btn_interrupt.clicked.connect(on_interrupt_clicked)
 
         #     if self.btn_interrupt.isChecked():
         #         self.btn_interrupt.
@@ -212,9 +225,4 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         # #         self.btn_interrupt.clicked.disconnect(self.handle_interrupt)
         # #         self.btn_interrupt.clicked.connect(self.start_process)
         # # self.is_interrupted = False
-        self.start_process()
-
-
-    # def handle_restart(self):
-    #     self.btn_interrupt.setText("Interrupt")
-    #
+        # self.start_process()
