@@ -115,7 +115,7 @@ class PepperWindow(QMainWindow):
         self.main_menu_bar = self.main_window.menuBar()
 
         self.main_menu_bar.setNativeMenuBar(False)
-        # self.main_preset = self.main_menu_bar.addMenu('Preset')
+        self.main_preset = self.main_menu_bar.addMenu('Preset')
         self.save_precomp_list_json()
 
         self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
@@ -371,6 +371,61 @@ class PepperWindow(QMainWindow):
         self.render_model.pepperlist.clear()
         self.render_model.layoutChanged.emit()
 
+    def save_precomp_list_json(self):
+        """
+
+        Returns:
+
+        """
+        # self.main_preset = self.main_menu_bar.addMenu('Preset')
+        directory_path = '/home/rapa/git/hook/python/BlackPepper/ui'
+        json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
+
+        for file_path in json_files:
+            file_path = QAction(os.path.basename(file_path))
+            file_path.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+            self.main_preset.addAction(file_path)
+
+        # self.main_preset.layoutChanged.emit()
+        # self.main_preset.addSeparator() # QMenu에 구분선 추가
+
+    def save_preset_json(self):
+        now = datetime.now()
+        base_filename = f'{self.pepper.identif}_{now.date()}_time_{now.hour}:{now.minute}'
+
+        # base_filename = 'render_check_list'
+        ext = '.json'
+        i = 1
+        while i <= 5:
+            self.filename = f"{base_filename}_v{i}{ext}"
+            if not os.path.isfile(self.filename):
+                break
+            i += 1
+        if i > 5:
+            i = 1
+        self.filename = f"{base_filename}_v{i}{ext}"
+
+        self.render_model.pepperlist.clear()
+        for render in self.pepper.precomp_list:
+            self.render_list_data.append(render['name'])
+        with open(self.filename, "w") as f:
+            json.dump(self.render_list_data, f, ensure_ascii=False)
+
+    def load_preset_set(self):
+        with open(self.render_list_path, "r") as f:
+            self.render_list_data = json.load(f)
+            print(self.render_list_data)
+
+    def precomp_list_len(self):
+        total = len(self.render_list_data)
+
+        self.render_model.pepperlist.clear()
+        for render in self.pepper.precomp_list:
+            self.render_model.pepperlist.append(render['name'])
+        self.render_model.layoutChanged.emit()
+        self.shots_selection.clear()
+        self.renderlists_selection.clear()
+
     def render_execute(self):
         houp = HouPepper()
         for precomp in self.pepper.precomp_list:
@@ -394,6 +449,27 @@ class PepperWindow(QMainWindow):
             # f.move(1000, 250)
             # f.show()
 
+        if len(self.pepper.precomp_list) == 0:
+            return
+
+        self.save_preset_json()
+
+        self.pepper.precomp_list.clear()
+        self.render_list_data.clear()
+
+        self.render_model.layoutChanged.emit()
+        self.template_model.layoutChanged.emit()
+        self.shot_model.layoutChanged.emit()
+
+        self.render_model.pepperlist.clear()
+        self.template_model.pepperlist.clear()
+        self.shot_model.pepperlist.clear()
+
+        self.projects_selection.clear()
+        self.renderlists_selection.clear()
+        self.templates_selection.clear()
+        self.shots_selection.clear()
+
     @staticmethod
     def path_seperator(precomp):
         temp_working_path = precomp['temp_working_path']
@@ -402,46 +478,6 @@ class PepperWindow(QMainWindow):
         jpg_output_path = precomp['jpg_output_path']
         video_output_path = precomp['video_output_path']
         return temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path
-
-
-    def save_precomp_list_json(self):
-        """
-
-        Returns:
-
-        """
-        self.main_preset = self.main_menu_bar.addMenu('Preset')
-        directory_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw'
-        json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
-
-        for file_path in json_files:
-            file_path = QAction(os.path.basename(file_path))
-            file_path.triggered.connect(lambda _, path=file_path: self.handle_file(path))
-            self.main_preset.addAction(file_path)
-
-        self.main_preset.addSeparator() # QMenu에 구분선 추가
-
-        def set_preset_json(self):
-            now = datetime.now()
-            base_filename = f'{self.pepper.identif}_{now.date()}_time_{now.hour}:{now.minute}'
-
-            # base_filename = 'render_check_list'
-            ext = '.json'
-            i = 1
-            while i <= 5:
-                self.filename = f"{base_filename}_v{i}{ext}"
-                if not os.path.isfile(self.filename):
-                    break
-                i += 1
-            if i > 5:
-                i = 1
-            self.filename = f"{base_filename}_v{i}{ext}"
-
-            self.render_model.pepperlist.clear()
-            for render in self.pepper.precomp_list:
-                self.render_list_data.append(render['name'])
-            with open(self.filename, "w") as f:
-                json.dump(self.render_list_data, f, ensure_ascii=False)
 
 
 def main():

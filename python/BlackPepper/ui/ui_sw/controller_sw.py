@@ -434,7 +434,7 @@ class PepperWindow(QMainWindow):
         # 파일을 열거나 처리하는 코드
         pass
 
-    def set_preset_json(self):
+    def save_preset_json(self):
         now = datetime.now()
         base_filename = f'{self.pepper.identif}_{now.date()}_time_{now.hour}:{now.minute}'
 
@@ -505,7 +505,7 @@ class PepperWindow(QMainWindow):
             with open(filename, "w") as f:
                 json.dump(self.render_list_data, f, ensure_ascii=False)
 
-    def precomp_list_save(self):
+    def precomp_list_save_tt(self):
         # render_list_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw/render_check_list.json'
         render_list_path = 'render_check_list.json'
 
@@ -525,12 +525,12 @@ class PepperWindow(QMainWindow):
         with open(render_list_path, "w") as f:
             json.dump(self.render_list_data, f, ensure_ascii=False)
 
-    def precomp_list_load(self):
+    def load_preset_set(self):
         with open(self.render_list_path, "r") as f:
             self.render_list_data = json.load(f)
             print(self.render_list_data)
 
-    def precomp_list_total(self):
+    def precomp_list_len(self):
         total = len(self.render_list_data)
 
         self.render_model.pepperlist.clear()
@@ -551,14 +551,12 @@ class PepperWindow(QMainWindow):
         #     temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
         #     houp.set_mantra_for_render(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
         #                                video_output_path)
-        if len(self.pepper.precomp_list) == 0 :
+        if len(self.pepper.precomp_list) == 0:
             return
 
         # self.precomp_list_save()
 
-        # self.chat_gpt()
-        # self.chat_gpt_2()
-        self.set_preset_json()
+        self.save_preset_json()
 
         self.pepper.precomp_list.clear()
         self.render_list_data.clear()
