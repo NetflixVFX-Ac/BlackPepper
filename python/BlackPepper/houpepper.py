@@ -322,16 +322,14 @@ class HouPepper:
                 self.cam_node.parm('resy').set(int(1920 / self.filmaspectratio[0]))
 
     def set_fx_working_for_shot(self, hip_path, abc_path, saved_path):
-        """
-
+        """Template에 casting된 shot layout output file인 Alembic의 카메라 정보를 가진 cam node를 저장하여 \n
+        shot fx working file path에 저장한다.
 
 
         Args:
-            hip_path:
-            abc_path:
-            saved_path:
-
-        Returns:
+            hip_path: template asset working file path
+            abc_path: shot casted asset layout output file path
+            saved_path: shot casted asset fx working file path
 
         """
         hou.hipFile.load(hip_path)
