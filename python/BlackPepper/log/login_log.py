@@ -14,9 +14,12 @@ class Logger:
 
         # self.set_logger()
 
+    # logging.DEBUG
+    # s = logging.getLogger('s')
+    # s.debug()
+
     def set_logger(self, ident):
         self.log = logging.getLogger(ident)
-
         if len(self.log.handlers) == 0:
             formatting = logging.Formatter('%(asctime)s - %(name)s %(levelname)s : %(message)s')
             self.log.setLevel(logging.DEBUG)
@@ -44,17 +47,8 @@ class Logger:
 
     def tree_log(self, pro):
         if pro:
-            self.log.debug(f"{pro}'s File Tree updated")
+            self.log.debug(f"File Tree of {pro}updated")
 
     def publish_working_file_log(self, task_type_name):
         if task_type_name:
-            self.log.debug()
-
-    # def create_working_file_log(self, user_name, working_file):
-    #     if os.path.exists(working_file):
-    #         self.log.debug("\"%s\" create houdini file in \"%s\"" % (user_name, working_file))
-    #         else:
-    #         self.log.warning("\"%s\" failed to create Maya file" % user_name)
-
-    # def load_output_file_log(self, user_name, output_file_path):
-    #     return self.log.debug("\"%s\" load output file from \"%s\"" % (user_name, output_file_path))
+            self.log.debug(f"publish {task_type_name} working file, last revision up")

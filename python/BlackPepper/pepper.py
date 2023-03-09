@@ -262,7 +262,7 @@ class Houpub:
         }
         self.dict_check(self.project, 'no_project')
         gazu.files.update_project_file_tree(self.project, file_tree)
-        self.mylog.debug(self.project, "File tree updated")
+        self.mylog.tree_log(self.project)
 
     def publish_working_file(self, task_type_name):
         """task_type_name과 self.entity를 통해 해당 entity의 입력된 task_type을 가진 task를 받아온다.\n
@@ -283,7 +283,7 @@ class Houpub:
         self.args_str_check(task_type_name)
         _, task = self.get_task(task_type_name)
         gazu.files.new_working_file(task, software=self.software)
-        self.mylog.debug("publish working file, last revision up")
+        self.mylog.publish_working_file_log(task_type_name)
 
     def publish_output_file(self, task_type_name, output_type_name, comments):
         """task_type_name과 output_type_name, self.entity를 통해 해당 entity의 입력된 task_type을 가진 task를 받아온다.\n
