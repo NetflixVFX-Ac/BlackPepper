@@ -1,5 +1,6 @@
 import sys
 import os
+from BlackPepper.mantra_process_bar import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow
@@ -8,6 +9,8 @@ from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
 from BlackPepper.houpepper import HouPepper
 from BlackPepper.ui.auto_login import Auto_log
+import hou
+
 
 
 class PepperWindow(QMainWindow):
@@ -294,22 +297,36 @@ class PepperWindow(QMainWindow):
     def render_execute(self):
         houp = HouPepper()
         for precomp in self.pepper.precomp_list:
-            temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
+            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path = self.path_seperator(precomp)
             print(temp_working_path, layout_output_path, fx_working_path)
             houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
         for precomp in self.pepper.precomp_list:
-            temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
-            houp.set_mantra_for_render(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
-                                       video_output_path)
+            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path = self.path_seperator(precomp)
+            if not QtWidgets.QApplication.instance():
+                app = QtWidgets.QApplication(sys.argv)
+            else:
+                app = QtWidgets.QApplication.instance()
+            m = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}', jpg_output_path,
+                                 layout_output_path, houp.cam_node, houp.abc_range[1] * hou.fps())
+            m.resize(800, 600)
+            m.move(1000, 250)
+            m.show()
+            app.exec_()
+            # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
+            # f.resize(800, 600)
+            # f.move(1000, 250)
+            # f.show()
+            # app.exec_()
 
     @staticmethod
     def path_seperator(precomp):
         temp_working_path = precomp['temp_working_path']
         layout_output_path = precomp['layout_output_path']
         fx_working_path = precomp['fx_working_path']
+        jpg_output_path = precomp['jpg_output_path']
         video_output_path = precomp['video_output_path']
-        return temp_working_path, layout_output_path, fx_working_path, video_output_path
+        return temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path
 
 
 def main():
