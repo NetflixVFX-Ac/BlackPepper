@@ -12,6 +12,12 @@ class Logger:
             except OSError:
                 raise ValueError('Failed to create the directory.')
 
+        # self.set_logger()
+
+    # logging.DEBUG
+    # s = logging.getLogger('s')
+    # s.debug()
+
     def set_logger(self, ident):
         self.log = logging.getLogger(ident)
         if len(self.log.handlers) == 0:
@@ -46,7 +52,3 @@ class Logger:
     def publish_working_file_log(self, task_type_name):
         if task_type_name:
             self.log.debug(f"publish {task_type_name} working file, last revision up")
-
-    def publish_output_file_log(self, task_type_name, output_type_name):
-        if task_type_name and output_type_name:
-            self.log.debug(f"publish {task_type_name}, {output_type_name} output file, last revision up")
