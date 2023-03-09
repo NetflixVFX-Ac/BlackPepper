@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>493</width>
-    <height>410</height>
+    <width>540</width>
+    <height>359</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Form</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(45, 45, 45);
@@ -20,21 +20,9 @@ font: 10pt&quot;Courier New&quot;;
 color: rgb(180, 180, 180);
 </string>
   </property>
-  <widget class="QWidget" name="centralwidget">
-   <property name="styleSheet">
-    <string notr="true">
-</string>
-   </property>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>430</width>
-      <height>360</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <property name="leftMargin">
       <number>50</number>
      </property>
@@ -48,7 +36,7 @@ color: rgb(180, 180, 180);
       <number>30</number>
      </property>
      <item>
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="label">
        <property name="font">
         <font>
          <family>Courier New</family>
@@ -64,7 +52,7 @@ color: rgb(180, 180, 180);
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer_4">
+      <spacer name="verticalSpacer_2">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -77,7 +65,7 @@ color: rgb(180, 180, 180);
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label_5">
+      <widget class="QLabel" name="label_2">
        <property name="font">
         <font>
          <family>Courier New</family>
@@ -115,7 +103,7 @@ color: rgb(180, 180, 180);
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer_5">
+      <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -128,7 +116,7 @@ color: rgb(180, 180, 180);
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label_6">
+      <widget class="QLabel" name="label_3">
        <property name="font">
         <font>
          <family>Courier New</family>
@@ -163,7 +151,7 @@ color: rgb(180, 180, 180);
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer_6">
+      <spacer name="verticalSpacer_3">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -176,9 +164,9 @@ color: rgb(180, 180, 180);
       </spacer>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <spacer name="horizontalSpacer_3">
+        <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -222,7 +210,7 @@ color: rgb(180, 180, 180);
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_4">
+        <spacer name="horizontalSpacer_2">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -257,25 +245,8 @@ color: rgb(45, 45, 45);</string>
       </layout>
      </item>
     </layout>
-   </widget>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>493</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuLogin_Menu">
-    <property name="title">
-     <string>Login Menu</string>
-    </property>
-   </widget>
-   <addaction name="menuLogin_Menu"/>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
