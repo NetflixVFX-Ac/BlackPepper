@@ -12,7 +12,7 @@ from BlackPepper.pepper import Houpub
 from BlackPepper.houpepper import HouPepper
 
 from PySide2.QtGui import QKeySequence
-from PySide2.QtWidgets import QAction, QMenuBar, QApplication
+from PySide2.QtWidgets import QAction, QApplication
 
 from datetime import datetime
 
@@ -71,7 +71,7 @@ class PepperWindow(QMainWindow):
         self.login_window.move(1000, 300)
         self.login_window.show()
         # main Ui loader
-        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_2.ui'))
+        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_3.ui'))
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
@@ -99,11 +99,42 @@ class PepperWindow(QMainWindow):
         # set statusbar to window
         self.login_window.statusBar().showMessage('kitsu 로그인 하세요!  houdini 확장자 선택하세요!')
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
-        # set menubar
-        menu_bar = self.main_window.menuBar()
-        menu_bar.setNativeMenuBar(False)
 
-        presetmenu = menu_bar.addMenu('Preset')
+        # set main menubar
+        self.main_menu_bar = self.main_window.menuBar()
+        self.main_menu_bar.setNativeMenuBar(False)
+        self.main_filemenu = self.main_menu_bar.addMenu('Menu')
+
+        self.save_precomp_list()
+
+        # self.main_filemenu.addSeparator() # QMenu에 구분선 추가
+
+        exitAction = QAction('Exit')
+        exitAction.setShortcut('Ctrl+Q')
+        exitAction.setStatusTip('Exit application')
+        exitAction.triggered.connect(QApplication.instance().quit)
+        self.main_filemenu.addAction(exitAction)
+
+
+        # login_menu_bar = self.login_window.menuBar()
+        # login_menu_bar.setNativeMenuBar(False)
+        # login_filemenu = login_menu_bar.addMenu('login test')
+        #
+        # # main menubar
+        # main_menu_bar = self.main_window.menuBar()
+        # main_menu_bar.setNativeMenuBar(False)
+        # # set File menubar
+        # main_filemenu = main_menu_bar.addMenu('File')
+        # exitAction = QAction('Exit')
+        # exitAction.setShortcut('Ctrl+Q')
+        # exitAction.setStatusTip('Exit application')
+        # exitAction.triggered.connect(QApplication.instance().quit)
+        # main_filemenu.addAction(exitAction)
+        # # set Help menubar
+        # main_helpmenu = main_menu_bar.addMenu('Help')
+        #
+        # # set Preset menubar
+        # main_presetmenu = main_menu_bar.addMenu('Preset')
 
         # directory_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw'
         # json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
@@ -112,21 +143,22 @@ class PepperWindow(QMainWindow):
         #     action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
         #     filemenu.addAction(action)
 
-        exitAction = QAction('Exit')
-        exitAction.setShortcut('Ctrl+Q')
-        exitAction.setStatusTip('Exit application')
-        exitAction.triggered.connect(QApplication.instance().quit)
-        presetmenu.addAction(exitAction)
+        # exitAction = QAction('Exit')
+        # exitAction.setShortcut('Ctrl+Q')
+        # exitAction.setStatusTip('Exit application')
+        # exitAction.triggered.connect(QApplication.instance().quit)
+        # main_presetmenu.addAction(exitAction)
 
 
         # menubar help 버튼에 링크 추가하기
-        self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
-        self.main_window.actionGazu.triggered.connect(lambda: webbrowser.open('https://gazu.cg-wire.com/index.html'))
-        self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
+        # self.exitAction.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        # self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        # self.main_window.actionGazu.triggered.connect(lambda: webbrowser.open('https://gazu.cg-wire.com/index.html'))
+        # self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
 
         # file_menu = menu_bar.addMenu('File')
         # self.main_window.menubar().
-        self.main_window.recentRenderlist1.triggered.connect(lambda checked, filename=self.filename: self.open_recent_file(self.filename))
+        # self.main_window.recentRenderlist1.triggered.connect(lambda checked, filename=self.filename: self.open_recent_file(self.filename))
         # recent_file_menu = QMenu("Menu1")
         # recent_files = self.pepper.precomp_list
         # print(recent_files)
@@ -140,6 +172,49 @@ class PepperWindow(QMainWindow):
         # self.createMenus()
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
         self.app.exec_()
+
+    def save_precomp_list(self):
+        """
+
+        Returns:
+
+        """
+        directory_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw'
+        json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
+
+        for file_path in json_files:
+            file_path = QAction(os.path.basename(file_path))
+            file_path.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+            self.main_filemenu.addAction(file_path)
+
+        self.main_filemenu.addSeparator() # QMenu에 구분선 추가
+
+    def ui_menubar(self):
+        # add login menubar
+        login_menu_bar = self.login_window.QMenuBar(self)
+        login_menu_bar.setNativeMenuBar(False)
+        login_menu = login_menu_bar.addMenu('login test')
+
+        # add main menubar
+        main_menu_bar = self.main_window.QMenuBar(self)
+        main_menu_bar.setNativeMenuBar(False)
+
+        add_menu = main_menu_bar.addMenu('Menu')
+        exit_action = QAction('Exit')
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.setStatusTip('Exit application')
+        exit_action.triggered.connect(QApplication.instance().quit)
+        add_menu.addAction(exit_action)
+
+        # set Help menubar
+        # main_help = main_menu_bar.addMenu('Help')
+        # kitsu_action = QAction('Kitsu host site')
+        # kitsu_action.setShortcut('F1')
+        # kitsu_action.setStatusTip('Kitsu houst site oepn')
+        # main_help.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        #
+        # # set Preset menubar
+        # main_preset = main_menu_bar.addMenu('Preset')
 
     def save_json(self):
         directory_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw'
