@@ -41,30 +41,36 @@ class PepperWindow(QMainWindow):
         self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         # setModel
         self.projects_listview.setModel(self.project_model)
+        self.projects_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
+        self.projects_listview.setSpacing(2)
         self.templates_listview.setModel(self.template_model)
+        self.templates_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
+        self.templates_listview.setSpacing(2)
         self.shots_listview.setModel(self.shot_model)
+        self.shots_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
+        self.shots_listview.setSpacing(2)
         self.renderlists_listview.setModel(self.render_model)
-        self.projects_selection = self.projects_listview.selectionModel()
-        self.templates_selection = self.templates_listview.selectionModel()
-        self.shots_selection = self.shots_listview.selectionModel()
-        self.renderlists_selection = self.renderlists_listview.selectionModel()
+        self.renderlists_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
+        self.renderlists_listview.setSpacing(2)
         # get script_path
         # __file__ (전역변수) : 현재 열려있는 파일의 위치와 이름을 가지고 있는 문자열 변수
         # path.realpath(파일이름) : 현재 파일의  표준 경로+이름 을 반환
         script_path = os.path.dirname(os.path.realpath(__file__))
         # login Ui loader
-        login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login.ui'))
+        login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login_3.ui'))
         login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
-        self.login_window.setWindowTitle('Login')
+        self.login_window.setWindowTitle('Black Pepper Login')
+        self.login_window.move(1000, 300)
         self.login_window.show()
         # main Ui loader
-        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_2.ui'))
+        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_3.ui'))
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
         self.main_window.setWindowTitle('Black Pepper')
+        self.main_window.move(700, 250)
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
