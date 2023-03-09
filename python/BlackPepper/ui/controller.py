@@ -232,9 +232,13 @@ class PepperWindow(QMainWindow):
         그리고 pepper 의 precomp_list를 render_moderl.pepperlist 에 append 한다.
         추가로 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
         """
-        for idx in self.shots_selection.selectedRows():
+        temp_rev = self.main_window.temp_rev_cbox.currentText()
+        selections = self.shots_selection.selectedRows()
+        # if len(selections) == 1:
+
+        for idx in selections:
             shot_dict = self.all_shots[idx.row()]
-            self.pepper.make_precomp_dict(shot_dict, temp_revision=self.temp_rev)
+            self.pepper.make_precomp_dict(shot_dict, temp_revision=int(temp_rev))
         self.render_model.pepperlist.clear()
         for render in self.pepper.precomp_list:
             self.render_model.pepperlist.append(render['name'])
