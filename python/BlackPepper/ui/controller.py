@@ -107,16 +107,28 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
 
+        # set statusbar to window
+        self.login_window.statusBar().showMessage('kitsu 로그인 하세요!  houdini 확장자 선택하세요!')
+        self.main_window.statusBar().showMessage('project 를 선택하세요 !')
+
         # set main menubar
         self.main_menu_bar = self.main_window.menuBar()
+
         self.main_menu_bar.setNativeMenuBar(False)
-        self.main_filemenu = self.main_menu_bar.addMenu('Menu')
+        # self.main_preset = self.main_menu_bar.addMenu('Preset')
         self.save_precomp_list_json()
+
+        self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
+
+
+        self.main_menu = self.main_menu_bar.addMenu('Menu')
+
         exitAction = QAction('Exit')
         exitAction.setShortcut('Ctrl+Q')
         exitAction.setStatusTip('Exit application')
         exitAction.triggered.connect(QApplication.instance().quit)
-        self.main_filemenu.addAction(exitAction)
+        self.main_preset.addAction(exitAction)
 
         main_helpmenu = self.main_menu_bar.addMenu('Help')
         kisuAction = QAction('Kitsu')
@@ -234,6 +246,7 @@ class PepperWindow(QMainWindow):
         self.templates_selection.clear()
         self.shots_selection.clear()
         self.renderlists_selection.clear()
+        self.main_window.statusBar().showMessage('temp 를 선택하세요 !')
 
     def template_selected(self, event):
         """templates_listview 의 template 를 클릭 시 실행 되는 메소드. \n
@@ -271,6 +284,7 @@ class PepperWindow(QMainWindow):
         self.shot_model.layoutChanged.emit()
         self.shots_selection.clear()
         self.renderlists_selection.clear()
+        self.main_window.statusBar().showMessage('shots 를 선택하세요 ! 다중선택가능 ! ')
 
     def renew_template_info(self):
         revision = self.main_window.temp_rev_cbox.currentText()
@@ -396,15 +410,16 @@ class PepperWindow(QMainWindow):
         Returns:
 
         """
+        self.main_preset = self.main_menu_bar.addMenu('Preset')
         directory_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw'
         json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
 
         for file_path in json_files:
             file_path = QAction(os.path.basename(file_path))
             file_path.triggered.connect(lambda _, path=file_path: self.handle_file(path))
-            self.main_filemenu.addAction(file_path)
+            self.main_preset.addAction(file_path)
 
-        self.main_filemenu.addSeparator() # QMenu에 구분선 추가
+        self.main_preset.addSeparator() # QMenu에 구분선 추가
 
         def set_preset_json(self):
             now = datetime.now()
