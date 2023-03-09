@@ -4,39 +4,6 @@ from PySide2 import QtWidgets, QtCore
 import os
 import glob
 
-framerate = 24
-input_pattern = "/home/rapa/dino/dino.%d.png"  # ffmpeg을 사용해 mov영상으로 만들 시퀀스 경로
-output_file = "/home/rapa/Rnd_output_04.mp4"  # ffmpeg을 사용 후 mov영상으로 나온 결과가 저장될 경로
-ffmpeg_path = "/mnt/pipeline/app/ffmpeg-5.1.1-i686-static/ffmpeg"  # ffmpeg모듈이 있는 경로(로컬내에 ffmpeg이 있다면 앞의 경로를 안써도 된다.)
-
-command = [
-    ffmpeg_path,
-    "-framerate", str(framerate),  # 초당프레임
-    "-i", input_pattern,  # 입력할 파일 이름
-    "-q 0",  # 출력품질 정함(숫자가 높을 수록 품질이 떨어짐)
-    "-threads 8",  # 속도향상을 위해 멀티쓰레드를 지정
-    "-c:v", "libx264",  # 코덱
-    "-pix_fmt", "yuv420p",  # 포맷양식
-    "-y",  # 출력파일을 쓸 때 같은 이름의 파일이 있어도 확인없이 덮어씀
-    "-loglevel", "debug",  # 인코딩 과정로그를 보여줌
-    output_file
-]
-
-cmd = (' '.join(str(s) for s in command))  # 'join()'메서드를 이용하여 문자열 리스트를 결합 command 리스트를 for문으로 읽어
-# 모든 요소를 하나의 문자열로 연결, 문자열의 각 요소는 공백 문자(' ')으로 구분
-print(cmd, "hihihi")  # ffmpeg을 실행하기 위한 명령문을 뽑아내줌
-
-
-def tree(path):  # 백분율로 나누기 위한 분모를 구하는 함수(분모의 수는 디렉토리 안의 시퀀스 수와 같다.)
-    global filecnt  # 전역함수로 filecnt는 코드내 어느 곳에서나 사용가능, 함수의 아웃풋 값이 담긴다.
-    for x in sorted(glob.glob(path + "/*")):  # glob.glob은 제시한 확장자에 맞는 파일명을 리스트 형식으로 반환
-        # -> path = /home/rapa/dino + /* 의 경로내의 모든 파일을 정리해서 차례대로 반환
-        print('ssssss', x)  # sorted는 이터너블한 데이터를 정렬된 새로운 데이터로 만들어서 반환
-        if os.path.isfile(x):  # os.path.isfile은 지정된 경로내에 파일이 있다면 True를 반환
-            filecnt += 1  # 한줄 위의 코드가 참이라면 재귀함수지정 변수인 filecnt에 1을 더함 -> for문은 순차적으로 읽으니 x로 지정된 이름이 존재해 참일 때마다 +1이 축적됨
-        else:
-            print("unknown:", x)  # 만약 for문이 순차적으로 읽는 도중 경로내에 파일이 없다면 "unknown"을 프린트
-    return int(filecnt)  # 리턴 값으로 시퀀스내의 시퀀스 수를 반환 -> 반환된 값은 백분율 식의 분모로 활용된다.
 
 
 filecnt = 0  # tree함수를 사용해 시퀀스 수가 들어올 주머니
@@ -49,11 +16,11 @@ def simple_percent_parser(output, total):  # 프로세스바에 시각화 해줄
     progress_re = re.compile("frame= (\d+)")  # re.compile은 문자열을 컴파일(형태저장)하여
     # 패턴 객체를 반환(re.compile모듈안에 search(), match(), findall() 등과 같은 다양한 메소드를 지원)
     m = progress_re.search(output)  # 'output'안에 're.compile'로 저장한 문자열이 있다면 're.search'모듈을 사용해 're.compile'로 저장한 문자열을 반환
-    print("sssssdas", m)
+    print("ssssss", m)
     if m: # m == 존재하거나 True 일때
         pc_complete = m.group(1)  # re.search()로 검색된 패턴에서 첫 번째 괄호 안에 매칭된 문자열을 반환 ->("frame= (\d+)")의 (\d+)
         if pc_complete: # pc_complete == 존재하거나 True 일때
-            print("xxasdxx", pc_complete)
+            print("xxxx", pc_complete)
             pc = int(int(pc_complete) / total * 100)  # pc_complete==실시간 frame값 / total==시퀀스 전체숫자값 * 100 ->퍼센테이지
             return pc  # gui인터페이스에 쓰여질 퍼센테이지 값
 

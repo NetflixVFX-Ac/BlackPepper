@@ -13,6 +13,13 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(45, 45, 45);
+selection-background-color: rgb(45, 180, 198);
+font: 10pt&quot;Courier New&quot;;
+color: rgb(180, 180, 180);
+</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <property name="leftMargin">
     <number>50</number>
@@ -34,7 +41,11 @@
         <widget class="QLabel" name="template_info">
          <property name="font">
           <font>
-           <pointsize>16</pointsize>
+           <family>Courier New</family>
+           <pointsize>10</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -46,7 +57,11 @@
         <widget class="QLabel" name="shot_info">
          <property name="font">
           <font>
-           <pointsize>16</pointsize>
+           <family>Courier New</family>
+           <pointsize>10</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -88,9 +103,11 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>15</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
+         <family>Courier New</family>
+         <pointsize>10</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
@@ -122,7 +139,11 @@
       <widget class="QLabel" name="label_3">
        <property name="font">
         <font>
-         <pointsize>16</pointsize>
+         <family>Courier New</family>
+         <pointsize>10</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
@@ -154,8 +175,10 @@
            </property>
            <property name="font">
             <font>
-             <pointsize>20</pointsize>
+             <family>Courier New</family>
+             <pointsize>10</pointsize>
              <weight>50</weight>
+             <italic>false</italic>
              <bold>false</bold>
             </font>
            </property>
@@ -168,8 +191,10 @@
           <widget class="QToolButton" name="del_btn">
            <property name="font">
             <font>
-             <pointsize>20</pointsize>
+             <family>Courier New</family>
+             <pointsize>10</pointsize>
              <weight>50</weight>
+             <italic>false</italic>
              <bold>false</bold>
             </font>
            </property>
@@ -184,7 +209,11 @@
         <widget class="QLabel" name="label_4">
          <property name="font">
           <font>
-           <pointsize>16</pointsize>
+           <family>Courier New</family>
+           <pointsize>10</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -234,7 +263,11 @@
         <widget class="QLabel" name="label_2">
          <property name="font">
           <font>
-           <pointsize>16</pointsize>
+           <family>Courier New</family>
+           <pointsize>10</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -246,7 +279,11 @@
         <widget class="QLabel" name="label">
          <property name="font">
           <font>
-           <pointsize>16</pointsize>
+           <family>Courier New</family>
+           <pointsize>10</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -256,6 +293,12 @@
        </item>
        <item row="2" column="0">
         <widget class="QListView" name="lv_proj">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(60, 60, 60);
+
+
+</string>
+         </property>
          <property name="alternatingRowColors">
           <bool>true</bool>
          </property>
@@ -267,7 +310,11 @@
           <widget class="QLabel" name="label_5">
            <property name="font">
             <font>
-             <pointsize>16</pointsize>
+             <family>Courier New</family>
+             <pointsize>10</pointsize>
+             <weight>50</weight>
+             <italic>false</italic>
+             <bold>false</bold>
             </font>
            </property>
            <property name="text">
@@ -291,8 +338,10 @@
            </property>
            <property name="font">
             <font>
-             <pointsize>12</pointsize>
+             <family>Courier New</family>
+             <pointsize>10</pointsize>
              <weight>50</weight>
+             <italic>false</italic>
              <bold>false</bold>
             </font>
            </property>

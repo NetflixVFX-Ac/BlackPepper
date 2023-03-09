@@ -13,6 +13,13 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(45, 45, 45);
+selection-background-color: rgb(48, 140, 198);
+font: 10pt&quot;Courier New&quot;;
+color: rgb(180, 180, 180);
+</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0">
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -32,8 +39,10 @@
       <widget class="QLabel" name="label">
        <property name="font">
         <font>
-         <pointsize>16</pointsize>
+         <family>Courier New</family>
+         <pointsize>10</pointsize>
          <weight>50</weight>
+         <italic>false</italic>
          <bold>false</bold>
         </font>
        </property>
@@ -59,7 +68,11 @@
       <widget class="QLabel" name="label_2">
        <property name="font">
         <font>
-         <pointsize>12</pointsize>
+         <family>Courier New</family>
+         <pointsize>10</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
@@ -80,6 +93,9 @@
          <width>0</width>
          <height>30</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color:rgb(52, 52, 52);</string>
        </property>
        <property name="text">
         <string>pipeline@rapa.org</string>
@@ -103,7 +119,11 @@
       <widget class="QLabel" name="label_3">
        <property name="font">
         <font>
-         <pointsize>12</pointsize>
+         <family>Courier New</family>
+         <pointsize>10</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
@@ -118,6 +138,9 @@
          <width>0</width>
          <height>30</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color:rgb(52, 52, 52);</string>
        </property>
        <property name="text">
         <string>netflixacademy</string>
@@ -159,8 +182,14 @@
         <widget class="QComboBox" name="hipbox">
          <property name="minimumSize">
           <size>
-           <width>150</width>
+           <width>90</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>120</width>
+           <height>100</height>
           </size>
          </property>
          <item>
@@ -203,6 +232,10 @@
            <width>150</width>
            <height>0</height>
           </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 153, 000);
+color: rgb(45, 45, 45);</string>
          </property>
          <property name="text">
           <string>Login</string>
