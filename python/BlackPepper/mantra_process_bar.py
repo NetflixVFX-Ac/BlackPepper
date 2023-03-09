@@ -216,6 +216,3 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.start_process()
 
 
-    # def handle_restart(self):
-    #     self.btn_interrupt.setText("Interrupt")
-    #
