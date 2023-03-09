@@ -54,6 +54,7 @@ class PepperWindow(QMainWindow):
         self.templates_listview.setModel(self.template_model)
         self.shots_listview.setModel(self.shot_model)
         self.renderlists_listview.setModel(self.render_model)
+
         self.projects_selection = self.projects_listview.selectionModel()
         self.templates_selection = self.templates_listview.selectionModel()
         self.shots_selection = self.shots_listview.selectionModel()
@@ -104,11 +105,7 @@ class PepperWindow(QMainWindow):
         self.main_menu_bar = self.main_window.menuBar()
         self.main_menu_bar.setNativeMenuBar(False)
         self.main_filemenu = self.main_menu_bar.addMenu('Menu')
-
         self.save_precomp_list_json()
-
-        # self.main_filemenu.addSeparator() # QMenu에 구분선 추가
-
         exitAction = QAction('Exit')
         exitAction.setShortcut('Ctrl+Q')
         exitAction.setStatusTip('Exit application')
@@ -214,13 +211,6 @@ class PepperWindow(QMainWindow):
         # # set Preset menubar
         # main_preset = main_menu_bar.addMenu('Preset')
 
-    def save_json(self):
-        directory_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw'
-        json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
-        for file_path in json_files:
-            action = QAction(os.path.basename(file_path), self)
-            action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
-            file_menu.addAction(action)
     def handle_file(self, file_path):
         # TODO: 파일 내용 처리하기
 
@@ -444,7 +434,7 @@ class PepperWindow(QMainWindow):
         # 파일을 열거나 처리하는 코드
         pass
 
-    def chat_gpt_3(self):
+    def set_preset_json(self):
         now = datetime.now()
         base_filename = f'{self.pepper.identif}_{now.date()}_time_{now.hour}:{now.minute}'
 
@@ -568,7 +558,7 @@ class PepperWindow(QMainWindow):
 
         # self.chat_gpt()
         # self.chat_gpt_2()
-        self.chat_gpt_3()
+        self.set_preset_json()
 
         self.pepper.precomp_list.clear()
         self.render_list_data.clear()
