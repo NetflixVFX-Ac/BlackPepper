@@ -108,6 +108,13 @@ class PepperWindow(QMainWindow):
 
     def set_auto_login(self):
         log_value = self.login_log.load_setting()
+        log_path = self.login_log.user_path
+        log_id = self.login_window.input_id.text()
+        log_pw = self.login_window.input_pw.text()
+        log_sfw = self.login_window.hipbox.currentText()[1:]
+        if os.path.exists(log_path) and log_id != log_value['user_id'] or log_pw != log_value['user_pw'] \
+                or log_sfw != log_value['user_ext']:
+            self.login_log.reset_setting()
         if log_value['valid_host'] and log_value['valid_user']:
             self.login_log.host = log_value['host']
             self.login_log.user_id = log_value['user_id']
