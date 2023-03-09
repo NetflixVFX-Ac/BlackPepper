@@ -355,7 +355,7 @@ def main():
     pepper = Houpub()
     pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
     pepper.project = 'PEPPER'
-    pepper.asset = 'temp_breaking_glass'
+    pepper.asset = 'temp_fire'
     pepper.entity = 'asset'
     # need software handling method
     pepper.software = 'hipnc'
@@ -378,13 +378,17 @@ def main():
         next_fx_path = pepper.make_next_working_path(fx_type_name)
         output_type_name = 'jpg_sequence'
         fx_output = pepper.output_file_path(output_type_name, fx_type_name)
+        fx_next_output = pepper.make_next_output_path(output_type_name, fx_type_name)
         output_type_name = 'movie_file'
         mov_output = pepper.output_file_path(output_type_name, fx_type_name)
+        mov_next_output = pepper.make_next_output_path(output_type_name, fx_type_name)
         print("fx_path :", fx_path)
         print("next_fx_path :", next_fx_path)
         print("fx_output :", fx_output)
         print("layout_output_path :", layout_output_path)
         print("mov_output :", mov_output)
+        print("fx_next_output :", fx_next_output)
+        print("mov_next_output :", mov_next_output)
         hou_pepper.set_fx_working_for_shot(simulation_path, layout_output_path,
                                            f'{next_fx_path}.{pepper.software.get("file_extension")}')
         # hou_pepper.set_mantra_for_render(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output)
@@ -393,13 +397,13 @@ def main():
             app = QtWidgets.QApplication(sys.argv)
         else:
             app = QtWidgets.QApplication.instance()
-        m = MantraMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output,
+        m = MantraMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_next_output,
                              layout_output_path, hou_pepper.cam_node, hou_pepper.abc_range[1]*hou.fps())
         m.resize(800, 600)
         m.move(1000, 250)
         m.show()
         app.exec_()
-        f = FFmpegMainWindow(fx_output, mov_output, hou.fps())
+        f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
         f.resize(800, 600)
         f.move(1000, 250)
         f.show()
