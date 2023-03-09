@@ -1,6 +1,7 @@
 import re
 from PySide2 import QtWidgets, QtCore
 
+
 class MantraMainWindow(QtWidgets.QMainWindow):
     """
     Houdini Mantra를 활용하여 Template에 Alembic 카메라 값이 추가 된 Hip 파일을 Sequence file(.jpg)로 추출한다.
@@ -8,6 +9,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
     정규표현을 활용하여 터미널에 출력되는 정보에서 컨버팅 중인 프레임을 파악하고 전체 프레임과 비교하여 Progress Widget으로
     진행사항을 유저에게 시각적으로 알려준다.
     """
+
     def __init__(self, next_fx_path, output_path, abc_path, cam_node, total_frame):
         """
 
@@ -22,6 +24,8 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         """
         super().__init__()
         self.p = None
+        # self.is_interrupted = False
+        # self.is_interrupted = None
         self.total_frame = total_frame
         self.command = [
             'python',
@@ -34,29 +38,34 @@ class MantraMainWindow(QtWidgets.QMainWindow):
 
         self.cmd = (' '.join(str(s) for s in self.command))
 
-        # self.btn = QtWidgets.QPushButton("MANTRA SEQUENCE RENDERING")
-        # self.btn.pressed.connect(self.start_process)
-        self.text = QtWidgets.QPlainTextEdit()
-        self.text.setReadOnly(True)
-
+        # Create the "Interrupt" Button
         self.progress = QtWidgets.QProgressBar()
         self.progress.setRange(0, 100)
+        self.text = QtWidgets.QPlainTextEdit()
+        self.text.setReadOnly(True)
+        # self.btn = QtWidgets.QPushButton("MANTRA SEQUENCE RENDERING")
+        # self.btn.pressed.connect(self.start_process)
+        self.btn_interrupt = QtWidgets.QPushButton("Interrupt")
 
         l = QtWidgets.QVBoxLayout()
         # l.addWidget(self.btn)
         # l.setStyleSheet("background-color:rgb(52, 52, 52);")
+        l.addWidget(self.btn_interrupt)
         l.addWidget(self.progress)
         l.addWidget(self.text)
 
         w = QtWidgets.QWidget()
         w.setStyleSheet(u"background-color: rgb(45, 45, 45);\n"
-        "selection-background-color: rgb(45, 180, 198);\n"
-        "font: 10pt\"Courier New\";\n"
-        "color: rgb(180, 180, 180);\n")
+                        "selection-background-color: rgb(45, 180, 198);\n"
+                        "font: 10pt\"Courier New\";\n"
+                        "color: rgb(180, 180, 180);\n")
         w.setLayout(l)
+
+        # self.btn_interrupt = False
 
         self.setCentralWidget(w)
         self.start_process()
+        self.handle_interrupt()
 
     def message(self, s):
         """
@@ -81,6 +90,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         """
         if self.p is None:  # No process running.
             self.message("Executing process")
+            self.btn_interrupt.setText("Interrupt")
             self.p = QtCore.QProcess()  # Keep a reference to the QProcess (e.g. on self) while it's running.
             self.p.readyReadStandardOutput.connect(self.handle_stdout)
             self.p.readyReadStandardError.connect(self.handle_stderr)
@@ -103,6 +113,11 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             self.progress.setValue(progress)
 
         self.message(stderr)
+        #
+        # if "Process finished." in stderr:
+        #     self.btn_interrupt.setText("Restart")
+        #     self.btn_interrupt.clicked.disconnect(self.handle_interrupt)
+        #     self.btn_interrupt.clicked.connect(self.start_process)
 
     def handle_stdout(self):
         """
@@ -138,6 +153,8 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         }
         state_name = states[state]
         self.message(f"State changed: {state_name}")
+        if self.is_interrupted and state == QtCore.QProcess.NotRunning:
+            self.start_process()
 
     def process_finished(self):
         """
@@ -148,8 +165,9 @@ class MantraMainWindow(QtWidgets.QMainWindow):
 
         """
         self.message("Process finished.")
+        # self.btn_interrupt.setText("Interrupt")
         self.p = None
-        self.close()
+        # self.is_interrupted = False
 
     def simple_percent_parser(self, output, total):
         """
@@ -172,3 +190,31 @@ class MantraMainWindow(QtWidgets.QMainWindow):
                 pc = int(int(pc_complete) / total * 100)
                 return pc
 
+    def handle_interrupt(self):
+        self.btn_interrupt.setCheckable(True)
+        if self.btn_interrupt is True:
+            self.btn_interrupt = QtWidgets.QPushButton("Restart")
+            self.btn_interrupt.setCheckable(False)
+
+        #     if self.btn_interrupt.isChecked():
+        #         self.btn_interrupt.
+        #
+        #
+        #
+        #
+        # #     if hasattr(self, 'is_interrupted') and self.is_interrupted:
+        # #         pass
+        # #     else:
+        # #         self.is_interrupted = True
+        # #         self.p.kill()
+        # #         self.message("Process Interrupted")
+        # #         self.btn_interrupt.setText("Restart")
+        # #         self.btn_interrupt.clicked.disconnect(self.handle_interrupt)
+        # #         self.btn_interrupt.clicked.connect(self.start_process)
+        # # self.is_interrupted = False
+        self.start_process()
+
+
+    # def handle_restart(self):
+    #     self.btn_interrupt.setText("Interrupt")
+    #
