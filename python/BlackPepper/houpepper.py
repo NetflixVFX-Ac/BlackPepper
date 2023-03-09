@@ -391,16 +391,16 @@ def main():
         m.move(1000, 250)
         m.show()
         app.exec_()
-        f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
-        f.resize(800, 600)
-        f.move(1000, 250)
-        f.show()
-        app.exec_()
+        # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
+        # f.resize(800, 600)
+        # f.move(1000, 250)
+        # f.show()
+        # app.exec_()
         # BlackPepper.publish_working_file(fx_type_name)
         # hou_pepper.set_ffmpeg_seq_to_mov(fx_output, mov_output)
 
-#
-# if __name__ == "__main__":
-#     main()
+
+if __name__ == "__main__":
+    main()
 
 
