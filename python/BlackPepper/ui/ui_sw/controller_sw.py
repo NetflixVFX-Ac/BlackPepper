@@ -105,7 +105,7 @@ class PepperWindow(QMainWindow):
         self.main_menu_bar.setNativeMenuBar(False)
         self.main_filemenu = self.main_menu_bar.addMenu('Menu')
 
-        self.save_precomp_list()
+        self.save_precomp_list_json()
 
         # self.main_filemenu.addSeparator() # QMenu에 구분선 추가
 
@@ -143,16 +143,14 @@ class PepperWindow(QMainWindow):
         #     action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
         #     filemenu.addAction(action)
 
-        # exitAction = QAction('Exit')
-        # exitAction.setShortcut('Ctrl+Q')
-        # exitAction.setStatusTip('Exit application')
-        # exitAction.triggered.connect(QApplication.instance().quit)
-        # main_presetmenu.addAction(exitAction)
-
-
+        main_helpmenu = self.main_menu_bar.addMenu('Help')
         # menubar help 버튼에 링크 추가하기
         # self.exitAction.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
-        # self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        kisuAction = QAction('Kitsu')
+        kisuAction.setShortcut('F1')
+        kisuAction.setStatusTip('Kitsu site open')
+        kisuAction.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        main_helpmenu.addAction(kisuAction)
         # self.main_window.actionGazu.triggered.connect(lambda: webbrowser.open('https://gazu.cg-wire.com/index.html'))
         # self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
 
@@ -173,7 +171,7 @@ class PepperWindow(QMainWindow):
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
         self.app.exec_()
 
-    def save_precomp_list(self):
+    def save_precomp_list_json(self):
         """
 
         Returns:
