@@ -1,5 +1,7 @@
 import sys
 import os
+import glob
+import json
 import webbrowser
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
@@ -8,6 +10,11 @@ from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
 from BlackPepper.houpepper import HouPepper
+
+from PySide2.QtGui import QKeySequence
+from PySide2.QtWidgets import QAction, QApplication
+
+from datetime import datetime
 
 
 class PepperWindow(QMainWindow):
@@ -28,6 +35,8 @@ class PepperWindow(QMainWindow):
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
+        self.render_list_data = []
+        self.filename = []
         # model instance
         self.project_model = PepperModel()
         self.template_model = PepperModel()
@@ -62,12 +71,13 @@ class PepperWindow(QMainWindow):
         self.login_window.move(1000, 300)
         self.login_window.show()
         # main Ui loader
-        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_2.ui'))
+        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_3.ui'))
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
         self.main_window.move(700, 250)
         self.main_window.setWindowTitle('Black Pepper v0.0.1')
+
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
@@ -86,16 +96,135 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
 
-        # set menebar, statusbar to window
+        # set statusbar to window
         self.login_window.statusBar().showMessage('kitsu 로그인 하세요!  houdini 확장자 선택하세요!')
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
-        # 버튼에 링크 추가하기
-        self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
-        self.main_window.actionGazu.triggered.connect(lambda: webbrowser.open('https://gazu.cg-wire.com/index.html'))
-        self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
 
+        # set main menubar
+        self.main_menu_bar = self.main_window.menuBar()
+        self.main_menu_bar.setNativeMenuBar(False)
+        self.main_filemenu = self.main_menu_bar.addMenu('Menu')
+
+        self.save_precomp_list_json()
+
+        # self.main_filemenu.addSeparator() # QMenu에 구분선 추가
+
+        exitAction = QAction('Exit')
+        exitAction.setShortcut('Ctrl+Q')
+        exitAction.setStatusTip('Exit application')
+        exitAction.triggered.connect(QApplication.instance().quit)
+        self.main_filemenu.addAction(exitAction)
+
+
+        # login_menu_bar = self.login_window.menuBar()
+        # login_menu_bar.setNativeMenuBar(False)
+        # login_filemenu = login_menu_bar.addMenu('login test')
+        #
+        # # main menubar
+        # main_menu_bar = self.main_window.menuBar()
+        # main_menu_bar.setNativeMenuBar(False)
+        # # set File menubar
+        # main_filemenu = main_menu_bar.addMenu('File')
+        # exitAction = QAction('Exit')
+        # exitAction.setShortcut('Ctrl+Q')
+        # exitAction.setStatusTip('Exit application')
+        # exitAction.triggered.connect(QApplication.instance().quit)
+        # main_filemenu.addAction(exitAction)
+        # # set Help menubar
+        # main_helpmenu = main_menu_bar.addMenu('Help')
+        #
+        # # set Preset menubar
+        # main_presetmenu = main_menu_bar.addMenu('Preset')
+
+        # directory_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw'
+        # json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
+        # for file_path in json_files:
+        #     action = QAction(os.path.basename(file_path), self)
+        #     action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+        #     filemenu.addAction(action)
+
+        main_helpmenu = self.main_menu_bar.addMenu('Help')
+        # menubar help 버튼에 링크 추가하기
+        # self.exitAction.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        kisuAction = QAction('Kitsu')
+        kisuAction.setShortcut('F1')
+        kisuAction.setStatusTip('Kitsu site open')
+        kisuAction.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        main_helpmenu.addAction(kisuAction)
+        # self.main_window.actionGazu.triggered.connect(lambda: webbrowser.open('https://gazu.cg-wire.com/index.html'))
+        # self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
+
+        # file_menu = menu_bar.addMenu('File')
+        # self.main_window.menubar().
+        # self.main_window.recentRenderlist1.triggered.connect(lambda checked, filename=self.filename: self.open_recent_file(self.filename))
+        # recent_file_menu = QMenu("Menu1")
+        # recent_files = self.pepper.precomp_list
+        # print(recent_files)
+        # for file_name in recent_files:
+        #     action = QAction(file_name, recent_file_menu)
+        #     action.triggered.connect(lambda checked, file_name=file_name: self.open_recent_file(file_name))
+        #     recent_file_menu.addAction(action)
+        # menu_bar = self.menuBar()
+        # menu_bar.addMenu(recent_file_menu)
+        # self.createActions()
+        # self.createMenus()
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
         self.app.exec_()
+
+    def save_precomp_list_json(self):
+        """
+
+        Returns:
+
+        """
+        directory_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw'
+        json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
+
+        for file_path in json_files:
+            file_path = QAction(os.path.basename(file_path))
+            file_path.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+            self.main_filemenu.addAction(file_path)
+
+        self.main_filemenu.addSeparator() # QMenu에 구분선 추가
+
+    def ui_menubar(self):
+        # add login menubar
+        login_menu_bar = self.login_window.QMenuBar(self)
+        login_menu_bar.setNativeMenuBar(False)
+        login_menu = login_menu_bar.addMenu('login test')
+
+        # add main menubar
+        main_menu_bar = self.main_window.QMenuBar(self)
+        main_menu_bar.setNativeMenuBar(False)
+
+        add_menu = main_menu_bar.addMenu('Menu')
+        exit_action = QAction('Exit')
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.setStatusTip('Exit application')
+        exit_action.triggered.connect(QApplication.instance().quit)
+        add_menu.addAction(exit_action)
+
+        # set Help menubar
+        # main_help = main_menu_bar.addMenu('Help')
+        # kitsu_action = QAction('Kitsu host site')
+        # kitsu_action.setShortcut('F1')
+        # kitsu_action.setStatusTip('Kitsu houst site oepn')
+        # main_help.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        #
+        # # set Preset menubar
+        # main_preset = main_menu_bar.addMenu('Preset')
+
+    def save_json(self):
+        directory_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw'
+        json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
+        for file_path in json_files:
+            action = QAction(os.path.basename(file_path), self)
+            action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+            file_menu.addAction(action)
+    def handle_file(self, file_path):
+        # TODO: 파일 내용 처리하기
+
+        pass
 
     def user_login(self):
         """mvc_login.ui를 디스플레이 해주는 메소드. 유저의 로그인 페이지 UI에서 Login 버튼 클릭, Enter 입력 시 실행된다. \n
@@ -255,18 +384,215 @@ class PepperWindow(QMainWindow):
         self.render_model.pepperlist.clear()
         self.render_model.layoutChanged.emit()
 
-    # self.main_window.
+    # menu bar
+    def createActions(self):
+        self.newAct = QAction("&New", self, shortcut=QKeySequence.New,
+                statusTip="Create a new file", triggered=self.newFile)
+
+        self.openAct = QAction("&Open...", self, shortcut=QKeySequence.Open,
+                statusTip="Open an existing file", triggered=self.open)
+
+        self.saveAct = QAction("&Save", self, shortcut=QKeySequence.Save,
+                statusTip="Save the document to disk", triggered=self.save)
+
+        self.saveAsAct = QAction("Save &As...", self,
+                shortcut=QKeySequence.SaveAs,
+                statusTip="Save the document under a new name",
+                triggered=self.saveAs)
+
+        # for i in range(MainWindow.MaxRecentFiles):
+        #     self.recentFileActs.append(
+        #             QAction(self, visible=False,
+        #                     triggered=self.openRecentFile))
+
+        # self.exitAct = QAction("E&xit", self, shortcut="Ctrl+Q",
+        #         statusTip="Exit the application",
+        #         triggered=QApplication.instance().closeAllWindows)
+
+        self.aboutAct = QAction("&About", self,
+                statusTip="Show the application's About box",
+                triggered=self.about)
+
+        # self.aboutQtAct = QAction("About &Qt", self,
+        #         statusTip="Show the Qt library's About box",
+        #         triggered=QApplication.instance().aboutQt)
+
+    def createMenus(self):
+        self.fileMenu = self.main_window.menuBar().addMenu("&File")
+        self.fileMenu.addAction(self.newAct)
+        self.fileMenu.addAction(self.openAct)
+        self.fileMenu.addAction(self.saveAct)
+        self.fileMenu.addAction(self.saveAsAct)
+        self.separatorAct = self.fileMenu.addSeparator()
+        # for i in range(MainWindow.MaxRecentFiles):
+        #     self.fileMenu.addAction(self.recentFileActs[i])
+        self.fileMenu.addSeparator()
+        self.fileMenu.addAction(self.exitAct)
+        self.updateRecentFileActions()
+
+        self.menuBar().addSeparator()
+
+        self.helpMenu = self.menuBar().addMenu("&Help")
+        self.helpMenu.addAction(self.aboutAct)
+        self.helpMenu.addAction(self.aboutQtAct)
+
     def menubar_clear(self):
 
         pass
 
-    def menubar_open_preset(self):
+    def menubar_open_preset(self, file_name):
+        # 파일을 열거나 처리하는 코드
         pass
 
+    def chat_gpt_3(self):
+        now = datetime.now()
+        base_filename = f'{self.pepper.identif}_{now.date()}_time_{now.hour}:{now.minute}'
+
+        # base_filename = 'render_check_list'
+        ext = '.json'
+        i = 1
+        while i <= 5:
+            self.filename = f"{base_filename}_v{i}{ext}"
+            if not os.path.isfile(self.filename):
+                break
+            i += 1
+        if i > 5:
+            i = 1
+        self.filename = f"{base_filename}_v{i}{ext}"
+
+        self.render_model.pepperlist.clear()
+        for render in self.pepper.precomp_list:
+            self.render_list_data.append(render['name'])
+        with open(self.filename, "w") as f:
+            json.dump(self.render_list_data, f, ensure_ascii=False)
+
+    def chat_gpt_2(self):
+        filename = 'render_check_list.json'
+
+        if not os.path.isfile(filename):
+            # 파일이 존재하지 않는 경우
+            self.render_model.pepperlist.clear()
+            for render in self.pepper.precomp_list:
+                self.render_list_data.append(render['name'])
+            with open(filename, "w") as f:
+                json.dump(self.render_list_data, f, ensure_ascii=False)
+        else:
+            # 파일이 존재하는 경우
+            base_filename, ext = os.path.splitext(filename)
+            i = 1
+            while i <= 5 and os.path.isfile(f"{base_filename}_v{i}{ext}"):
+                i += 1
+            if i <= 5:
+                filename = f"{base_filename}_v{i}{ext}"
+            else:
+                filename = f"{base_filename}_v1{ext}"
+            self.render_model.pepperlist.clear()
+            for render in self.pepper.precomp_list:
+                self.render_list_data.append(render['name'])
+            with open(filename, "w") as f:
+                json.dump(self.render_list_data, f, ensure_ascii=False)
+
+    def chat_gpt(self):
+        filename = 'render_check_list.json'
+
+        if not os.path.isfile(filename):
+            self.render_model.pepperlist.clear()
+            for render in self.pepper.precomp_list:
+                self.render_list_data.append(render['name'])
+            with open(filename, "w") as f:
+                json.dump(self.render_list_data, f, ensure_ascii=False)
+        else:
+            base_filename, ext = os.path.splitext(filename)
+            i = 1
+            while i <= 5 and os.path.isfile(filename):
+                filename = f"{base_filename}_v{i}{ext}"
+                i += 1
+            if i > 5:
+                filename = f"{base_filename}_v1{ext}"
+            self.render_model.pepperlist.clear()
+            for render in self.pepper.precomp_list:
+                self.render_list_data.append(render['name'])
+            with open(filename, "w") as f:
+                json.dump(self.render_list_data, f, ensure_ascii=False)
+
+    def precomp_list_save(self):
+        # render_list_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw/render_check_list.json'
+        render_list_path = 'render_check_list.json'
+
+        index = 0
+        while os.path.exists(render_list_path):
+            render_list_path = re.sub(r'_\d+(?=[.]\w+$)', r'', render_list_path)
+            render_list_path = re.sub(r'(?=[.]\w+$)', rf'_{index}', render_list_path)
+            index += 1
+
+        # if os.path.isfile(render_list_path):
+        #     self.render_list_data.clear()
+        # render_list = self.pepper.precomp_list()
+
+        self.render_model.pepperlist.clear()
+        for render in self.pepper.precomp_list:
+            self.render_list_data.append(render['name'])
+        with open(render_list_path, "w") as f:
+            json.dump(self.render_list_data, f, ensure_ascii=False)
+
+    def precomp_list_load(self):
+        with open(self.render_list_path, "r") as f:
+            self.render_list_data = json.load(f)
+            print(self.render_list_data)
+
+    def precomp_list_total(self):
+        total = len(self.render_list_data)
+
+        self.render_model.pepperlist.clear()
+        for render in self.pepper.precomp_list:
+            self.render_model.pepperlist.append(render['name'])
+        self.render_model.layoutChanged.emit()
+        self.shots_selection.clear()
+        self.renderlists_selection.clear()
+
     def render_execute(self):
-        houp = HouPepper()
-        for precomp in self.pepper.precomp_list:
-            houp.abc_path = precomp['layout_output_path']
+        # houp = HouPepper()
+        # for precomp in self.pepper.precomp_list:
+        #     temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
+        #     print(temp_working_path, layout_output_path, fx_working_path)
+        #     houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
+        #                                  f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
+        # for precomp in self.pepper.precomp_list:
+        #     temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
+        #     houp.set_mantra_for_render(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
+        #                                video_output_path)
+        if len(self.pepper.precomp_list) == 0 :
+            return
+
+        # self.precomp_list_save()
+
+        # self.chat_gpt()
+        # self.chat_gpt_2()
+        self.chat_gpt_3()
+
+        self.pepper.precomp_list.clear()
+        self.render_list_data.clear()
+
+        self.render_model.layoutChanged.emit()
+        self.template_model.layoutChanged.emit()
+        self.shot_model.layoutChanged.emit()
+
+        self.render_model.pepperlist.clear()
+        self.template_model.pepperlist.clear()
+        self.shot_model.pepperlist.clear()
+
+        self.projects_selection.clear()
+        self.renderlists_selection.clear()
+        self.templates_selection.clear()
+        self.shots_selection.clear()
+
+    @staticmethod
+    def path_seperator(precomp):
+        temp_working_path = precomp['temp_working_path']
+        layout_output_path = precomp['layout_output_path']
+        fx_working_path = precomp['fx_working_path']
+        video_output_path = precomp['video_output_path']
+        return temp_working_path, layout_output_path, fx_working_path, video_output_path
 
 
 def main():

@@ -1,15 +1,14 @@
 import sys
 import os
-from BlackPepper.mantra_process_bar import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QMainWindow
+from PySide2.QtWidgets import QMainWindow, QApplication, QWidget, QLabel, QVBoxLayout
 from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
 from BlackPepper.houpepper import HouPepper
-from BlackPepper.ui.auto_login import Auto_log
-import hou
+from PySide2.QtGui import QIcon
+
 
 
 class PepperWindow(QMainWindow):
@@ -20,15 +19,13 @@ class PepperWindow(QMainWindow):
         여러 개의 shot들을 한번에 선택해 조정할 수 있도록 shots와 rendelistes의 view는 ExtendedSelection으로 설정했다. \n
         PepperWindow 실행 시 self.login_ui가 우선 실행된다.
         """
-
+        QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
+        self.app = QtWidgets.QApplication(sys.argv)
         self.pepper = Houpub()
-        self.login_log = Auto_log()
         self.projects_selection = None
         self.templates_selection = None
         self.shots_selection = None
         self.renderlists_selection = None
-        self.temp_rev = None
-        self.cam_rev = None
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
@@ -37,6 +34,7 @@ class PepperWindow(QMainWindow):
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
         self.render_model = PepperModel()
+
         # listview instance
         self.projects_listview = PepperView(self)
         self.templates_listview = PepperView(self)
@@ -62,13 +60,12 @@ class PepperWindow(QMainWindow):
         self.templates_selection = self.templates_listview.selectionModel()
         self.shots_selection = self.shots_listview.selectionModel()
         self.renderlists_selection = self.renderlists_listview.selectionModel()
-
         # get script_path
         # __file__ (전역변수) : 현재 열려있는 파일의 위치와 이름을 가지고 있는 문자열 변수
         # path.realpath(파일이름) : 현재 파일의  표준 경로+이름 을 반환
         script_path = os.path.dirname(os.path.realpath(__file__))
         # login Ui loader
-        login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login_3.ui'))
+        login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login_jk.ui'))
         login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
@@ -76,7 +73,7 @@ class PepperWindow(QMainWindow):
         self.login_window.move(1000, 300)
         self.login_window.show()
         # main Ui loader
-        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_3.ui'))
+        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_2_jk.ui'))
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
@@ -94,50 +91,13 @@ class PepperWindow(QMainWindow):
         self.main_window.render_btn.clicked.connect(self.render_execute)
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
-        self.main_window.logout_btn.clicked.connect(self.user_logout)
-        self.main_window.temp_rev_cbox.currentTextChanged.connect(self.renew_template_info)
         # add listview to ui
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
-        self.set_auto_login()
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
-
-    def set_auto_login(self):
-        log_value = self.login_log.load_setting()
-        log_path = self.login_log.user_path
-        log_id = self.login_window.input_id.text()
-        log_pw = self.login_window.input_pw.text()
-        log_sfw = self.login_window.hipbox.currentText()[1:]
-        if os.path.exists(log_path) and log_id != log_value['user_id'] or log_pw != log_value['user_pw'] \
-                or log_sfw != log_value['user_ext']:
-            self.login_log.reset_setting()
-        if log_value['valid_host'] and log_value['valid_user']:
-            self.login_log.host = log_value['host']
-            self.login_log.user_id = log_value['user_id']
-            self.login_log.user_pw = log_value['user_pw']
-            self.login_log.user_ext = log_value['user_ext']
-            self.pepper.login(self.login_log.host, self.login_log.user_id, self.login_log.user_pw)
-            self.pepper.software = self.login_log.user_ext
-            self.login_window.close()
-            self.open_main_window()
-        else:
-            pass
-
-    def set_auto_login(self):
-        log_value = self.login_log.load_setting()
-        if log_value['valid_host'] and log_value['valid_user']:
-            self.login_log.host = log_value['host']
-            self.login_log.user_id = log_value['user_id']
-            self.login_log.user_pw = log_value['user_pw']
-            self.login_log.user_ext = log_value['user_ext']
-            self.pepper.login(self.login_log.host, self.login_log.user_id, self.login_log.user_pw)
-            self.pepper.software = self.login_log.user_ext
-            self.login_window.close()
-            self.open_main_window()
-        else:
-            pass
+        self.app.exec_()
 
     def user_login(self):
         """mvc_login.ui를 디스플레이 해주는 메소드. 유저의 로그인 페이지 UI에서 Login 버튼 클릭, Enter 입력 시 실행된다. \n
@@ -147,23 +107,15 @@ class PepperWindow(QMainWindow):
         로그인 성공 시 입력받은 Houdini license 종류가 pepper의 self.software에 set 된다.
         이후 self.main_window가 바로 실행되어 pepper의 메인 UI가 디스플레이 된다.
         """
-        self.login_log.host = "http://192.168.3.116/api"
-        self.login_log.user_id = self.login_window.input_id.text()
-        self.login_log.user_pw = self.login_window.input_pw.text()
-        self.login_log.user_ext = self.login_window.hipbox.currentText()[1:]
+        user_id = self.login_window.input_id.text()
+        user_pw = self.login_window.input_pw.text()
+        user_software = self.login_window.hipbox.currentText()[1:]
+        host = "http://192.168.3.116/api"
 
-        if self.login_log.connect_login():
-            self.pepper.software = self.login_log.user_ext
-            self.login_log.auto_login = True
-            self.login_log.save_setting()
-            self.login_window.close()
-            self.open_main_window()
-
-    def user_logout(self):
-        if self.login_log.connect_login():
-            self.login_log.log_out()
-            self.main_window.close()
-            self.login_window.show()
+        self.pepper.login(host, user_id, user_pw)
+        self.pepper.software = user_software
+        self.login_window.close()
+        self.open_main_window()
 
     def open_main_window(self):
         """mvc_main.ui를 디스플레이 해주는 메소드. 로그인 성공 시 실행된다. \n
@@ -198,6 +150,7 @@ class PepperWindow(QMainWindow):
         project_name = self.my_projects[event.row()]
         self.pepper.project = project_name
         self.all_assets = self.pepper.get_all_assets()
+        print(f"project_name : {project_name} get_assets = {self.all_assets}")
         self.template_model.pepperlist.clear()
         self.shot_model.pepperlist.clear()
 
@@ -220,7 +173,7 @@ class PepperWindow(QMainWindow):
 
         또, 기존과 다른 template 를 클릭 시 기존 shots_listview 의 shot_model 을 clear 한 뒤 클릭 된
         template 의 shot 들을 shots_listview 에 display 해준다.
-        재 선택 시 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
+        재 선택 시 Shots, Render files 의 selectionModel 들을 clear 해준다.
 
         Args:
             event: Listview click event
@@ -229,14 +182,10 @@ class PepperWindow(QMainWindow):
         # event
         template_name = self.all_assets[event.row()]
         self.pepper.asset = template_name
-        self.pepper.entity = 'asset'
-        rev_list = self.pepper.get_every_revision_for_working_file('fx_template')
-        self.renew_template_cbox(rev_list)
 
-        self.renew_template_info()
         # set template info label
-        # name, time, rev = self.pepper.get_working_file_data('simulation', 'asset')
-        # self.main_window.template_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
+        name, time, rev = self.pepper.get_working_file_data('simulation', 'asset')
+        self.main_window.template_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
         self.all_shots = self.pepper.get_casting_path_for_asset()
 
         self.shot_model.pepperlist.clear()
@@ -249,11 +198,6 @@ class PepperWindow(QMainWindow):
         self.shots_selection.clear()
         self.renderlists_selection.clear()
 
-    def renew_template_info(self):
-        revision = self.main_window.temp_rev_cbox.currentText()
-        name, time, rev = self.pepper.get_working_file_data('simulation', revision, 'asset')
-        self.main_window.template_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
-
     def shot_selected(self, event):
         """Shots 를 선택 시 선택한 shot 의 정보(dict)를 self.all_shots = [] 에 담는 함수 이다.\n
         추가로 하단 Shot info 에 created Artist,Time,Revision 정보를 보여 준다.
@@ -265,70 +209,47 @@ class PepperWindow(QMainWindow):
 
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
-        self.pepper.entity = 'shot'
-        rev_list = self.pepper.get_every_revision_for_output_file('Camera_cache', 'layout')
-        self.renew_shot_cbox(rev_list)
-        self.renew_shot_info()
-        self.renderlists_selection.clear()
 
-    def renew_shot_info(self):
-        revision = self.main_window.shot_rev_cbox.currentText()
-        name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', revision, 'shot')
+        name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', 'shot')
         self.main_window.shot_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
 
-    def renew_template_cbox(self, rev_list):
-        self.main_window.temp_rev_cbox.clear()
-        for rev in rev_list:
-            self.main_window.temp_rev_cbox.addItem(f'{rev}')
+        self.renderlists_selection.clear()
 
-    def renew_shot_cbox(self, rev_list):
-        self.main_window.shot_rev_cbox.clear()
-        for rev in rev_list:
-            self.main_window.shot_rev_cbox.addItem(f'{rev}')
-
-    def append_render_list(self, event):
-        """main window 의 append_btn 에 연결 되어 클릭시 사용 되는 함수 이다.
-        선택된 shot 들의 shot_dict 를  pepper의 make_precomp_dict 를 사용하여 shot 별로 houdini에서 필요한
-        path들을 딕셔너리로 만들고 self.precomp_list에 넣어주고 render_moderl.pepperlist clear 정리해준다.
-        그리고 pepper 의 precomp_list를 render_moderl.pepperlist 에 append 한다.
-        추가로 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
+    def append_render_list(self):
         """
-        temp_rev = int(self.main_window.temp_rev_cbox.currentText())
-        shot_rev = int(self.main_window.shot_rev_cbox.currentText())
-        selections = self.shots_selection.selectedRows()
-        if len(selections) == 1:
-            shot_dict = self.all_shots[selections[0].row()]
-            self.pepper.make_precomp_dict(shot_dict, temp_revision=temp_rev, cam_revision=shot_rev)
-            self.renew_render_list()
-            self.shots_selection.clear()
-            return
-        for idx in selections:
-            shot_dict = self.all_shots[idx.row()]
-            self.pepper.make_precomp_dict(shot_dict, temp_revision=temp_rev)
-            self.shots_selection.clear()
-        self.renew_render_list()
 
-    def renew_render_list(self):
+        Returns:
+
+        """
+        for idx in self.shots_selection.selectedRows():
+            shot_dict = self.all_shots[idx.row()]
+            self.pepper.make_precomp_dict(shot_dict)
+        self.render_model.pepperlist.clear()
+        for render in self.pepper.precomp_list:
+            self.render_model.pepperlist.append(render['name'])
+        self.render_model.layoutChanged.emit()
+        self.shots_selection.clear()
+        self.renderlists_selection.clear()
+
+    def delete_render_list(self):
+        """
+
+        Returns:
+
+        """
+        for idx in self.renderlists_selection.selectedRows():
+            self.pepper.delete_precomp_dict(idx.data())
         self.render_model.pepperlist.clear()
         for render in self.pepper.precomp_list:
             self.render_model.pepperlist.append(render['name'])
         self.render_model.layoutChanged.emit()
         self.renderlists_selection.clear()
 
-    def delete_render_list(self):
-        """main window 의 del_btn 에 연결 되어 클릭시 사용 되는 함수 이다.
-        renderlists_selection(선택된 render files) 들을 pepper의 delete_precomp_dict를 사용하여 precomp_list에서 remove한다.
-        path들을 딕셔너리로 만들고 self.precomp_list에 넣어주고 render_moderl.pepperlist clear 정리해준다.
-        그리고 pepper 의 precomp_list를 render_moderl.pepperlist 에 append 한다.
-        추가로 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
-        """
-        for idx in self.renderlists_selection.selectedRows():
-            self.pepper.delete_precomp_dict(idx.data())
-        self.renew_render_list()
-
     def clear_list(self):
-        """main window 의 reset_btn에 연결 되어 render files list를 reset하는 함수이다.
-        render files list( pepper.precomp_list)를 [] 빈 리스트로 만들고, render_moderl.pepperlist 를 clear 한다.
+        """
+
+        Returns:
+
         """
         self.pepper.precomp_list = []
         self.render_model.pepperlist.clear()
@@ -337,41 +258,26 @@ class PepperWindow(QMainWindow):
     def render_execute(self):
         houp = HouPepper()
         for precomp in self.pepper.precomp_list:
-            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path = self.path_seperator(precomp)
+            temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
             print(temp_working_path, layout_output_path, fx_working_path)
             houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
         for precomp in self.pepper.precomp_list:
-            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path = self.path_seperator(precomp)
-            # if not QtWidgets.QApplication.instance():
-            #     app = QtWidgets.QApplication(sys.argv)
-            # else:
-            #     app = QtWidgets.QApplication.instance()
-            # m = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}', jpg_output_path,
-            #                      layout_output_path, houp.cam_node, houp.abc_range[1] * hou.fps())
-            # m.resize(800, 600)
-            # m.move(1000, 250)
-            # m.show()
-            # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
-            # f.resize(800, 600)
-            # f.move(1000, 250)
-            # f.show()
+            temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
+            houp.set_mantra_for_render(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
+                                       video_output_path)
 
     @staticmethod
     def path_seperator(precomp):
         temp_working_path = precomp['temp_working_path']
         layout_output_path = precomp['layout_output_path']
         fx_working_path = precomp['fx_working_path']
-        jpg_output_path = precomp['jpg_output_path']
         video_output_path = precomp['video_output_path']
-        return temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path
+        return temp_working_path, layout_output_path, fx_working_path, video_output_path
 
 
 def main():
-    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-    app = QtWidgets.QApplication(sys.argv)
     window = PepperWindow()
-    app.exec_()
 
 
 if __name__ == "__main__":

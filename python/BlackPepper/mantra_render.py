@@ -33,7 +33,7 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
     if root is not None:
         n = root.createNode('ifd')
         n.parm('camera').set(cam_setting)
-        n.parm('vm_picture').set(f'{output_path[:-8]}$F4.jpg')
+        n.parm('vm_picture').set(f'{output_path[:-17]}{output_path[-4:]}_$F4.jpg')
         n.parm('trange').set(1)
         for i in n.parmTuple('f'):
             i.deleteAllKeyframes()

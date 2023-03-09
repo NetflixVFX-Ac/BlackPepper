@@ -59,6 +59,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
                         "selection-background-color: rgb(45, 180, 198);\n"
                         "font: 10pt\"Courier New\";\n"
                         "color: rgb(180, 180, 180);\n")
+
         w.setLayout(l)
 
         # self.btn_interrupt = False

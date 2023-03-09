@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1016</width>
+    <width>1018</width>
     <height>600</height>
    </rect>
   </property>
@@ -14,7 +14,14 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">background-color: rgb(45, 45, 45);
+selection-background-color: rgb(45, 180, 198);
+font: 10pt&quot;Courier New&quot;;
+color: rgb(180, 180, 180);
+</string>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -38,11 +45,19 @@
          <widget class="QLabel" name="label_6">
           <property name="font">
            <font>
-            <pointsize>16</pointsize>
+            <family>Courier New</family>
+            <pointsize>10</pointsize>
+            <weight>50</weight>
+            <italic>false</italic>
+            <bold>false</bold>
            </font>
           </property>
+          <property name="styleSheet">
+           <string notr="true">font: 10pt&quot;Courier New&quot;;
+color: rgb(180, 180, 180);</string>
+          </property>
           <property name="text">
-           <string>sw mvc main v2</string>
+           <string>Black Pepper v0.0.1</string>
           </property>
          </widget>
         </item>
@@ -52,7 +67,11 @@
            <widget class="QLabel" name="label_8">
             <property name="font">
              <font>
-              <pointsize>16</pointsize>
+              <family>Courier New</family>
+              <pointsize>10</pointsize>
+              <weight>50</weight>
+              <italic>false</italic>
+              <bold>false</bold>
              </font>
             </property>
             <property name="text">
@@ -66,7 +85,11 @@
              <widget class="QLabel" name="label_10">
               <property name="font">
                <font>
-                <pointsize>16</pointsize>
+                <family>Courier New</family>
+                <pointsize>10</pointsize>
+                <weight>50</weight>
+                <italic>false</italic>
+                <bold>false</bold>
                </font>
               </property>
               <property name="text">
@@ -75,10 +98,36 @@
              </widget>
             </item>
             <item>
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
              <widget class="QPushButton" name="reset_btn">
+              <property name="maximumSize">
+               <size>
+                <width>80</width>
+                <height>120</height>
+               </size>
+              </property>
               <property name="font">
                <font>
-                <pointsize>12</pointsize>
+                <family>Courier New</family>
+                <pointsize>10</pointsize>
+                <weight>50</weight>
+                <italic>false</italic>
+                <bold>false</bold>
                </font>
               </property>
               <property name="text">
@@ -92,7 +141,11 @@
            <widget class="QLabel" name="label_11">
             <property name="font">
              <font>
-              <pointsize>16</pointsize>
+              <family>Courier New</family>
+              <pointsize>10</pointsize>
+              <weight>50</weight>
+              <italic>false</italic>
+              <bold>false</bold>
              </font>
             </property>
             <property name="text">
@@ -122,7 +175,11 @@
            <widget class="QLabel" name="label_12">
             <property name="font">
              <font>
-              <pointsize>16</pointsize>
+              <family>Courier New</family>
+              <pointsize>10</pointsize>
+              <weight>50</weight>
+              <italic>false</italic>
+              <bold>false</bold>
              </font>
             </property>
             <property name="text">
@@ -198,7 +255,11 @@
               </property>
               <property name="font">
                <font>
-                <pointsize>12</pointsize>
+                <family>Courier New</family>
+                <pointsize>10</pointsize>
+                <weight>50</weight>
+                <italic>false</italic>
+                <bold>false</bold>
                </font>
               </property>
               <property name="text">
@@ -239,7 +300,11 @@
               </property>
               <property name="font">
                <font>
-                <pointsize>12</pointsize>
+                <family>Courier New</family>
+                <pointsize>10</pointsize>
+                <weight>50</weight>
+                <italic>false</italic>
+                <bold>false</bold>
                </font>
               </property>
               <property name="text">
@@ -296,19 +361,31 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>150</width>
-            <height>50</height>
+            <width>100</width>
+            <height>40</height>
            </size>
           </property>
           <property name="font">
            <font>
-            <pointsize>15</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
+            <family>Courier New</family>
+            <pointsize>10</pointsize>
+            <weight>50</weight>
+            <italic>false</italic>
+            <bold>false</bold>
            </font>
+          </property>
+          <property name="cursor">
+           <cursorShape>ArrowCursor</cursorShape>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(255, 153, 000);
+color: rgb(45, 45, 45);</string>
           </property>
           <property name="text">
            <string>RENDER</string>
+          </property>
+          <property name="default">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -323,141 +400,19 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1016</width>
-     <height>22</height>
+     <width>1018</width>
+     <height>20</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
+   <widget class="QMenu" name="menuSeleted_Shots_save">
     <property name="title">
-     <string>File</string>
+     <string>Seleted Shots save</string>
     </property>
-    <widget class="QMenu" name="actionRecent">
-     <property name="title">
-      <string>Open Recent Render files Preset</string>
-     </property>
-     <addaction name="action1"/>
-     <addaction name="action2"/>
-     <addaction name="action3"/>
-     <addaction name="action4"/>
-     <addaction name="action5"/>
-    </widget>
     <addaction name="separator"/>
-    <addaction name="actionClear"/>
-    <addaction name="actionOpe"/>
-    <addaction name="actionRecent"/>
-    <addaction name="separator"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionSave_as"/>
-    <addaction name="separator"/>
-    <addaction name="actionQuit_Application"/>
-    <addaction name="separator"/>
-    <addaction name="recentRenderlist1"/>
-    <addaction name="recentRenderlist2"/>
-    <addaction name="recentRenderlist3"/>
    </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
-    <addaction name="actionKitsu"/>
-    <addaction name="actionGazu"/>
-    <addaction name="actionPepper"/>
-    <addaction name="actionSidefx"/>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuHelp"/>
+   <addaction name="menuSeleted_Shots_save"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action1">
-   <property name="text">
-    <string>1.</string>
-   </property>
-  </action>
-  <action name="action2">
-   <property name="text">
-    <string>2.</string>
-   </property>
-  </action>
-  <action name="action3">
-   <property name="text">
-    <string>3.</string>
-   </property>
-  </action>
-  <action name="action4">
-   <property name="text">
-    <string>4.</string>
-   </property>
-  </action>
-  <action name="action5">
-   <property name="text">
-    <string>5.</string>
-   </property>
-  </action>
-  <action name="actionQuit_Application">
-   <property name="text">
-    <string>Quit Application</string>
-   </property>
-  </action>
-  <action name="actionClear">
-   <property name="text">
-    <string>Clear       F4</string>
-   </property>
-  </action>
-  <action name="actionOpen">
-   <property name="text">
-    <string>Open</string>
-   </property>
-  </action>
-  <action name="actionSave">
-   <property name="text">
-    <string>Save                   Ctrl + S</string>
-   </property>
-  </action>
-  <action name="actionSave_as">
-   <property name="text">
-    <string>Save as</string>
-   </property>
-  </action>
-  <action name="actionKitsu">
-   <property name="text">
-    <string>Kitsu site             F1</string>
-   </property>
-  </action>
-  <action name="actionGazu">
-   <property name="text">
-    <string>Gazu`s documentation site</string>
-   </property>
-  </action>
-  <action name="actionOpe">
-   <property name="text">
-    <string>Open  open 이랑 save 너무 과하다</string>
-   </property>
-  </action>
-  <action name="actionPepper">
-   <property name="text">
-    <string>Pepper document</string>
-   </property>
-  </action>
-  <action name="actionSidefx">
-   <property name="text">
-    <string>Side fx site</string>
-   </property>
-  </action>
-  <action name="recentRenderlist1">
-   <property name="text">
-    <string>1.</string>
-   </property>
-  </action>
-  <action name="recentRenderlist2">
-   <property name="text">
-    <string>2.</string>
-   </property>
-  </action>
-  <action name="recentRenderlist3">
-   <property name="text">
-    <string>3.</string>
-   </property>
-  </action>
  </widget>
  <resources/>
  <connections/>

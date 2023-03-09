@@ -1,38 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>495</width>
-    <height>431</height>
+    <width>540</width>
+    <height>359</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(58, 58, 58);</string>
+   <string notr="true">background-color: rgb(45, 45, 45);
+selection-background-color: rgb(48, 140, 198);
+font: 10pt&quot;Courier New&quot;;
+color: rgb(180, 180, 180);
+</string>
   </property>
-  <widget class="QWidget" name="centralwidget">
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>490</width>
-      <height>387</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_7">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <property name="leftMargin">
       <number>50</number>
      </property>
@@ -49,21 +39,20 @@
       <widget class="QLabel" name="label">
        <property name="font">
         <font>
-         <pointsize>16</pointsize>
+         <family>Courier New</family>
+         <pointsize>10</pointsize>
          <weight>50</weight>
+         <italic>false</italic>
          <bold>false</bold>
         </font>
        </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(255, 255, 255);</string>
-       </property>
        <property name="text">
-        <string>Login</string>
+        <string>Black Pepper v0.0.1</string>
        </property>
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer_19">
+      <spacer name="verticalSpacer_2">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -76,14 +65,18 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label_20">
+      <widget class="QLabel" name="label_2">
        <property name="font">
         <font>
-         <pointsize>12</pointsize>
+         <family>Courier New</family>
+         <pointsize>10</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
-        <string>ID</string>
+        <string>ID email</string>
        </property>
       </widget>
      </item>
@@ -102,8 +95,7 @@
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(46, 46, 46);
-color: rgb(255, 255, 255);</string>
+        <string notr="true">background-color:rgb(52, 52, 52);</string>
        </property>
        <property name="text">
         <string>pipeline@rapa.org</string>
@@ -111,7 +103,7 @@ color: rgb(255, 255, 255);</string>
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer_20">
+      <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -124,14 +116,18 @@ color: rgb(255, 255, 255);</string>
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label_21">
+      <widget class="QLabel" name="label_3">
        <property name="font">
         <font>
-         <pointsize>12</pointsize>
+         <family>Courier New</family>
+         <pointsize>10</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
-        <string>PW</string>
+        <string>pw</string>
        </property>
       </widget>
      </item>
@@ -144,8 +140,7 @@ color: rgb(255, 255, 255);</string>
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(46, 46, 46);
-color: rgb(255, 255, 255);</string>
+        <string notr="true">background-color:rgb(52, 52, 52);</string>
        </property>
        <property name="text">
         <string>netflixacademy</string>
@@ -156,7 +151,7 @@ color: rgb(255, 255, 255);</string>
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer_21">
+      <spacer name="verticalSpacer_3">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -169,9 +164,9 @@ color: rgb(255, 255, 255);</string>
       </spacer>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <spacer name="horizontalSpacer_13">
+        <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -187,12 +182,15 @@ color: rgb(255, 255, 255);</string>
         <widget class="QComboBox" name="hipbox">
          <property name="minimumSize">
           <size>
-           <width>150</width>
+           <width>90</width>
            <height>0</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true">color: rgb(255, 255, 255);</string>
+         <property name="maximumSize">
+          <size>
+           <width>120</width>
+           <height>100</height>
+          </size>
          </property>
          <item>
           <property name="text">
@@ -212,7 +210,7 @@ color: rgb(255, 255, 255);</string>
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_14">
+        <spacer name="horizontalSpacer_2">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -229,26 +227,15 @@ color: rgb(255, 255, 255);</string>
        </item>
        <item>
         <widget class="QPushButton" name="login_btn">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
          <property name="minimumSize">
           <size>
            <width>150</width>
            <height>0</height>
           </size>
          </property>
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
          <property name="styleSheet">
-          <string notr="true">color: rgb(255, 255, 255);</string>
+          <string notr="true">background-color: rgb(255, 153, 000);
+color: rgb(45, 45, 45);</string>
          </property>
          <property name="text">
           <string>Login</string>
@@ -258,24 +245,8 @@ color: rgb(255, 255, 255);</string>
       </layout>
      </item>
     </layout>
-   </widget>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>495</width>
-     <height>22</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
-  <action name="actiontest">
-   <property name="text">
-    <string>test</string>
-   </property>
-  </action>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
