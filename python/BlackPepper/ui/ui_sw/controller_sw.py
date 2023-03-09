@@ -1,5 +1,7 @@
 import sys
 import os
+import re
+import json
 import webbrowser
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
@@ -10,7 +12,9 @@ from BlackPepper.pepper import Houpub
 from BlackPepper.houpepper import HouPepper
 
 from PySide2.QtGui import QKeySequence
-from PySide2.QtWidgets import QAction, QMenu
+from PySide2.QtWidgets import QAction, QMenuBar, QApplication
+
+from datetime import datetime
 
 
 class PepperWindow(QMainWindow):
@@ -31,6 +35,8 @@ class PepperWindow(QMainWindow):
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
+        self.render_list_data = []
+        self.filename = []
         # model instance
         self.project_model = PepperModel()
         self.template_model = PepperModel()
@@ -65,12 +71,14 @@ class PepperWindow(QMainWindow):
         self.login_window.move(1000, 300)
         self.login_window.show()
         # main Ui loader
-        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_2.ui'))
+        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_3.ui'))
+        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_3.ui'))
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
         self.main_window.move(700, 250)
         self.main_window.setWindowTitle('Black Pepper v0.0.1')
+
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
@@ -92,11 +100,25 @@ class PepperWindow(QMainWindow):
         # set statusbar to window
         self.login_window.statusBar().showMessage('kitsu 로그인 하세요!  houdini 확장자 선택하세요!')
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
+        # set menubar
+        exitAction = QAction('Exit')
+        exitAction.setShortcut('Ctrl+Q')
+        exitAction.setStatusTip('Exit application')
+        exitAction.triggered.connect(QApplication.instance().quit)
+
+        menu_bar = self.main_window.menuBar()
+        menu_bar.setNativeMenuBar(False)
+        filemenu = menu_bar.addMenu('File')
+        filemenu.addAction(exitAction)
+
         # menubar help 버튼에 링크 추가하기
         self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
         self.main_window.actionGazu.triggered.connect(lambda: webbrowser.open('https://gazu.cg-wire.com/index.html'))
         self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
-        # set menubar
+
+        # file_menu = menu_bar.addMenu('File')
+        # self.main_window.menubar().
+        self.main_window.recentRenderlist1.triggered.connect(lambda checked, filename=self.filename: self.open_recent_file(self.filename))
         # recent_file_menu = QMenu("Menu1")
         # recent_files = self.pepper.precomp_list
         # print(recent_files)
@@ -302,7 +324,6 @@ class PepperWindow(QMainWindow):
         #         statusTip="Show the Qt library's About box",
         #         triggered=QApplication.instance().aboutQt)
 
-
     def createMenus(self):
         self.fileMenu = self.main_window.menuBar().addMenu("&File")
         self.fileMenu.addAction(self.newAct)
@@ -330,7 +351,105 @@ class PepperWindow(QMainWindow):
         # 파일을 열거나 처리하는 코드
         pass
 
-    def recent_precomp(self):
+    def chat_gpt_3(self):
+        now = datetime.now()
+        base_filename = f'{self.pepper.identif}_{now.date()}_time_{now.hour}:{now.minute}'
+
+        # base_filename = 'render_check_list'
+        ext = '.json'
+        i = 1
+        while i <= 5:
+            self.filename = f"{base_filename}_v{i}{ext}"
+            if not os.path.isfile(self.filename):
+                break
+            i += 1
+        if i > 5:
+            i = 1
+        self.filename = f"{base_filename}_v{i}{ext}"
+
+        self.render_model.pepperlist.clear()
+        for render in self.pepper.precomp_list:
+            self.render_list_data.append(render['name'])
+        with open(self.filename, "w") as f:
+            json.dump(self.render_list_data, f, ensure_ascii=False)
+
+    def chat_gpt_2(self):
+        filename = 'render_check_list.json'
+
+        if not os.path.isfile(filename):
+            # 파일이 존재하지 않는 경우
+            self.render_model.pepperlist.clear()
+            for render in self.pepper.precomp_list:
+                self.render_list_data.append(render['name'])
+            with open(filename, "w") as f:
+                json.dump(self.render_list_data, f, ensure_ascii=False)
+        else:
+            # 파일이 존재하는 경우
+            base_filename, ext = os.path.splitext(filename)
+            i = 1
+            while i <= 5 and os.path.isfile(f"{base_filename}_v{i}{ext}"):
+                i += 1
+            if i <= 5:
+                filename = f"{base_filename}_v{i}{ext}"
+            else:
+                filename = f"{base_filename}_v1{ext}"
+            self.render_model.pepperlist.clear()
+            for render in self.pepper.precomp_list:
+                self.render_list_data.append(render['name'])
+            with open(filename, "w") as f:
+                json.dump(self.render_list_data, f, ensure_ascii=False)
+
+    def chat_gpt(self):
+        filename = 'render_check_list.json'
+
+        if not os.path.isfile(filename):
+            self.render_model.pepperlist.clear()
+            for render in self.pepper.precomp_list:
+                self.render_list_data.append(render['name'])
+            with open(filename, "w") as f:
+                json.dump(self.render_list_data, f, ensure_ascii=False)
+        else:
+            base_filename, ext = os.path.splitext(filename)
+            i = 1
+            while i <= 5 and os.path.isfile(filename):
+                filename = f"{base_filename}_v{i}{ext}"
+                i += 1
+            if i > 5:
+                filename = f"{base_filename}_v1{ext}"
+            self.render_model.pepperlist.clear()
+            for render in self.pepper.precomp_list:
+                self.render_list_data.append(render['name'])
+            with open(filename, "w") as f:
+                json.dump(self.render_list_data, f, ensure_ascii=False)
+
+    def precomp_list_save(self):
+        # render_list_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw/render_check_list.json'
+        render_list_path = 'render_check_list.json'
+
+        index = 0
+        while os.path.exists(render_list_path):
+            render_list_path = re.sub(r'_\d+(?=[.]\w+$)', r'', render_list_path)
+            render_list_path = re.sub(r'(?=[.]\w+$)', rf'_{index}', render_list_path)
+            index += 1
+
+        # if os.path.isfile(render_list_path):
+        #     self.render_list_data.clear()
+        # render_list = self.pepper.precomp_list()
+
+        self.render_model.pepperlist.clear()
+        for render in self.pepper.precomp_list:
+            self.render_list_data.append(render['name'])
+        with open(render_list_path, "w") as f:
+            json.dump(self.render_list_data, f, ensure_ascii=False)
+
+    def precomp_list_load(self):
+        with open(self.render_list_path, "r") as f:
+            self.render_list_data = json.load(f)
+            print(self.render_list_data)
+
+    def precomp_list_total(self):
+        total = len(self.render_list_data)
+
         self.render_model.pepperlist.clear()
         for render in self.pepper.precomp_list:
             self.render_model.pepperlist.append(render['name'])
@@ -339,9 +458,48 @@ class PepperWindow(QMainWindow):
         self.renderlists_selection.clear()
 
     def render_execute(self):
-        houp = HouPepper()
-        for precomp in self.pepper.precomp_list:
-            houp.abc_path = precomp['layout_output_path']
+        # houp = HouPepper()
+        # for precomp in self.pepper.precomp_list:
+        #     temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
+        #     print(temp_working_path, layout_output_path, fx_working_path)
+        #     houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
+        #                                  f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
+        # for precomp in self.pepper.precomp_list:
+        #     temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
+        #     houp.set_mantra_for_render(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
+        #                                video_output_path)
+        if len(self.pepper.precomp_list) == 0 :
+            return
+
+        # self.precomp_list_save()
+
+        # self.chat_gpt()
+        # self.chat_gpt_2()
+        self.chat_gpt_3()
+
+        self.pepper.precomp_list.clear()
+        self.render_list_data.clear()
+
+        self.render_model.layoutChanged.emit()
+        self.template_model.layoutChanged.emit()
+        self.shot_model.layoutChanged.emit()
+
+        self.render_model.pepperlist.clear()
+        self.template_model.pepperlist.clear()
+        self.shot_model.pepperlist.clear()
+
+        self.projects_selection.clear()
+        self.renderlists_selection.clear()
+        self.templates_selection.clear()
+        self.shots_selection.clear()
+
+    @staticmethod
+    def path_seperator(precomp):
+        temp_working_path = precomp['temp_working_path']
+        layout_output_path = precomp['layout_output_path']
+        fx_working_path = precomp['fx_working_path']
+        video_output_path = precomp['video_output_path']
+        return temp_working_path, layout_output_path, fx_working_path, video_output_path
 
 
 def main():
