@@ -159,20 +159,6 @@ class PepperWindow(QMainWindow):
         else:
             pass
 
-    def set_auto_login(self):
-        log_value = self.login_log.load_setting()
-        if log_value['valid_host'] and log_value['valid_user']:
-            self.login_log.host = log_value['host']
-            self.login_log.user_id = log_value['user_id']
-            self.login_log.user_pw = log_value['user_pw']
-            self.login_log.user_ext = log_value['user_ext']
-            self.pepper.login(self.login_log.host, self.login_log.user_id, self.login_log.user_pw)
-            self.pepper.software = self.login_log.user_ext
-            self.login_window.close()
-            self.open_main_window()
-        else:
-            pass
-
     def user_login(self):
         """mvc_login.ui를 디스플레이 해주는 메소드. 유저의 로그인 페이지 UI에서 Login 버튼 클릭, Enter 입력 시 실행된다. \n
         UI에서는 id, password를 입력받고, combobox를 통해 Houdini의 license 종류를 입력받는다. \n
