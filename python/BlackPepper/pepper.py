@@ -716,9 +716,14 @@ class Houpub:
         my_projects = [project['name'] for project in gazu.user.all_open_projects()]
         return my_projects
 
-    def get_working_file_data(self, task_type_name, entity_type):
+    def get_working_file_data(self, task_type_name, revision, entity_type):
         self.entity = entity_type
         _, task = self.get_task(task_type_name)
+        working_files = gazu.files.get_all_working_files_for_entity(self.entity)
+        for check_file in working_files:
+            if check_file['revision'] == revision:
+                working_file = check_file
+                print(working_file)
         working_file = gazu.files.get_last_working_files(task)
         created_time = working_file['main']['created_at']
         rev = working_file['main']['revision']
