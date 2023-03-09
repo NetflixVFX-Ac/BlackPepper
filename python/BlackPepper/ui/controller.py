@@ -24,6 +24,8 @@ class PepperWindow(QMainWindow):
         self.templates_selection = None
         self.shots_selection = None
         self.renderlists_selection = None
+        self.temp_rev = None
+        self.cam_rev = None
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
@@ -41,30 +43,36 @@ class PepperWindow(QMainWindow):
         self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         # setModel
         self.projects_listview.setModel(self.project_model)
+        self.projects_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
+        self.projects_listview.setSpacing(2)
         self.templates_listview.setModel(self.template_model)
+        self.templates_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
+        self.templates_listview.setSpacing(2)
         self.shots_listview.setModel(self.shot_model)
+        self.shots_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
+        self.shots_listview.setSpacing(2)
         self.renderlists_listview.setModel(self.render_model)
-        self.projects_selection = self.projects_listview.selectionModel()
-        self.templates_selection = self.templates_listview.selectionModel()
-        self.shots_selection = self.shots_listview.selectionModel()
-        self.renderlists_selection = self.renderlists_listview.selectionModel()
+        self.renderlists_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
+        self.renderlists_listview.setSpacing(2)
         # get script_path
         # __file__ (전역변수) : 현재 열려있는 파일의 위치와 이름을 가지고 있는 문자열 변수
         # path.realpath(파일이름) : 현재 파일의  표준 경로+이름 을 반환
         script_path = os.path.dirname(os.path.realpath(__file__))
         # login Ui loader
-        login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login.ui'))
+        login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login_3.ui'))
         login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
-        self.login_window.setWindowTitle('Login')
+        self.login_window.setWindowTitle('Black Pepper Login')
+        self.login_window.move(1000, 300)
         self.login_window.show()
         # main Ui loader
-        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_2.ui'))
+        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_3.ui'))
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
         self.main_window.setWindowTitle('Black Pepper')
+        self.main_window.move(700, 250)
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
@@ -168,6 +176,9 @@ class PepperWindow(QMainWindow):
         # event
         template_name = self.all_assets[event.row()]
         self.pepper.asset = template_name
+        self.pepper.entity = 'asset'
+        rev_list = self.pepper.get_every_revision_for_working_file('fx_template')
+        self.get_every_revision(rev_list)
 
         # set template info label
         name, time, rev = self.pepper.get_working_file_data('simulation', 'asset')
@@ -195,11 +206,18 @@ class PepperWindow(QMainWindow):
 
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
+        self.pepper.entity = 'shot'
+        rev_list = self.pepper.get_every_revision_for_output_file('Camera_cache', 'layout')
 
         name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', 'shot')
         self.main_window.shot_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
 
         self.renderlists_selection.clear()
+
+    def get_every_revision(self, rev_list):
+        self.main_window.temp_rev_cbox.clear()
+        for rev in rev_list:
+            self.main_window.temp_rev_cbox.addItem(f'{rev}')
 
     def append_render_list(self):
         """main window 의 append_btn 에 연결 되어 클릭시 사용 되는 함수 이다.
@@ -210,7 +228,7 @@ class PepperWindow(QMainWindow):
         """
         for idx in self.shots_selection.selectedRows():
             shot_dict = self.all_shots[idx.row()]
-            self.pepper.make_precomp_dict(shot_dict)
+            self.pepper.make_precomp_dict(shot_dict, temp_revision=self.temp_rev)
         self.render_model.pepperlist.clear()
         for render in self.pepper.precomp_list:
             self.render_model.pepperlist.append(render['name'])
@@ -245,6 +263,7 @@ class PepperWindow(QMainWindow):
         houp = HouPepper()
         for precomp in self.pepper.precomp_list:
             temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
+            print(temp_working_path, layout_output_path, fx_working_path)
             houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
         for precomp in self.pepper.precomp_list:
