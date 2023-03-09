@@ -1,4 +1,5 @@
 import logging
+import os
 
 
 def make_logger(name):
@@ -37,7 +38,10 @@ def make_logger(name):
 
     # 4 handler instance 생성
     console = logging.StreamHandler()
-    file_handler = logging.FileHandler(filename="BlackPepper.log")
+    dir_path = os.path.expanduser('~/.config/Hook')
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    file_handler = logging.FileHandler(os.path.join(dir_path, 'hook_pepper_log.log'))
 
     # 5 handler 별로 다른 level 설정
     console.setLevel(logging.INFO)

@@ -357,7 +357,7 @@ def main():
     pepper = Houpub()
     pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
     pepper.project = 'PEPPER'
-    pepper.asset = 'temp_dancing_particle'
+    pepper.asset = 'temp_breaking_glass'
     pepper.entity = 'asset'
     # need software handling method
     pepper.software = 'hipnc'
@@ -397,9 +397,13 @@ def main():
             app = QtWidgets.QApplication.instance()
         m = MantraMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output,
                              layout_output_path, hou_pepper.cam_node, hou_pepper.abc_range[1]*hou.fps())
+        m.resize(800, 600)
+        m.move(1000, 250)
         m.show()
         app.exec_()
         f = FFmpegMainWindow(fx_output, mov_output, hou.fps())
+        f.resize(800, 600)
+        f.move(1000, 250)
         f.show()
         app.exec_()
         # BlackPepper.publish_working_file(fx_type_name)

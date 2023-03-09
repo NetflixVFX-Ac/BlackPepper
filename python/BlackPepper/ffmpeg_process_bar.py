@@ -54,10 +54,15 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         self.progress.setRange(0, 100)
 
         l = QtWidgets.QVBoxLayout()
+        # l.setStyleSheet("background-color:rgb(52, 52, 52);")
         l.addWidget(self.progress)
         l.addWidget(self.text)
 
         w = QtWidgets.QWidget()
+        w.setStyleSheet(u"background-color: rgb(45, 45, 45);\n"
+                        "selection-background-color: rgb(45, 180, 198);\n"
+                        "font: 10pt\"Courier New\";\n"
+                        "color: rgb(180, 180, 180);\n")
         w.setLayout(l)
 
         self.setCentralWidget(w)
@@ -162,18 +167,7 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
                 print("unknown:", x)
         return int(self.filecnt)
 
-    def simple_percent_parser(self, output, total):# 프로세스바에 시각화 해줄 수치를 만들어 내는 백분율계산기
-        """
-
-
-
-        Args:
-            output:
-            total:
-
-        Returns:
-
-        """
+    def simple_percent_parser(self, output, total):  # 프로세스바에 시각화 해줄 수치를 만들어 내는 백분율계산기
         progress_re = re.compile("frame=   (\d+)")
         m = progress_re.search(output)
         print("m search :", m)
@@ -190,4 +184,4 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
             if pc_complete:
                 print(pc_complete, total)
                 pc = int(int(pc_complete) / total * 100)
-                return pc #백분율을 통해 process bar에 보여질 값
+                return pc  # 백분율을 통해 process bar에 보여질 값
