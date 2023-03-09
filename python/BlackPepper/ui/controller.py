@@ -7,7 +7,7 @@ from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
 from BlackPepper.houpepper import HouPepper
-from BlackPepper.ui.ui_sj.auto_login import Auto_log
+from BlackPepper.ui.auto_login import Auto_log
 
 
 class PepperWindow(QMainWindow):
@@ -105,7 +105,9 @@ class PepperWindow(QMainWindow):
             self.login_log.host = log_value['host']
             self.login_log.user_id = log_value['user_id']
             self.login_log.user_pw = log_value['user_pw']
+            self.login_log.user_ext = log_value['user_ext']
             self.pepper.login(self.login_log.host, self.login_log.user_id, self.login_log.user_pw)
+            self.pepper.software = self.login_log.user_ext
             self.login_window.close()
             self.open_main_window()
         else:
@@ -123,17 +125,16 @@ class PepperWindow(QMainWindow):
         self.login_log.host = "http://192.168.3.116/api"
         self.login_log.user_id = self.login_window.input_id.text()
         self.login_log.user_pw = self.login_window.input_pw.text()
-        user_software = self.login_window.hipbox.currentText()[1:]
+        self.login_log.user_ext = self.login_window.hipbox.currentText()[1:]
 
-        if self.login_log.connect_gazu():
-            self.pepper.software = user_software
+        if self.login_log.connect_login():
             self.login_log.auto_login = True
             self.login_log.save_setting()
             self.login_window.close()
             self.open_main_window()
 
     def user_logout(self):
-        if self.login_log.connect_gazu():
+        if self.login_log.connect_login():
             self.login_log.log_out()
             self.main_window.close()
             self.login_window.show()
