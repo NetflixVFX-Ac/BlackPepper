@@ -23,7 +23,8 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         self.p = None
         self.output_dir = os.path.dirname(output_path)
         self.seq_dir = os.path.dirname(seq_path)
-        self.sequence_path = seq_path[:-8] + '%04d.jpg'
+        print("seq_dir :", self.seq_dir)
+        self.sequence_path = seq_path[:-17] + seq_path[-4:] + '_%04d.jpg'
 
         self.filecnt = 0
         self.total_frame = self.tree(self.seq_dir)
@@ -39,7 +40,7 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
             "-pix_fmt", "yuv420p",  # 포맷양식
             "-y",  # 출력파일을 쓸 때 같은 이름의 파일이 있어도 확인없이 덮어씀
             "-loglevel", "debug",  # 인코딩 과정로그를 보여줌
-            output_path
+            output_path + '.mov'
         ]
         self.cmd = (' '.join(str(s) for s in self.command))
         print("cmd : ", self.cmd)
