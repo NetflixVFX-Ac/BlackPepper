@@ -101,6 +101,9 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
         self.set_auto_login()
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
+        self.app.exec_()
+
+    def set_auto_login(self):
         log_value = self.login_log.load_setting()
         if log_value['valid_host'] and log_value['valid_user']:
             self.login_log.host = log_value['host']
@@ -113,7 +116,6 @@ class PepperWindow(QMainWindow):
             self.open_main_window()
         else:
             pass
-        self.app.exec_()
 
     def set_auto_login(self):
         log_value = self.login_log.load_setting()
