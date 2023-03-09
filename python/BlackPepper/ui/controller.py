@@ -202,7 +202,6 @@ class PepperWindow(QMainWindow):
             self.main_window.close()
             self.login_window.show()
 
-
     def open_main_window(self):
         """mvc_main.ui를 디스플레이 해주는 메소드. 로그인 성공 시 실행된다. \n
         projects, templates, shots, render_lists의 네 가지 부분으로 나뉘어 있다. \n
@@ -391,6 +390,10 @@ class PepperWindow(QMainWindow):
 
         # self.main_preset.layoutChanged.emit()
         # self.main_preset.addSeparator() # QMenu에 구분선 추가
+
+    def handle_file(self, file_path):
+        # TODO: 파일 내용 처리하기
+        pass
 
     def save_preset_json(self):
         now = datetime.now()
