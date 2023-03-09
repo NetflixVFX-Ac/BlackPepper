@@ -199,7 +199,6 @@ class PepperWindow(QMainWindow):
         project_name = self.my_projects[event.row()]
         self.pepper.project = project_name
         self.all_assets = self.pepper.get_all_assets()
-        print(f"project_name : {project_name} get_assets = {self.all_assets}")
         self.template_model.pepperlist.clear()
         self.shot_model.pepperlist.clear()
 
@@ -253,7 +252,6 @@ class PepperWindow(QMainWindow):
 
     def renew_template_info(self):
         revision = self.main_window.temp_rev_cbox.currentText()
-        print(revision)
         name, time, rev = self.pepper.get_working_file_data('simulation', revision, 'asset')
         self.main_window.template_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
 
@@ -271,11 +269,13 @@ class PepperWindow(QMainWindow):
         self.pepper.entity = 'shot'
         rev_list = self.pepper.get_every_revision_for_output_file('Camera_cache', 'layout')
         self.renew_shot_cbox(rev_list)
-
-        name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', 'shot')
-        self.main_window.shot_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
-
+        self.renew_shot_info()
         self.renderlists_selection.clear()
+
+    def renew_shot_info(self):
+        revision = self.main_window.shot_rev_cbox.currentText()
+        name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', revision, 'shot')
+        self.main_window.shot_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
 
     def renew_template_cbox(self, rev_list):
         self.main_window.temp_rev_cbox.clear()
@@ -348,11 +348,11 @@ class PepperWindow(QMainWindow):
             #     app = QtWidgets.QApplication(sys.argv)
             # else:
             #     app = QtWidgets.QApplication.instance()
-            m = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}', jpg_output_path,
-                                 layout_output_path, houp.cam_node, houp.abc_range[1] * hou.fps())
-            m.resize(800, 600)
-            m.move(1000, 250)
-            m.show()
+            # m = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}', jpg_output_path,
+            #                      layout_output_path, houp.cam_node, houp.abc_range[1] * hou.fps())
+            # m.resize(800, 600)
+            # m.move(1000, 250)
+            # m.show()
             # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
             # f.resize(800, 600)
             # f.move(1000, 250)
@@ -375,5 +375,7 @@ def main():
     app.exec_()
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
+
+main()
