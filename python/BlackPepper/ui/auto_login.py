@@ -16,6 +16,7 @@ class Auto_log:
         self._host = None
         self._user_id = None
         self._user_pw = None
+        self._user_ext = None
         self._valid_host = False
         self._valid_user = False
 
@@ -67,6 +68,14 @@ class Auto_log:
         self._user_pw = upw
 
     @property
+    def user_ext(self):
+        return self._user_ext
+
+    @user_ext.setter
+    def user_ext(self, ext):
+        self._user_ext = ext
+
+    @property
     def user(self):
         return self._user
 
@@ -78,8 +87,9 @@ class Auto_log:
     def auto_login(self, value):
         self._auto_login = value
 
-    def connect_gazu(self):
+    def connect_login(self):
         self.pr.login(self.host, self.user_id, self.user_pw)
+        self.pr.software = self.user_ext
         self.hklog.set_logger(self.user_id)
         if not gazu.client.host_is_valid():
             self.hklog.failed_log()
@@ -127,6 +137,7 @@ class Auto_log:
             'host': self.host,
             'user_id': self.user_id,
             'user_pw': self.user_pw,
+            'user_ext': self.user_ext,
             'valid_host': self.valid_host,
             'valid_user': self.valid_user,
             'auto_login': self.auto_login
