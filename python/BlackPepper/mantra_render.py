@@ -5,7 +5,21 @@ import shutil
 import glob
 import sys
 
+
 def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
+    """
+
+
+
+    Args:
+        hip_path:
+        output_path:
+        abc_path:
+        cam_node:
+
+    Returns:
+
+    """
     abc_range = abc.alembicTimeRange(abc_path)
     cam_setting = f'/obj/{cam_node}/'
     basename = os.path.basename(hip_path)
@@ -23,7 +37,7 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
         n.parm('trange').set(1)
         for i in n.parmTuple('f'):
             i.deleteAllKeyframes()
-        n.parmTuple('f').set([abc_range[0] * hou.fps(), 3, 1])
+        n.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
         n.parm('vm_verbose').set(1)
         n.parm("execute").pressButton()
     output_dir = os.path.dirname(output_path) + '/*.jpg'
@@ -39,6 +53,13 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
         print("missing sequence frame")
 
 def main():
+    """
+
+
+
+    Returns:
+
+    """
     args = sys.argv
     if len(args) != 5:
         print('Insufficient arguments')

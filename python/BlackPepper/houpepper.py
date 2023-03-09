@@ -1,8 +1,5 @@
-import os
-import glob
 import numpy as np
 from BlackPepper.pepper import Houpub
-import shutil
 from BlackPepper.ffmpeg_process_bar import FFmpegMainWindow
 from BlackPepper.mantra_process_bar import MantraMainWindow
 from PySide2 import QtWidgets
@@ -354,83 +351,6 @@ class HouPepper:
         hou.hipFile.save(file_name=saved_path)
         self.cam_list.clear()
         self.cam_path.clear()
-
-    def set_mantra_for_render(self, hip_path, output_path):
-        cam_setting = f'/obj/{self.cam_node}/'
-        basename = os.path.basename(hip_path)
-        home_path = os.path.expanduser('~')
-        temp_path = os.path.join(home_path+'/temp', basename)
-        if not os.path.isdir(home_path+'/temp'):
-            os.makedirs(home_path+'/temp')
-        shutil.copyfile(hip_path, temp_path)
-        hou.hipFile.load(temp_path)
-        root = hou.node('/out')
-        if root is not None:
-            n = root.createNode('ifd')
-            n.parm('camera').set(cam_setting)
-            n.parm('vm_picture').set(f'{output_path[:-8]}$F4.jpg')
-            n.parm('trange').set(1)
-            for i in n.parmTuple('f'):
-                i.deleteAllKeyframes()
-            n.parmTuple('f').set([self.abc_range[0] * hou.fps(), 3, 1])
-            n.parm('vm_verbose').set(1)
-            n.parm("execute").pressButton()
-            app = QtWidgets.QApplication()
-            w = MantraMainWindow(n.parm('vm_verbose').set(1), self.abc_range[1] * hou.fps())
-            w.show()
-            app.exec_()
-
-        output_dir = os.path.dirname(output_path) + '/*.jpg'
-        error_dir = os.path.dirname(output_path) + '/*.jpg.mantra_checkpoint'
-        file_list = glob.glob(output_dir)
-        error_list = glob.glob(error_dir)
-        if len(file_list) == self.abc_range[1] * hou.fps():
-            if len(error_list) == 0:
-                shutil.rmtree(home_path+'/temp')
-            else:
-                print("render error")
-        else:
-            print("missing sequence frame")
-
-
-    def set_ffmpeg_seq_to_mov(self, seq_path, output_path):
-        """
-
-
-
-        Args:
-            seq_path:
-            output_path:
-
-        Returns:
-
-        """
-        output_dir = os.path.dirname(output_path)
-        seq_dir = os.path.dirname(seq_path)
-        sequence_path = seq_path[:-8] + '%04d.jpg'
-        print('seq_dir :', seq_dir)
-        print('sequence_path :', sequence_path)
-        command = [
-            'ffmpeg',
-            "-framerate", str(hou.fps()),  # 초당프레임
-            "-i", sequence_path,  # 입력할 파일 이름
-            "-q 0",  # 출력품질 정함(숫자가 높을 수록 품질이 떨어짐)
-            "-threads 8",  # 속도향상을 위해 멀티쓰레드를 지정
-            "-c:v", "prores_ks",  # 코덱
-            "-pix_fmt", "yuv420p",  # 포맷양식
-            "-y",  # 출력파일을 쓸 때 같은 이름의 파일이 있어도 확인없이 덮어씀
-            "-loglevel", "debug",  # 인코딩 과정로그를 보여줌
-            output_path
-        ]
-        cmd = (' '.join(str(s) for s in command))
-        print(cmd)
-        print("output_dir :", output_dir)
-        if not os.path.isdir(output_dir):
-            os.makedirs(output_dir)
-        app = QtWidgets.QApplication()
-        w = FFmpegMainWindow(cmd, seq_dir)
-        w.show()
-        app.exec_()
 
 
 def main():
