@@ -1,5 +1,6 @@
 import gazu
-from BlackPepper.log.log_pepper import make_logger
+# from BlackPepper.log.log_pepper import make_logger
+from BlackPepper.log.login_log import Logger
 
 
 class Houpub:
@@ -18,7 +19,8 @@ class Houpub:
 
     def __init__(self):
         self.identif = None
-        self.mylog = None
+        self.user = None
+        self.mylog = Logger()
         self.precomp_list = []
         pass
 
@@ -40,9 +42,9 @@ class Houpub:
             AuthFailedException: id나 password가 맞지 않을 때
         """
         gazu.client.set_host(host)
-        gazu.log_in(identify, password)
+        self.user = gazu.log_in(identify, password)
         self.identif = identify
-        self.mylog = make_logger(self.identif)
+        self.mylog.set_logger(self.identif)
 
     @property
     def project(self):
@@ -869,10 +871,10 @@ class Houpub:
             raise Exception("NO ERROR CODE")
 
 
-# BlackPepper = Houpub()
-# BlackPepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
-# BlackPepper.software = 'hipnc'
-# BlackPepper.project = 'PEPPER'
+BlackPepper = Houpub()
+BlackPepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+BlackPepper.software = 'hipnc'
+BlackPepper.project = 'PEPPER'
 # BlackPepper.asset = 'temp_dancing_particle'
 # css = BlackPepper.get_casting_path_for_asset()
 # for cs in css:
