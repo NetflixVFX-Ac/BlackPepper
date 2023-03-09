@@ -1,16 +1,19 @@
 import sys
 import os
+import glob, json, webbrowser
 from BlackPepper.mantra_process_bar import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow
+from PySide2.QtGui import QKeySequence
+from PySide2.QtWidgets import QAction, QApplication
 from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
 from BlackPepper.houpepper import HouPepper
 from BlackPepper.ui.auto_login import Auto_log
 import hou
-
+from datetime import datetime
 
 
 class PepperWindow(QMainWindow):
@@ -33,6 +36,8 @@ class PepperWindow(QMainWindow):
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
+        self.render_list_data = []
+        self.filename = []
         # model instance
         self.project_model = PepperModel()
         self.template_model = PepperModel()
@@ -102,8 +107,26 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
+
+        # set main menubar
+        self.main_menu_bar = self.main_window.menuBar()
+        self.main_menu_bar.setNativeMenuBar(False)
+        self.main_filemenu = self.main_menu_bar.addMenu('Menu')
+        self.save_precomp_list_json()
+        exitAction = QAction('Exit')
+        exitAction.setShortcut('Ctrl+Q')
+        exitAction.setStatusTip('Exit application')
+        exitAction.triggered.connect(QApplication.instance().quit)
+        self.main_filemenu.addAction(exitAction)
+
+        main_helpmenu = self.main_menu_bar.addMenu('Help')
+        kisuAction = QAction('Kitsu')
+        kisuAction.setShortcut('F1')
+        kisuAction.setStatusTip('Kitsu site open')
+        kisuAction.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        main_helpmenu.addAction(kisuAction)
+
         self.set_auto_login()
-        # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
 
     def set_auto_login(self):
         log_value = self.login_log.load_setting()
@@ -352,6 +375,45 @@ class PepperWindow(QMainWindow):
         jpg_output_path = precomp['jpg_output_path']
         video_output_path = precomp['video_output_path']
         return temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path
+
+
+    def save_precomp_list_json(self):
+        """
+
+        Returns:
+
+        """
+        directory_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw'
+        json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
+
+        for file_path in json_files:
+            file_path = QAction(os.path.basename(file_path))
+            file_path.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+            self.main_filemenu.addAction(file_path)
+
+        self.main_filemenu.addSeparator() # QMenu에 구분선 추가
+
+        def set_preset_json(self):
+            now = datetime.now()
+            base_filename = f'{self.pepper.identif}_{now.date()}_time_{now.hour}:{now.minute}'
+
+            # base_filename = 'render_check_list'
+            ext = '.json'
+            i = 1
+            while i <= 5:
+                self.filename = f"{base_filename}_v{i}{ext}"
+                if not os.path.isfile(self.filename):
+                    break
+                i += 1
+            if i > 5:
+                i = 1
+            self.filename = f"{base_filename}_v{i}{ext}"
+
+            self.render_model.pepperlist.clear()
+            for render in self.pepper.precomp_list:
+                self.render_list_data.append(render['name'])
+            with open(self.filename, "w") as f:
+                json.dump(self.render_list_data, f, ensure_ascii=False)
 
 
 def main():
