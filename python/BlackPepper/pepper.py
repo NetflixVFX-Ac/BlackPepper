@@ -538,7 +538,7 @@ class Houpub:
 
         precomp = {'name': name, 'temp_working_path': temp_working_path,
                    'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
-                   'jpg_output_path' : jpg_output_path, 'video_output_path': video_output_path}
+                   'jpg_output_path': jpg_output_path, 'video_output_path': video_output_path}
         if precomp in self.precomp_list:
             return
         self.precomp_list.append(precomp)
@@ -718,24 +718,35 @@ class Houpub:
         my_projects = [project['name'] for project in gazu.user.all_open_projects()]
         return my_projects
 
-    def get_working_file_data(self, task_type_name, entity_type):
+    def get_working_file_data(self, task_type_name, revision, entity_type):
+        global the_working_file
         self.entity = entity_type
         _, task = self.get_task(task_type_name)
-        working_file = gazu.files.get_last_working_files(task)
-        created_time = working_file['main']['created_at']
-        rev = working_file['main']['revision']
-        person_id = working_file['main']['person_id']
+        working_files = gazu.files.get_all_working_files_for_entity(self.entity)
+        for check_file in working_files:
+            if str(check_file['revision']) == revision:
+                the_working_file = check_file
+        # working_file = gazu.files.get_last_working_files(task)
+        created_time = the_working_file['created_at']
+        rev = the_working_file['revision']
+        person_id = the_working_file['person_id']
         person = gazu.person.get_person(person_id)
         return person['first_name'] + person['last_name'], created_time, rev
 
-    def get_output_file_data(self, output_type_name, task_type_name, entity_type):
+    def get_output_file_data(self, output_type_name, task_type_name, revision, entity_type):
+        global the_output_file
         self.entity = entity_type
         task_type, _ = self.get_task(task_type_name)
         output_type = gazu.files.get_output_type_by_name(output_type_name)
-        output_file = gazu.files.get_last_output_files_for_entity(self.entity, output_type, task_type)[0]
-        rev = output_file['revision']
-        created_time = output_file['created_at']
-        person_id = output_file['person_id']
+        # output_file = gazu.files.get_last_output_files_for_entity(self.entity, output_type, task_type)[0]
+        output_files = gazu.files.all_output_files_for_entity(self.entity, output_type, task_type)
+        for check_file in output_files:
+            if str(check_file['revision']) == revision:
+                the_output_file = check_file
+                break
+        rev = the_output_file['revision']
+        created_time = the_output_file['created_at']
+        person_id = the_output_file['person_id']
         person = gazu.person.get_person(person_id)
         return person['first_name'] + person['last_name'], created_time, rev
 
