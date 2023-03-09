@@ -74,7 +74,7 @@ class HouPepper:
 
 
         Args:
-            abc_tree_all (list): node in .abc
+            abc_tree_all (tuple): node in .abc
 
         Returns: node list
 
@@ -116,7 +116,7 @@ class HouPepper:
         self._abc_range = abc_range
 
     def set_abc_cam_tree(self, abc_path):
-        """ Alembic file에 포함된 node, node path, camera in/out frame을 설정한다. /n
+        """ Alembic file에 포함된 node, node path, camera in/out frame을 설정한다. \n
         Alembic file 내, Camera node를 찾아 cam list, cam path를 구한다.
 
         Args:
@@ -135,7 +135,7 @@ class HouPepper:
         self.abc_range = abc.alembicTimeRange(self.abc_path)
 
     def get_abc_cam_tree(self, abc_tree_all):
-        """
+        """Alembic 파일 내 Node에서 이름이 camera인 노드를 찾는다.
 
 
         Args:
@@ -376,7 +376,7 @@ def main():
         # BlackPepper.publish_working_file(fx_type_name)
         fx_path = pepper.working_file_path(fx_type_name)
         next_fx_path = pepper.make_next_working_path(fx_type_name)
-        output_type_name = 'JPG'
+        output_type_name = 'jpg_sequence'
         fx_output = pepper.output_file_path(output_type_name, fx_type_name)
         output_type_name = 'movie_file'
         mov_output = pepper.output_file_path(output_type_name, fx_type_name)

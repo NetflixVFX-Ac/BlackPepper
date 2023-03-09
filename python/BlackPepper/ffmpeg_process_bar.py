@@ -77,7 +77,7 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         self.text.appendPlainText(s)
 
     def start_process(self):
-        """ Qprocess를 활용하여 터미널에 명령을 내려주고 터미널 신호에 따라 출력하는 내용을 달리한다. /n
+        """ Qprocess를 활용하여 터미널에 명령을 내려주고 터미널 신호에 따라 출력하는 내용을 달리한다. \n
         진행 중, 오류, 변동, 마무리 단계마다 Text Widget에 상태를 Handling 한다.
 
         """
@@ -145,9 +145,9 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         return int(self.filecnt)
 
     def simple_percent_parser(self, output, total):
-        """Progress bar에 넣을 정보를 백분율로 계산한다. /n
-        컨버팅이 끝난 frame은 Text Widget에 표시되고, 정규표현식을 사용하여 Text Widget에서 해당 frame을 파악한다. /n
-        tree 함수를 사용하여 구한 전체 frame을 분모로 설정하고 컨버팅이 끝난 frame을 분자로 설정하여 백분율을 계싼한다. /n
+        """Progress bar에 넣을 정보를 백분율로 계산한다. \n
+        컨버팅이 끝난 frame은 Text Widget에 표시되고, 정규표현식을 사용하여 Text Widget에서 해당 frame을 파악한다. \n
+        tree 함수를 사용하여 구한 전체 frame을 분모로 설정하고 컨버팅이 끝난 frame을 분자로 설정하여 백분율을 계싼한다. \n
         Text Widget에 성공적으로 컨버팅이 끝난 정보가 출력될 때, 100 %를 출력해준다.
 
         Args:
