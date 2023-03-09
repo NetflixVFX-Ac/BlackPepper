@@ -1,6 +1,6 @@
 import sys
 import os
-import re
+import glob
 import json
 import webbrowser
 from PySide2 import QtCore, QtWidgets
@@ -71,8 +71,7 @@ class PepperWindow(QMainWindow):
         self.login_window.move(1000, 300)
         self.login_window.show()
         # main Ui loader
-        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_3.ui'))
-        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_3.ui'))
+        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_2.ui'))
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
@@ -101,15 +100,24 @@ class PepperWindow(QMainWindow):
         self.login_window.statusBar().showMessage('kitsu 로그인 하세요!  houdini 확장자 선택하세요!')
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
         # set menubar
+        menu_bar = self.main_window.menuBar()
+        menu_bar.setNativeMenuBar(False)
+
+        presetmenu = menu_bar.addMenu('Preset')
+
+        # directory_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw'
+        # json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
+        # for file_path in json_files:
+        #     action = QAction(os.path.basename(file_path), self)
+        #     action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+        #     filemenu.addAction(action)
+
         exitAction = QAction('Exit')
         exitAction.setShortcut('Ctrl+Q')
         exitAction.setStatusTip('Exit application')
         exitAction.triggered.connect(QApplication.instance().quit)
+        presetmenu.addAction(exitAction)
 
-        menu_bar = self.main_window.menuBar()
-        menu_bar.setNativeMenuBar(False)
-        filemenu = menu_bar.addMenu('File')
-        filemenu.addAction(exitAction)
 
         # menubar help 버튼에 링크 추가하기
         self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
@@ -132,6 +140,18 @@ class PepperWindow(QMainWindow):
         # self.createMenus()
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
         self.app.exec_()
+
+    def save_json(self):
+        directory_path = '/home/rapa/git/hook/python/BlackPepper/ui/ui_sw'
+        json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
+        for file_path in json_files:
+            action = QAction(os.path.basename(file_path), self)
+            action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+            file_menu.addAction(action)
+    def handle_file(self, file_path):
+        # TODO: 파일 내용 처리하기
+
+        pass
 
     def user_login(self):
         """mvc_login.ui를 디스플레이 해주는 메소드. 유저의 로그인 페이지 UI에서 Login 버튼 클릭, Enter 입력 시 실행된다. \n
