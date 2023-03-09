@@ -117,14 +117,13 @@ class PepperWindow(QMainWindow):
         self.main_menu_bar.setNativeMenuBar(False)
         self.main_preset = self.main_menu_bar.addMenu('Preset')
         self.save_precomp_list_json()
-
+        self.main_preset.addSeparator()
         self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
         self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
 
 
-        self.main_menu = self.main_menu_bar.addMenu('Menu')
-
-        exitAction = QAction('Exit')
+        # self.main_menu = self.main_menu_bar.addMenu('Menu')
+        exitAction = QAction('Exit', self.main_window)
         exitAction.setShortcut('Ctrl+Q')
         exitAction.setStatusTip('Exit application')
         exitAction.triggered.connect(QApplication.instance().quit)
@@ -197,8 +196,26 @@ class PepperWindow(QMainWindow):
     def user_logout(self):
         if self.login_log.connect_login():
             self.login_log.log_out()
+
+            self.pepper.precomp_list.clear()
+            self.render_list_data.clear()
+
+            self.render_model.layoutChanged.emit()
+            self.template_model.layoutChanged.emit()
+            self.shot_model.layoutChanged.emit()
+
+            self.render_model.pepperlist.clear()
+            self.template_model.pepperlist.clear()
+            self.shot_model.pepperlist.clear()
+
+            self.projects_selection.clear()
+            self.renderlists_selection.clear()
+            self.templates_selection.clear()
+            self.shots_selection.clear()
+
             self.main_window.close()
             self.login_window.show()
+
 
     def open_main_window(self):
         """mvc_main.ui를 디스플레이 해주는 메소드. 로그인 성공 시 실행된다. \n
