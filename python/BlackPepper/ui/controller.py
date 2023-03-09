@@ -21,8 +21,7 @@ class PepperWindow(QMainWindow):
         여러 개의 shot들을 한번에 선택해 조정할 수 있도록 shots와 rendelistes의 view는 ExtendedSelection으로 설정했다. \n
         PepperWindow 실행 시 self.login_ui가 우선 실행된다.
         """
-        QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-        self.app = QtWidgets.QApplication(sys.argv)
+
         self.pepper = Houpub()
         self.login_log = Auto_log()
         self.projects_selection = None
@@ -97,6 +96,7 @@ class PepperWindow(QMainWindow):
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
         self.main_window.logout_btn.clicked.connect(self.user_logout)
+        self.main_window.temp_rev_cbox.currentTextChanged.connect(self.renew_template_info)
         # add listview to ui
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
@@ -104,7 +104,6 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
         self.set_auto_login()
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
-        self.app.exec_()
 
     def set_auto_login(self):
         log_value = self.login_log.load_setting()
@@ -315,7 +314,6 @@ class PepperWindow(QMainWindow):
         for render in self.pepper.precomp_list:
             self.render_model.pepperlist.append(render['name'])
         self.render_model.layoutChanged.emit()
-        self.shots_selection.clear()
         self.renderlists_selection.clear()
 
     def delete_render_list(self):
@@ -346,21 +344,19 @@ class PepperWindow(QMainWindow):
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
         for precomp in self.pepper.precomp_list:
             temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path = self.path_seperator(precomp)
-            if not QtWidgets.QApplication.instance():
-                app = QtWidgets.QApplication(sys.argv)
-            else:
-                app = QtWidgets.QApplication.instance()
+            # if not QtWidgets.QApplication.instance():
+            #     app = QtWidgets.QApplication(sys.argv)
+            # else:
+            #     app = QtWidgets.QApplication.instance()
             m = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}', jpg_output_path,
                                  layout_output_path, houp.cam_node, houp.abc_range[1] * hou.fps())
             m.resize(800, 600)
             m.move(1000, 250)
             m.show()
-            app.exec_()
             # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
             # f.resize(800, 600)
             # f.move(1000, 250)
             # f.show()
-            # app.exec_()
 
     @staticmethod
     def path_seperator(precomp):
@@ -373,7 +369,10 @@ class PepperWindow(QMainWindow):
 
 
 def main():
+    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
+    app = QtWidgets.QApplication(sys.argv)
     window = PepperWindow()
+    app.exec_()
 
 
 if __name__ == "__main__":
