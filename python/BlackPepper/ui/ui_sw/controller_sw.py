@@ -1,5 +1,6 @@
 import sys
 import os
+import webbrowser
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow
@@ -41,36 +42,32 @@ class PepperWindow(QMainWindow):
         self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         # setModel
         self.projects_listview.setModel(self.project_model)
-        self.projects_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
-        self.projects_listview.setSpacing(2)
         self.templates_listview.setModel(self.template_model)
-        self.templates_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
-        self.templates_listview.setSpacing(2)
         self.shots_listview.setModel(self.shot_model)
-        self.shots_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
-        self.shots_listview.setSpacing(2)
         self.renderlists_listview.setModel(self.render_model)
-        self.renderlists_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
-        self.renderlists_listview.setSpacing(2)
+        self.projects_selection = self.projects_listview.selectionModel()
+        self.templates_selection = self.templates_listview.selectionModel()
+        self.shots_selection = self.shots_listview.selectionModel()
+        self.renderlists_selection = self.renderlists_listview.selectionModel()
         # get script_path
         # __file__ (전역변수) : 현재 열려있는 파일의 위치와 이름을 가지고 있는 문자열 변수
         # path.realpath(파일이름) : 현재 파일의  표준 경로+이름 을 반환
         script_path = os.path.dirname(os.path.realpath(__file__))
         # login Ui loader
-        login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login_3.ui'))
+        login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login_2.ui'))
         login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
-        self.login_window.setWindowTitle('Black Pepper Login')
+        self.login_window.setWindowTitle('Black Pepper v0.0.1')
         self.login_window.move(1000, 300)
         self.login_window.show()
         # main Ui loader
-        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_3.ui'))
+        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_2.ui'))
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
-        self.main_window.setWindowTitle('Black Pepper')
         self.main_window.move(700, 250)
+        self.main_window.setWindowTitle('Black Pepper v0.0.1')
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
@@ -88,6 +85,15 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
+
+        # set menebar, statusbar to window
+        self.login_window.statusBar().showMessage('kitsu 로그인 하세요!  houdini 확장자 선택하세요!')
+        self.main_window.statusBar().showMessage('project 를 선택하세요 !')
+        # 버튼에 링크 추가하기
+        self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        self.main_window.actionGazu.triggered.connect(lambda: webbrowser.open('https://gazu.cg-wire.com/index.html'))
+        self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
+
         # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
         self.app.exec_()
 
@@ -156,6 +162,7 @@ class PepperWindow(QMainWindow):
         self.templates_selection.clear()
         self.shots_selection.clear()
         self.renderlists_selection.clear()
+        self.main_window.statusBar().showMessage('temp 를 선택하세요 !')
 
     def template_selected(self, event):
         """templates_listview 의 template 를 클릭 시 실행 되는 메소드. \n
@@ -165,7 +172,7 @@ class PepperWindow(QMainWindow):
 
         또, 기존과 다른 template 를 클릭 시 기존 shots_listview 의 shot_model 을 clear 한 뒤 클릭 된
         template 의 shot 들을 shots_listview 에 display 해준다.
-        재 선택 시 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
+        재 선택 시 Shots, Render files 의 selectionModel 들을 clear 해준다.
 
         Args:
             event: Listview click event
@@ -174,8 +181,6 @@ class PepperWindow(QMainWindow):
         # event
         template_name = self.all_assets[event.row()]
         self.pepper.asset = template_name
-        self.pepper.entity = 'asset'
-        rev_list = self.pepper.get_every_revision_for_working_file('fx_template')
 
         # set template info label
         name, time, rev = self.pepper.get_working_file_data('simulation', 'asset')
@@ -191,6 +196,7 @@ class PepperWindow(QMainWindow):
         self.shot_model.layoutChanged.emit()
         self.shots_selection.clear()
         self.renderlists_selection.clear()
+        self.main_window.statusBar().showMessage('shots 를 선택하세요 ! 다중선택가능 ! ')
 
     def shot_selected(self, event):
         """Shots 를 선택 시 선택한 shot 의 정보(dict)를 self.all_shots = [] 에 담는 함수 이다.\n
@@ -200,7 +206,6 @@ class PepperWindow(QMainWindow):
             event: Listview click event
         """
         shot_dict = self.all_shots[event.row()]
-        rev_list = self.pepper.get_every_revision_for_output_file('camera_cache', 'layout')
 
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
@@ -211,11 +216,10 @@ class PepperWindow(QMainWindow):
         self.renderlists_selection.clear()
 
     def append_render_list(self):
-        """main window 의 append_btn 에 연결 되어 클릭시 사용 되는 함수 이다.
-        선택된 shot 들의 shot_dict 를  pepper의 make_precomp_dict 를 사용하여 shot 별로 houdini에서 필요한
-        path들을 딕셔너리로 만들고 self.precomp_list에 넣어주고 render_moderl.pepperlist clear 정리해준다.
-        그리고 pepper 의 precomp_list를 render_moderl.pepperlist 에 append 한다.
-        추가로 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
+        """
+
+        Returns:
+
         """
         for idx in self.shots_selection.selectedRows():
             shot_dict = self.all_shots[idx.row()]
@@ -228,11 +232,10 @@ class PepperWindow(QMainWindow):
         self.renderlists_selection.clear()
 
     def delete_render_list(self):
-        """main window 의 del_btn 에 연결 되어 클릭시 사용 되는 함수 이다.
-        renderlists_selection(선택된 render files) 들을 pepper의 delete_precomp_dict를 사용하여 precomp_list에서 remove한다.
-        path들을 딕셔너리로 만들고 self.precomp_list에 넣어주고 render_moderl.pepperlist clear 정리해준다.
-        그리고 pepper 의 precomp_list를 render_moderl.pepperlist 에 append 한다.
-        추가로 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
+        """
+
+        Returns:
+
         """
         for idx in self.renderlists_selection.selectedRows():
             self.pepper.delete_precomp_dict(idx.data())
@@ -243,32 +246,27 @@ class PepperWindow(QMainWindow):
         self.renderlists_selection.clear()
 
     def clear_list(self):
-        """main window 의 reset_btn에 연결 되어 render files list를 reset하는 함수이다.
-        render files list( pepper.precomp_list)를 [] 빈 리스트로 만들고, render_moderl.pepperlist 를 clear 한다.
+        """
+
+        Returns:
+
         """
         self.pepper.precomp_list = []
         self.render_model.pepperlist.clear()
         self.render_model.layoutChanged.emit()
 
+    # self.main_window.
+    def menubar_clear(self):
+
+        pass
+
+    def menubar_open_preset(self):
+        pass
+
     def render_execute(self):
         houp = HouPepper()
         for precomp in self.pepper.precomp_list:
-            temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
-            print(temp_working_path, layout_output_path, fx_working_path)
-            houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
-                                         f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
-        for precomp in self.pepper.precomp_list:
-            temp_working_path, layout_output_path, fx_working_path, video_output_path = self.path_seperator(precomp)
-            houp.set_mantra_for_render(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
-                                       video_output_path)
-
-    @staticmethod
-    def path_seperator(precomp):
-        temp_working_path = precomp['temp_working_path']
-        layout_output_path = precomp['layout_output_path']
-        fx_working_path = precomp['fx_working_path']
-        video_output_path = precomp['video_output_path']
-        return temp_working_path, layout_output_path, fx_working_path, video_output_path
+            houp.abc_path = precomp['layout_output_path']
 
 
 def main():
