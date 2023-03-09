@@ -121,11 +121,6 @@ class Auto_log:
             except OSError:
                 raise ValueError("Failed to create the directory.")
         try:
-
-            if os.path.exists(self.user_path):
-                self.load_setting()
-                if self.user_id != self.user_dict['user_id'] or self.user_pw != self.user_dict['user_pw'] or self.user_ext != self.user_dict['user_ext']:
-                    self.reset_setting()
             if not os.path.exists(self.user_path):
                 self.reset_setting()
         except OSError:
