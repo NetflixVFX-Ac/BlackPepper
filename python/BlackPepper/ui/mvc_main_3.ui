@@ -47,7 +47,6 @@ color: rgb(180, 180, 180);
            <font>
             <family>Courier New</family>
             <pointsize>10</pointsize>
-            <weight>50</weight>
             <italic>false</italic>
             <bold>false</bold>
            </font>
@@ -69,7 +68,6 @@ color: rgb(180, 180, 180);</string>
              <font>
               <family>Courier New</family>
               <pointsize>10</pointsize>
-              <weight>50</weight>
               <italic>false</italic>
               <bold>false</bold>
              </font>
@@ -87,7 +85,6 @@ color: rgb(180, 180, 180);</string>
                <font>
                 <family>Courier New</family>
                 <pointsize>10</pointsize>
-                <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>
                </font>
@@ -125,7 +122,6 @@ color: rgb(180, 180, 180);</string>
                <font>
                 <family>Courier New</family>
                 <pointsize>10</pointsize>
-                <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>
                </font>
@@ -143,7 +139,6 @@ color: rgb(180, 180, 180);</string>
              <font>
               <family>Courier New</family>
               <pointsize>10</pointsize>
-              <weight>50</weight>
               <italic>false</italic>
               <bold>false</bold>
              </font>
@@ -177,7 +172,6 @@ color: rgb(180, 180, 180);</string>
              <font>
               <family>Courier New</family>
               <pointsize>10</pointsize>
-              <weight>50</weight>
               <italic>false</italic>
               <bold>false</bold>
              </font>
@@ -257,7 +251,6 @@ color: rgb(180, 180, 180);</string>
                <font>
                 <family>Courier New</family>
                 <pointsize>10</pointsize>
-                <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>
                </font>
@@ -286,6 +279,22 @@ color: rgb(180, 180, 180);</string>
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QComboBox" name="temp_rev_cbox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>75</width>
+                <height>25</height>
+               </size>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -302,7 +311,6 @@ color: rgb(180, 180, 180);</string>
                <font>
                 <family>Courier New</family>
                 <pointsize>10</pointsize>
-                <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>
                </font>
@@ -328,6 +336,22 @@ color: rgb(180, 180, 180);</string>
               </property>
               <property name="text">
                <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="shot_rev_cbox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>75</width>
+                <height>25</height>
+               </size>
               </property>
              </widget>
             </item>
@@ -369,7 +393,6 @@ color: rgb(180, 180, 180);</string>
            <font>
             <family>Courier New</family>
             <pointsize>10</pointsize>
-            <weight>50</weight>
             <italic>false</italic>
             <bold>false</bold>
            </font>
