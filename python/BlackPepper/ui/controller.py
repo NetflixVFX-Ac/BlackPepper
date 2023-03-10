@@ -150,6 +150,7 @@ class PepperWindow(QMainWindow):
         else:
             pass
 
+
     def user_login(self):
         """mvc_login.ui를 디스플레이 해주는 메소드. 유저의 로그인 페이지 UI에서 Login 버튼 클릭, Enter 입력 시 실행된다. \n
         UI에서는 id, password를 입력받고, combobox를 통해 Houdini의 license 종류를 입력받는다. \n
@@ -440,7 +441,8 @@ class PepperWindow(QMainWindow):
 
     def handle_file(self, file_path):
         # TODO: 파일 내용 처리하기
-        self.load_preset_set()
+        # self.load_preset_set()
+        pass
 
     def save_preset_json(self):
         """
