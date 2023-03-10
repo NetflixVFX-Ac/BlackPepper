@@ -1,6 +1,7 @@
 import re
 from PySide2 import QtWidgets, QtCore
-
+import os
+import glob
 
 class MantraMainWindow(QtWidgets.QMainWindow):
     """
@@ -28,7 +29,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.check = None
         # self.is_interrupted = None
         self.total_frame = total_frame
-        self.command = [
+        self.mantra_command = [
             'python',
             '/home/rapa/git/hook/python/BlackPepper/mantra_render.py',
             next_fx_path,
@@ -37,7 +38,13 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             cam_node
         ]
 
-        self.cmd = (' '.join(str(s) for s in self.command))
+        self.mantra_cmd = (' '.join(str(s) for s in self.command))
+
+        self.output_dir = os.path.dirname(mov_output_path)
+        self.seq_dir = os.path.dirname(jpg_output_path)
+        self.sequence_path = jpg_output_path[:-17] + jpg_output_path[-4:] + '_%04d.jpg'
+        self.filecnt = 0
+        self.ffmpeg_total_frame = self.tree(self.seq_dir)
 
         self.ffmpeg_command = [
             'ffmpeg',
@@ -81,7 +88,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         # self.btn_interrupt = False
 
         self.setCentralWidget(w)
-        self.start_process(self.cmd)
+        self.start_process(self.mantra_cmd)
         self.handle_interrupt()
 
     def message(self, s):
