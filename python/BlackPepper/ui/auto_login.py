@@ -10,7 +10,8 @@ class Auto_log:
         self.hklog = Logger()
         self.pr = Houpub()
 
-        self.user_dict = None
+        self.user_dict = {}
+        self.user_dict['auto'] = []
 
         self._user = None
         self._host = None
@@ -22,8 +23,10 @@ class Auto_log:
 
         self._auto_login = False
 
-        self.dir_path = os.path.expanduser('~/.config/Hook/')
-        self.user_path = os.path.join(self.dir_path, 'user.json')
+        self.dir_path = ''
+        self.user_path = ''
+
+        self.home_path()
 
         self.access_setting()
 
@@ -87,6 +90,12 @@ class Auto_log:
     def auto_login(self, value):
         self._auto_login = value
 
+    def home_json_path(self):
+        now_path = os.path.realpath(__file__)
+        split_path = now_path.split('/')[:-2]
+        self.dir_path = '/'.join(split_path)
+        self.user_path = os.path.join(self.dir_path, 'user.json')
+
     def connect_login(self):
         self.pr.login(self.host, self.user_id, self.user_pw)
         self.pr.software = self.user_ext
@@ -130,10 +139,17 @@ class Auto_log:
     def load_setting(self):
         with open(self.user_path, 'r') as json_file:
             self.user_dict = json.load(json_file)
-        return self.user_dict
+            print("CCC", self.user_dict)
+            if 'auto' not in self.user_dict:
+                self.save_setting()
+                return
+            else:
+                for auto in self.user_dict['auto']:
+                    return auto
 
     def save_setting(self):
-        self.user_dict = {
+        self.user_dict = {'auto': []}
+        self.user_dict['auto'].append({
             'host': self.host,
             'user_id': self.user_id,
             'user_pw': self.user_pw,
@@ -141,7 +157,7 @@ class Auto_log:
             'valid_host': self.valid_host,
             'valid_user': self.valid_user,
             'auto_login': self.auto_login
-        }
+        })
         with open(self.user_path, 'w') as json_file:
             json.dump(self.user_dict, json_file)
 
@@ -152,5 +168,4 @@ class Auto_log:
         self.valid_host = False
         self.valid_user = False
         self.auto_login = False
-
         self.save_setting()
