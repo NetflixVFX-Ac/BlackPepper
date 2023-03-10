@@ -115,12 +115,14 @@ class PepperWindow(QMainWindow):
         self.main_menu_bar = self.main_window.menuBar()
 
         self.main_menu_bar.setNativeMenuBar(False)
-        self.main_preset = self.main_menu_bar.addMenu('Preset')
+        self.main_preset = self.main_menu_bar.addMenu('Menu')
         self.save_precomp_list_json()
         self.main_preset.addSeparator()
         self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
         self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
 
+        logoutAction = QAction('Logout', self.main_window)
+        self.main_preset.addAction(logoutAction)
 
         # self.main_menu = self.main_menu_bar.addMenu('Menu')
         exitAction = QAction('Exit', self.main_window)
@@ -129,8 +131,11 @@ class PepperWindow(QMainWindow):
         exitAction.triggered.connect(QApplication.instance().quit)
         self.main_preset.addAction(exitAction)
 
+        # logoutAction = QAction('Logout', self.main_window)
+
+
         main_helpmenu = self.main_menu_bar.addMenu('Help')
-        kisuAction = QAction('Kitsu')
+        kisuAction = QAction('Kitsu', self.main_window)
         kisuAction.setShortcut('F1')
         kisuAction.setStatusTip('Kitsu site open')
         kisuAction.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
@@ -286,7 +291,7 @@ class PepperWindow(QMainWindow):
         self.shot_model.layoutChanged.emit()
         self.shots_selection.clear()
         self.renderlists_selection.clear()
-        self.main_window.statusBar().showMessage('shots 를 선택하세요 ! 다중선택가능 ! ')
+        self.main_window.statusBar().showMessage('shots 를 선택하세요 ! 다중A선택가능 ! ')
 
     def renew_template_info(self):
         revision = self.main_window.temp_rev_cbox.currentText()

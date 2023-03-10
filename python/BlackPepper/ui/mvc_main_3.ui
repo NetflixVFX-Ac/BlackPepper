@@ -481,33 +481,6 @@ color: rgb(45, 45, 45);</string>
      <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu">
-    <property name="title">
-     <string>Menu</string>
-    </property>
-    <widget class="QMenu" name="preset">
-     <property name="title">
-      <string>Recent precomp list</string>
-     </property>
-     <addaction name="action1"/>
-     <addaction name="action2"/>
-     <addaction name="action3"/>
-     <addaction name="action4"/>
-     <addaction name="action5"/>
-    </widget>
-    <addaction name="preset"/>
-    <addaction name="separator"/>
-    <addaction name="actionExit"/>
-   </widget>
-   <widget class="QMenu" name="Help">
-    <property name="title">
-     <string>Help</string>
-    </property>
-    <addaction name="actionKitsu"/>
-    <addaction name="actionSidefx"/>
-   </widget>
-   <addaction name="menu"/>
-   <addaction name="Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="quit_act">
