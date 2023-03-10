@@ -163,17 +163,26 @@ class PepperWindow(QMainWindow):
         sidefx_action.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
         main_helpmenu.addAction(sidefx_action)
 
-        self.set_auto_login()
+        # self.set_auto_login()
 
     def set_auto_login(self):
-        log_value = self.login_log.load_setting()
         log_path = self.login_log.user_path
         log_id = self.login_window.input_id.text()
         log_pw = self.login_window.input_pw.text()
         log_sfw = self.login_window.hipbox.currentText()[1:]
-        if os.path.exists(log_path) and log_id != log_value['user_id'] or log_pw != log_value['user_pw'] \
-                or log_sfw != log_value['user_ext']:
+        log_value = self.login_log.load_setting()
+        if os.path.exists(log_path) and (log_id != log_value['user_id'] or log_pw != log_value['user_pw'] \
+                                         or log_sfw != log_value['user_ext']):
             self.login_log.reset_setting()
+            self.login_log.host = "http://192.168.3.116/api"
+            self.login_log.user_id = log_id
+            self.login_log.user_pw = log_pw
+            self.login_log.user_ext = log_sfw
+            self.login_log.valid_host = True
+            self.login_log.valid_user = True
+            self.login_log.auto_login = True
+            self.login_log.save_setting()
+            return
         if log_value['valid_host'] and log_value['valid_user']:
             self.login_log.host = log_value['host']
             self.login_log.user_id = log_value['user_id']
