@@ -3,7 +3,7 @@ import os
 import glob
 import json
 import webbrowser
-from BlackPepper.mantra_process_bar import MantraMainWindow
+from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow
@@ -12,7 +12,7 @@ from PySide2.QtWidgets import QAction, QApplication
 from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
-from BlackPepper.houpepper import HouPepper
+from BlackPepper.process.houpepper import HouPepper
 from BlackPepper.ui.auto_login import Auto_log
 import hou
 from datetime import datetime
