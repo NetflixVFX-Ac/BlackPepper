@@ -343,7 +343,7 @@ def main():
     pepper = Houpub()
     pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
     pepper.project = 'PEPPER'
-    pepper.asset = 'temp_fire'
+    pepper.asset = 'temp_breaking_glass'
     pepper.entity = 'asset'
     # need software handling method
     pepper.software = 'hipnc'
@@ -391,11 +391,11 @@ def main():
         m.move(1000, 250)
         m.show()
         app.exec_()
-        f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
-        f.resize(800, 600)
-        f.move(1000, 250)
-        f.show()
-        app.exec_()
+        # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
+        # f.resize(800, 600)
+        # f.move(1000, 250)
+        # f.show()
+        # app.exec_()
         # BlackPepper.publish_working_file(fx_type_name)
         # hou_pepper.set_ffmpeg_seq_to_mov(fx_output, mov_output)
 
