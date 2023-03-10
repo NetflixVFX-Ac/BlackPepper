@@ -425,29 +425,28 @@ class PepperWindow(QMainWindow):
         scanline_action.triggered.connect(lambda: webbrowser.open('https://www.scanlinevfx.com/'))
         main_helpmenu.addAction(scanline_action)
 
-    def save_precomp_list_json(self):
+    def set_mainwindow_preset(self):
+        """Render 버튼을 누르면 main ui 의 preset 정보들이 json 으로 저장되는 함수이다.
         """
+        recent_menu = QMenu('Recent Presets', self.main_window)
 
-        Returns:
-
-        """
-        # self.main_preset = self.main_menu_bar.addMenu('Preset')
         directory_path = '/home/rapa/git/hook/python/BlackPepper/ui'
         json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
 
         for file_path in json_files:
-            file_path = QAction(os.path.basename(file_path))
-            file_path.triggered.connect(lambda _, path=file_path: self.handle_file(path))
-            self.main_preset.addAction(file_path)
-
-        # self.main_preset.layoutChanged.emit()
-        # self.main_preset.addSeparator() # QMenu에 구분선 추가
+            file_action = QAction(os.path.basename(file_path), self)
+            file_action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+            recent_menu.addAction(file_action)
+        self.main_menu.addMenu(recent_menu)
 
     def handle_file(self, file_path):
         # TODO: 파일 내용 처리하기
-        pass
+        self.load_preset_set()
 
     def save_preset_json(self):
+        """
+        Render 버튼을 누르면 main ui 의 preset 정보들이 json 으로 저장되는 함수이다.
+        """
         now = datetime.now()
         base_filename = f'{self.pepper.identif}_{now.date()}_time_{now.hour}:{now.minute}'
 

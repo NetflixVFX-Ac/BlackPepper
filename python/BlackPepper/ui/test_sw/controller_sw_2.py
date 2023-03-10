@@ -417,7 +417,7 @@ class PepperWindow(QMainWindow):
     def set_mainwindow_preset(self):
         """Render 버튼을 누르면 main ui 의 preset 정보들이 json 으로 저장되는 함수이다.
         """
-        imp_menu = QMenu('Recent Presets', self.main_window)
+        recent_menu = QMenu('Recent Presets', self.main_window)
 
         directory_path = '/home/rapa/git/hook/python/BlackPepper/ui'
         json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
@@ -425,8 +425,8 @@ class PepperWindow(QMainWindow):
         for file_path in json_files:
             file_action = QAction(os.path.basename(file_path), self)
             file_action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
-            imp_menu.addAction(file_action)
-        self.main_menu.addMenu(imp_menu)
+            recent_menu.addAction(file_action)
+        self.main_menu.addMenu(recent_menu)
 
     def handle_file(self, file_path):
         # TODO: 파일 내용 처리하기
@@ -436,7 +436,6 @@ class PepperWindow(QMainWindow):
     def save_preset_json(self):
         """
         Render 버튼을 누르면 main ui 의 preset 정보들이 json 으로 저장되는 함수이다.
-
         """
         now = datetime.now()
         base_filename = f'{self.pepper.identif}_{now.date()}_time_{now.hour}:{now.minute}'
