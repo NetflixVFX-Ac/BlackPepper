@@ -3,7 +3,8 @@ from PySide2 import QtWidgets, QtCore
 import os
 import glob
 
-class MantraMainWindow(QtWidgets.QMainWindow):
+
+class RenderMainWindow(QtWidgets.QMainWindow):
     """
     Houdini Mantra를 활용하여 Template에 Alembic 카메라 값이 추가 된 Hip 파일을 Sequence file(.jpg)로 추출한다.
     터미널에서 mantra_render.py 를 실행하고, 터미널에 출력되는 정보를 Text Widget으로 보여준다.
@@ -26,7 +27,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.p = None
         self.is_interrupted = False
-        self.check = None
+        self.check = False
         # self.is_interrupted = None
         self.total_frame = total_frame
         self.mantra_command = [
@@ -38,7 +39,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             cam_node
         ]
 
-        self.mantra_cmd = (' '.join(str(s) for s in self.command))
+        self.mantra_cmd = (' '.join(str(s) for s in self.mantra_command))
 
         self.output_dir = os.path.dirname(mov_output_path)
         self.seq_dir = os.path.dirname(jpg_output_path)
@@ -49,7 +50,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.ffmpeg_command = [
             'ffmpeg',
             "-framerate", '24',  # 초당프레임
-            "-i", jpg_output_path,  # 입력할 파일 이름
+            "-i", self.sequence_path,  # 입력할 파일 이름
             "-q 0",  # 출력품질 정함(숫자가 높을 수록 품질이 떨어짐)
             "-threads 8",  # 속도향상을 위해 멀티쓰레드를 지정
             "-c:v", "prores_ks",  # 코덱
@@ -113,6 +114,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
 
         """
         if self.p is None:  # No process running.
+            print("cmd :", cmd)
             self.message("Executing process")
             self.btn_interrupt.setText("Interrupt")
             self.p = QtCore.QProcess()  # Keep a reference to the QProcess (e.g. on self) while it's running.
@@ -132,16 +134,15 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         """
         data = self.p.readAllStandardError()
         stderr = bytes(data).decode("utf8")
-        progress = self.simple_percent_parser(stderr, self.total_frame)
+        print("stderr self.check :", self.check)
+        if self.check:
+            progress = self.mantra_simple_percent_parser(stderr, self.total_frame)
+        else:
+            progress = self.ffmpeg_simple_percent_parser(stderr, self.ffmpeg_total_frame)
         if progress:
             self.progress.setValue(progress)
 
         self.message(stderr)
-        #
-        # if "Process finished." in stderr:
-        #     self.btn_interrupt.setText("Restart")
-        #     self.btn_interrupt.clicked.disconnect(self.handle_interrupt)
-        #     self.btn_interrupt.clicked.connect(self.start_process)
 
     def handle_stdout(self):
         """
@@ -153,7 +154,11 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         """
         data = self.p.readAllStandardOutput()
         stdout = bytes(data).decode("utf8")
-        progress = self.simple_percent_parser(stdout, self.total_frame)
+        print("stdout self.check :", self.check)
+        if self.check == False:
+            progress = self.mantra_simple_percent_parser(stdout, self.total_frame)
+        elif self.check == True:
+            progress = self.ffmpeg_simple_percent_parser(stdout, self.ffmpeg_total_frame)
         if progress:
             self.progress.setValue(progress)
 
@@ -178,7 +183,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         state_name = states[state]
         self.message(f"State changed: {state_name}")
         if self.is_interrupted and state == QtCore.QProcess.NotRunning:
-            self.start_process()
+            self.start_process(self.mantra_cmd)
 
     def process_finished(self):
         """
@@ -192,8 +197,10 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         # self.btn_interrupt.setText("Interrupt")
         self.p = None
         self.is_interrupted = False
+        self.check = True
+        self.start_process(self.ff_cmd)
 
-    def simple_percent_parser(self, output, total):
+    def mantra_simple_percent_parser(self, output, total):
         """
 
 
@@ -207,12 +214,43 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         """
         progress_re = re.compile('_(\d+)\.jpg')
         m = progress_re.search(output)
-        print("m :", m)
+        print("mantra search :", m)
         if m:
             pc_complete = m.group(1)
             if pc_complete:
                 pc = int(int(pc_complete) / total * 100)
                 return pc
+
+    def ffmpeg_simple_percent_parser(self, output, total):
+        """Progress bar에 넣을 정보를 백분율로 계산한다. \n
+        컨버팅이 끝난 frame은 Text Widget에 표시되고, 정규표현식을 사용하여 Text Widget에서 해당 frame을 파악한다. \n
+        tree 함수를 사용하여 구한 전체 frame을 분모로 설정하고 컨버팅이 끝난 frame을 분자로 설정하여 백분율을 계싼한다. \n
+        Text Widget에 성공적으로 컨버팅이 끝난 정보가 출력될 때, 100 %를 출력해준다.
+
+        Args:
+            output (str): Text in Text Widget
+            total (int): Total frame
+
+        Returns: pc(progress percent)
+
+        """
+        progress_re = re.compile("frame=   (\d+)")
+        m = progress_re.search(output)
+        print("ffmpeg search :", m)
+        if m:
+            pc_complete = m.group(1)
+            if pc_complete:
+                pc = int(int(pc_complete) / total * 100)
+                return pc
+
+        progress_re2 = re.compile("(\d+) frames successfully")
+        m2 = progress_re2.search(output)
+        if m2:
+            pc_complete = m2.group(1)
+            if pc_complete:
+                print(pc_complete, total)
+                pc = int(int(pc_complete) / total * 100)
+                return pc  # 백분율을 통해 process bar에 보여질 값
 
     def handle_interrupt(self):
         self.btn_interrupt.setCheckable(True)
@@ -220,6 +258,20 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             self.btn_interrupt = QtWidgets.QPushButton("Restart")
             self.btn_interrupt.setCheckable(False)
 
-        self.start_process()
+        self.start_process(self.mantra_cmd)
 
+    def tree(self, path):
+        """ Sequence file이 있는 경로 내 파일의 갯수를 파악하여 Total frame을 계산한다.
 
+        Args:
+            path (str): Sequence file path
+
+        Returns: filecnt
+
+        """
+        for x in sorted(glob.glob(path + "/*")):
+            if os.path.isfile(x):
+                self.filecnt += 1
+            else:
+                print("unknown:", x)
+        return int(self.filecnt)
