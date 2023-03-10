@@ -172,7 +172,7 @@ class PepperWindow(QMainWindow):
         log_pw = self.login_window.input_pw.text()
         log_sfw = self.login_window.hipbox.currentText()[1:]
         log_value = self.login_log.load_setting()
-        if os.path.exists(log_path) and (log_id != log_value['user_id'] or log_pw != log_value['user_pw'] \
+        if os.path.exists(log_path) and (log_id != log_value['user_id'] or log_pw != log_value['user_pw']
                                          or log_sfw != log_value['user_ext']):
             self.login_log.reset_setting()
             self.login_log.host = "http://192.168.3.116/api"

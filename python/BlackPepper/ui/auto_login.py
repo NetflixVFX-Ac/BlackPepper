@@ -26,7 +26,7 @@ class Auto_log:
         self.dir_path = ''
         self.user_path = ''
 
-        self.home_path()
+        self.home_json_path()
 
         self.access_setting()
 
@@ -97,7 +97,7 @@ class Auto_log:
     def home_json_path(self):
         now_path = os.path.realpath(__file__)
         split_path = now_path.split('/')[:-2]
-        self.dir_path = '/'.join(split_path)
+        self.dir_path = os.path.join('/'.join(split_path), '.config')
         self.user_path = os.path.join(self.dir_path, 'user.json')
 
     def connect_login(self):
@@ -143,16 +143,15 @@ class Auto_log:
     def load_setting(self):
         with open(self.user_path, 'r') as json_file:
             self.user_dict = json.load(json_file)
-            print("CCC", self.user_dict)
             if 'auto' not in self.user_dict:
                 self.save_setting()
                 return
             else:
-                for auto in self.user_dict['auto']:
-                    return auto
+                for auto_value in self.user_dict['auto']:
+                    return auto_value
 
     def save_setting(self):
-        self.user_dict = {'auto': []}
+        self.user_dict['auto'] = []
         self.user_dict['auto'].append({
             'host': self.host,
             'user_id': self.user_id,
