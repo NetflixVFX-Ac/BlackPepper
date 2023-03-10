@@ -1,39 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>PepperLogin</class>
+ <widget class="QWidget" name="PepperLogin">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>493</width>
-    <height>410</height>
+    <width>600</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Pepper Login</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">background-color: rgb(45, 45, 45);
-selection-background-color: rgb(48, 140, 198);
-font: 10pt&quot;Courier New&quot;;
-color: rgb(180, 180, 180);
-</string>
-  </property>
-  <widget class="QWidget" name="centralwidget">
-   <property name="styleSheet">
-    <string notr="true"/>
-   </property>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>430</width>
-      <height>360</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <property name="leftMargin">
       <number>50</number>
      </property>
@@ -47,23 +32,21 @@ color: rgb(180, 180, 180);
       <number>30</number>
      </property>
      <item>
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="label">
        <property name="font">
         <font>
-         <family>Courier New</family>
-         <pointsize>10</pointsize>
+         <pointsize>16</pointsize>
          <weight>50</weight>
-         <italic>false</italic>
          <bold>false</bold>
         </font>
        </property>
        <property name="text">
-        <string>Black Pepper v0.0.1</string>
+        <string>Pepper v0.0.1 sw</string>
        </property>
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer_4">
+      <spacer name="verticalSpacer_2">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -76,14 +59,10 @@ color: rgb(180, 180, 180);
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label_5">
+      <widget class="QLabel" name="label_2">
        <property name="font">
         <font>
-         <family>Courier New</family>
-         <pointsize>10</pointsize>
-         <weight>50</weight>
-         <italic>false</italic>
-         <bold>false</bold>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -105,16 +84,13 @@ color: rgb(180, 180, 180);
          <height>30</height>
         </size>
        </property>
-       <property name="styleSheet">
-        <string notr="true">background-color:rgb(52, 52, 52);</string>
-       </property>
        <property name="text">
         <string>pipeline@rapa.org</string>
        </property>
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer_5">
+      <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -127,14 +103,10 @@ color: rgb(180, 180, 180);
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label_6">
+      <widget class="QLabel" name="label_3">
        <property name="font">
         <font>
-         <family>Courier New</family>
-         <pointsize>10</pointsize>
-         <weight>50</weight>
-         <italic>false</italic>
-         <bold>false</bold>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -150,9 +122,6 @@ color: rgb(180, 180, 180);
          <height>30</height>
         </size>
        </property>
-       <property name="styleSheet">
-        <string notr="true">background-color:rgb(52, 52, 52);</string>
-       </property>
        <property name="text">
         <string>netflixacademy</string>
        </property>
@@ -162,7 +131,7 @@ color: rgb(180, 180, 180);
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer_6">
+      <spacer name="verticalSpacer_3">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -175,9 +144,9 @@ color: rgb(180, 180, 180);
       </spacer>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <spacer name="horizontalSpacer_3">
+        <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -193,14 +162,8 @@ color: rgb(180, 180, 180);
         <widget class="QComboBox" name="hipbox">
          <property name="minimumSize">
           <size>
-           <width>90</width>
+           <width>150</width>
            <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>120</width>
-           <height>100</height>
           </size>
          </property>
          <item>
@@ -221,7 +184,7 @@ color: rgb(180, 180, 180);
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_4">
+        <spacer name="horizontalSpacer_2">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -244,10 +207,6 @@ color: rgb(180, 180, 180);
            <height>0</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: rgb(255, 153, 000);
-color: rgb(45, 45, 45);</string>
-         </property>
          <property name="text">
           <string>Login</string>
          </property>
@@ -256,19 +215,8 @@ color: rgb(45, 45, 45);</string>
       </layout>
      </item>
     </layout>
-   </widget>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>493</width>
-     <height>23</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
