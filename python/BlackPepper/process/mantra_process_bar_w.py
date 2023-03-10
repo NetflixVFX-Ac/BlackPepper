@@ -10,14 +10,14 @@ class MantraMainWindow(QtWidgets.QMainWindow):
     진행사항을 유저에게 시각적으로 알려준다.
     """
 
-    def __init__(self, next_fx_path, jpg_output_path, mov_output_path, abc_path, cam_node, total_frame):
+    def __init__(self, next_fx_path, output_path, abc_path, cam_node, total_frame):
         """
 
 
 
         Args:
             next_fx_path:
-            jpg_output_path:
+            output_path:
             abc_path:
             cam_node:
             total_frame:
@@ -25,34 +25,17 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.p = None
         self.is_interrupted = False
-        self.check = None
-        # self.is_interrupted = None
         self.total_frame = total_frame
         self.command = [
             'python',
             '/home/rapa/git/hook/python/BlackPepper/mantra_render.py',
             next_fx_path,
-            jpg_output_path,
+            output_path,
             abc_path,
             cam_node
         ]
 
         self.cmd = (' '.join(str(s) for s in self.command))
-
-        self.ffmpeg_command = [
-            'ffmpeg',
-            "-framerate", '24',  # 초당프레임
-            "-i", jpg_output_path,  # 입력할 파일 이름
-            "-q 0",  # 출력품질 정함(숫자가 높을 수록 품질이 떨어짐)
-            "-threads 8",  # 속도향상을 위해 멀티쓰레드를 지정
-            "-c:v", "prores_ks",  # 코덱
-            "-pix_fmt", "yuv420p",  # 포맷양식
-            "-y",  # 출력파일을 쓸 때 같은 이름의 파일이 있어도 확인없이 덮어씀
-            "-loglevel", "debug",  # 인코딩 과정로그를 보여줌
-            mov_output_path + '.mov'
-        ]
-
-        self.ff_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
 
         # Create the "Interrupt" Button
         self.progress = QtWidgets.QProgressBar()
@@ -62,6 +45,10 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         # self.btn = QtWidgets.QPushButton("MANTRA SEQUENCE RENDERING")
         # self.btn.pressed.connect(self.start_process)
         self.btn_interrupt = QtWidgets.QPushButton("Interrupt")
+        self.btn_interrupt.clicked.connect(self.handle_interrupt)
+        #
+        # #for json
+        # self.frame_dict =
 
         l = QtWidgets.QVBoxLayout()
         # l.addWidget(self.btn)
@@ -75,14 +62,10 @@ class MantraMainWindow(QtWidgets.QMainWindow):
                         "selection-background-color: rgb(45, 180, 198);\n"
                         "font: 10pt\"Courier New\";\n"
                         "color: rgb(180, 180, 180);\n")
-
         w.setLayout(l)
-
-        # self.btn_interrupt = False
-
         self.setCentralWidget(w)
-        self.start_process(self.cmd)
-        self.handle_interrupt()
+        self.start_process()
+
 
     def message(self, s):
         """
@@ -97,7 +80,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         """
         self.text.appendPlainText(s)
 
-    def start_process(self, cmd):
+    def start_process(self):
         """
 
 
@@ -113,7 +96,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             self.p.readyReadStandardError.connect(self.handle_stderr)
             self.p.stateChanged.connect(self.handle_state)
             self.p.finished.connect(self.process_finished)  # Clean up once complete.
-            self.p.start(cmd)
+            self.p.start(self.cmd)
 
     def handle_stderr(self):
         """
@@ -130,11 +113,6 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             self.progress.setValue(progress)
 
         self.message(stderr)
-        #
-        # if "Process finished." in stderr:
-        #     self.btn_interrupt.setText("Restart")
-        #     self.btn_interrupt.clicked.disconnect(self.handle_interrupt)
-        #     self.btn_interrupt.clicked.connect(self.start_process)
 
     def handle_stdout(self):
         """
@@ -170,8 +148,6 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         }
         state_name = states[state]
         self.message(f"State changed: {state_name}")
-        if self.is_interrupted and state == QtCore.QProcess.NotRunning:
-            self.start_process()
 
     def process_finished(self):
         """
@@ -182,9 +158,10 @@ class MantraMainWindow(QtWidgets.QMainWindow):
 
         """
         self.message("Process finished.")
+        self.btn_interrupt.setText("Restart")
         # self.btn_interrupt.setText("Interrupt")
         self.p = None
-        self.is_interrupted = False
+        # self.is_interrupted = False
 
     def simple_percent_parser(self, output, total):
         """
@@ -207,12 +184,17 @@ class MantraMainWindow(QtWidgets.QMainWindow):
                 pc = int(int(pc_complete) / total * 100)
                 return pc
 
-    def handle_interrupt(self):
-        self.btn_interrupt.setCheckable(True)
-        if self.btn_interrupt is True:
-            self.btn_interrupt = QtWidgets.QPushButton("Restart")
-            self.btn_interrupt.setCheckable(False)
-
+    def restart_process(self):
+        self.progress.setValue(0)
         self.start_process()
+        self.btn_interrupt.setText("Interrupt")
 
+    def handle_interrupt(self):
+        if self.p is not None:
+            self.p.kill()
+            self.btn_interrupt.setText("Restart")
+            self.btn_interrupt.clicked.connect(self.restart_process)
+        else:
+            self.btn_interrupt.setText("Interrupt")
+            self.start_process()
 

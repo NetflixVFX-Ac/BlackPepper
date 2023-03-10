@@ -1,7 +1,7 @@
 import numpy as np
 from BlackPepper.pepper import Houpub
-from BlackPepper.ffmpeg_process_bar import FFmpegMainWindow
-from BlackPepper.mantra_process_bar import MantraMainWindow
+from BlackPepper.process.ffmpeg_process_bar import FFmpegMainWindow
+from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
 from PySide2 import QtWidgets
 import hou
 import _alembic_hom_extensions as abc
@@ -135,13 +135,12 @@ class HouPepper:
         self.abc_range = abc.alembicTimeRange(self.abc_path)
 
     def get_abc_cam_tree(self, abc_tree_all):
-        """Alembic 파일 내 Node에서 이름이 camera인 노드를 찾는다.
-
+        """Alembic 파일 내 Node에서 이름이 camera인 노드를 찾는다. \n
+        Node를 node_name, node_type, node_children으로 나누고 node_type이 camera인 경우, 해당 노드를 cam_list에 저장한다. \n
+        node_type이 camera인 노드의 node_name에 해당하는 경로를 가져와 cam_path에 저장한다.
 
         Args:
-            abc_tree_all:
-
-        Returns:
+            abc_tree_all: abc.alembicGetSceneHierarchy(alembic file path, '')
 
         """
         node_name = abc_tree_all[0]
@@ -173,12 +172,12 @@ class HouPepper:
 
     def check_abc(self, abc_path):
         """
-
+        입력받은 path가 Alembic file path인지 확인한다.
 
         Args:
-            abc_path:
+            abc_path (str): path
 
-        Returns:
+        Returns: boolean
 
         """
         file_name = abc_path
@@ -190,13 +189,12 @@ class HouPepper:
             return True
 
     def set_cam_view(self, cam):
-        """
+        """Alembic file에 있는 카메라가 가진 frame range에 frame rate를 곱하여 real time frame 동안의 \n
+        camera 정보 값을 가져와 Houdini 내 새로 생성한 카메라 정보 값에 넣어준다.
 
 
         Args:
-            cam:
-
-        Returns:
+            cam: cam node created in houdini
 
         """
         # abc_range : (0.041666666666666664, 10.0)
@@ -210,14 +208,12 @@ class HouPepper:
                     exec("self.{}.append({})".format(parm_name, camera_dict.get(parm_name)))
 
     def get_cam_resolution(self, cam):
-        """
-
+        """Alembic file에 있는 카메라가 가진 frame range에 frame rate를 곱하여 real time frame 동안의 \n
+        camera 해상도 값을 가져와 Houdini 내 새로 생성한 카메라 해상도 값에 넣어준다.
 
 
         Args:
-            cam:
-
-        Returns:
+            cam: cam node created in houdini
 
         """
         # abc_range : (0.041666666666666664, 10.0)
@@ -229,14 +225,14 @@ class HouPepper:
                 return True
 
     def get_cam_xform(self, cam):
-        """
-
+        """Alembic file에 있는 카메라가 가진 frame range에 frame rate를 곱하여 real time frame 동안의 \n
+        Houdini 내 Matrix4 모듈을 사용하여 camera translate, rotate, scale 값을 가져온다.
 
 
         Args:
-            cam:
+            cam: camera node created in houdini
 
-        Returns:
+        Returns (list): translate, rotate, scale
 
         """
         # abc_range : (0.041666666666666664, 10.0)
@@ -255,16 +251,13 @@ class HouPepper:
         return translate, rotate, scale
 
     def set_cam_key(self, key, node, parm):
-        """
-
-
+        """key에 저장된 x, y, z 값(traslate, rotate, scale)을 Houdini obj에 만든 camera parameter에 넣어준다. \n
+        numpy convolution 메소드를 사용하여 Key 값이 변하는 구간에서 값들을 읽어 camera parameter에 넣어준다.
 
         Args:
-            key:
-            node:
-            parm:
-
-        Returns:
+            key(list): x, y, z position
+            node(str): camera node created in houdini
+            parm: 't' (translate) or 'r' (rotate) or 's' (scale)
 
         """
         # self.set_cam_key(tr, cam_node, 't')
@@ -294,14 +287,11 @@ class HouPepper:
                     node.parm('{}'.format(parm)).setKeyframe(keyframe)
 
     def set_cam_create(self, abc_path):
-        """
-
-
+        """Houdini obj 경로에 camera node를 만들고, Alembic file에 있는 camera의 정보 값들을 \n
+        obj 안에 만든 camera에 넣어준다. 정보는 camera의 dictionary 값, camera resolution, camera x,y,z position에 해당된다.
 
         Args:
-            abc_path:
-
-        Returns:
+            abc_path: Alembic file path
 
         """
         self.set_abc_cam_tree(abc_path)
@@ -332,16 +322,14 @@ class HouPepper:
                 self.cam_node.parm('resy').set(int(1920 / self.filmaspectratio[0]))
 
     def set_fx_working_for_shot(self, hip_path, abc_path, saved_path):
-        """
-
+        """Template에 casting된 shot layout output file인 Alembic의 카메라 정보를 가진 cam node를 저장하여 \n
+        shot fx working file path에 저장한다.
 
 
         Args:
-            hip_path:
-            abc_path:
-            saved_path:
-
-        Returns:
+            hip_path: template asset working file path
+            abc_path: shot casted asset layout output file path
+            saved_path: shot casted asset fx working file path
 
         """
         hou.hipFile.load(hip_path)
@@ -355,7 +343,7 @@ def main():
     pepper = Houpub()
     pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
     pepper.project = 'PEPPER'
-    pepper.asset = 'temp_fire'
+    pepper.asset = 'temp_breaking_glass'
     pepper.entity = 'asset'
     # need software handling method
     pepper.software = 'hipnc'
@@ -403,16 +391,16 @@ def main():
         m.move(1000, 250)
         m.show()
         app.exec_()
-        f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
-        f.resize(800, 600)
-        f.move(1000, 250)
-        f.show()
-        app.exec_()
+        # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
+        # f.resize(800, 600)
+        # f.move(1000, 250)
+        # f.show()
+        # app.exec_()
         # BlackPepper.publish_working_file(fx_type_name)
         # hou_pepper.set_ffmpeg_seq_to_mov(fx_output, mov_output)
 
-#
-# if __name__ == "__main__":
-#     main()
+
+if __name__ == "__main__":
+    main()
 
 
