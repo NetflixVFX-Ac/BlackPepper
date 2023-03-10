@@ -1,7 +1,7 @@
 import re
 from PySide2 import QtWidgets, QtCore
 
-.
+
 class MantraMainWindow(QtWidgets.QMainWindow):
     """
     Houdini Mantra를 활용하여 Template에 Alembic 카메라 값이 추가 된 Hip 파일을 Sequence file(.jpg)로 추출한다.

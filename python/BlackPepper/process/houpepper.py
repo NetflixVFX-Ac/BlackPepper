@@ -6,7 +6,7 @@ from PySide2 import QtWidgets
 import hou
 import _alembic_hom_extensions as abc
 import sys
-.
+
 class HouPepper:
     """
     이 모듈은 Template으로 정한 Houdini 파일에 Alembic 파일의 카메라값을 불러와 FX working file path에 저장한다. Alembic 파일은
