@@ -79,6 +79,10 @@ class Auto_log:
     def user(self):
         return self._user
 
+    @user.setter
+    def user(self, us):
+        self._user = us
+
     @property
     def auto_login(self):
         return self._auto_login
@@ -102,7 +106,7 @@ class Auto_log:
             log_in = self.pr.user
         except gazu.AuthFailedException:
             raise ValueError('Invalid user ID or password.')
-        self._user = log_in['user']
+        self.user = log_in['user']
         self._valid_user = True
         self.save_setting()
         self.hklog.enter_log(self.user['full_name'])
@@ -110,7 +114,7 @@ class Auto_log:
 
     def log_out(self):
         gazu.log_out()
-        self._user = None
+        self.user = None
         self.reset_setting()
         return True
 
