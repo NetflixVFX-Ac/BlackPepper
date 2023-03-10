@@ -150,7 +150,6 @@ class PepperWindow(QMainWindow):
         else:
             pass
 
-
     def user_login(self):
         """mvc_login.ui를 디스플레이 해주는 메소드. 유저의 로그인 페이지 UI에서 Login 버튼 클릭, Enter 입력 시 실행된다. \n
         UI에서는 id, password를 입력받고, combobox를 통해 Houdini의 license 종류를 입력받는다. \n
@@ -426,7 +425,7 @@ class PepperWindow(QMainWindow):
         main_helpmenu.addAction(scanline_action)
 
     def set_mainwindow_preset(self):
-        """Render 버튼을 누르면 main ui 의 preset 정보들이 json 으로 저장되는 함수이다.
+        """메뉴바 'Menu' 에 'Recent Presets'메뉴에 path 에 있는 최신 5개의 json 파일들을 내림차순으로 보여준다.
         """
         recent_menu = QMenu('Recent Presets', self.main_window)
 
@@ -504,6 +503,7 @@ class PepperWindow(QMainWindow):
             # f.move(1000, 250)
             # f.show()
 
+        # pepper.precomp_list 의 갯수가 0개이면 반환하는 값이 없다.
         if len(self.pepper.precomp_list) == 0:
             return
 
