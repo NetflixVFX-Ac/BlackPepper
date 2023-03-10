@@ -164,6 +164,7 @@ class PepperWindow(QMainWindow):
         main_helpmenu.addAction(sidefx_action)
 
         self.set_auto_login()
+        # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
 
     def set_auto_login(self):
         log_path = self.login_log.user_path

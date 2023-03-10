@@ -78,7 +78,6 @@ class MainWindow(QtWidgets.QMainWindow):  # Qt라이브러리를 사용하는 �
 
         self.p = None
         self.setGeometry(100, 100, 600, 400)
-        self.h_layout = QtWidgets.QHBoxLayout()
         self.btn = QtWidgets.QPushButton("Execute")  # QtWidgets모듈에서 버튼을 만들어주는 함수를 불러오고 이름을 "execute"적는다.
         self.btn2 = QtWidgets.QPushButton("Pause")
         self.btn.pressed.connect(self.start_process)  # 위에서 만든 버튼이 눌렀을 때 작동할 함수를 pressed.connect모듈로 연결한다.
@@ -90,6 +89,7 @@ class MainWindow(QtWidgets.QMainWindow):  # Qt라이브러리를 사용하는 �
         self.progress = QtWidgets.QProgressBar()  # 작업 진행 상황을 시각적으로 나타내는 위젯
         self.progress.setRange(0, 100)  # setRange() 메서드를 사용하여 '프로그레스바'의 최소값과 최대값을 지정
         # -버튼 위젯 생성 부분-
+        self.h_layout = QtWidgets.QHBoxLayout()
         self.h_layout.addWidget(self.btn)
         self.h_layout.addWidget(self.btn2)
 
@@ -105,15 +105,14 @@ class MainWindow(QtWidgets.QMainWindow):  # Qt라이브러리를 사용하는 �
 
         w = QtWidgets.QWidget()  # 부모 위젯을 생성 -> GUI상 레이아웃과 레이아웃에 추가될 위젯이 보여질 창
         w.setLayout(l)  # 부모 위젯에 QVBoxLayout 설정 -> l == gui상에 올라갈 위젯 묶음
-        w.setLayout(l)
-
         self.setCentralWidget(w)  # QMainWindow를 위젯을 중앙에 위치하는 설정하는 역할
 
     def message(self, s):  # 위젯 로그창에 메세지를 써주는 함수
         self.text.appendPlainText(s)
 
     def start_process(self):
-        if self.p is None:  # 조건이 참일 경우 코드 실행함
+        if self.p is not None and self.p.state() == QtCore.QProcess.Running:# 조건이 참일 경우 코드 실행함
+            return
             self.message("Executing process")  # gui에서 'execute'버튼을 누를 시"Executing process"가 TextWidget에 뜸
             self.p = QtCore.QProcess()  # start(), write(), readAll(), kill()과 같은 메소드를 제공하며 이러한 메소드를 사용하여 프로세스의 동작을 관리
             self.p.readyReadStandardOutput.connect(self.handle_stdout)
@@ -123,7 +122,9 @@ class MainWindow(QtWidgets.QMainWindow):  # Qt라이브러리를 사용하는 �
             self.p.start(cmd)  # p.start(cmd)는 QtCore.QProcess 클래스의 메소드, 외부 스크립트를 실행 -> cmd == ffmpeg 실행문
 
     def pause_process(self):
-        self.p.kill()
+        if self.p is not None and self.p.state() == QtCore.QProcess.Running:
+            self.p.kill()
+            self.p = None
 
     def handle_stderr(self):
         data = self.p.readAllStandardError()  # QtCore.QProcess()처리 정보를 받아옴
@@ -152,6 +153,12 @@ class MainWindow(QtWidgets.QMainWindow):  # Qt라이브러리를 사용하는 �
 
     def process_finished(self):  # 위젯 로그창에 메세지를 써주는 함수를 사용해 "Process finished."를 인코딩 마지막에 써줌
         self.message("Process finished.")  # 위젯 로그창에 메세지를 써주는 함수
+        self.p = None
+        self.p.readyReadStandardError.disconnect(self.handle_stderr)
+        self.p.readyReadStandardOutput.disconnect(self.handle_stdout)
+        self.p.stateChanged.disconnect(self.handle_state)
+        self.p.finished.disconnect(self.process_finished)
+        self.message("Process finished.")
         self.p = None
 
 

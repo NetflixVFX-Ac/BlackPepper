@@ -1,7 +1,6 @@
 import numpy as np
 from BlackPepper.pepper import Houpub
-from BlackPepper.ffmpeg_process_bar import FFmpegMainWindow
-from BlackPepper.mantra_process_bar_w import MantraMainWindow
+from BlackPepper.hou_man_process_json_sj.mantra_process_bar import MantraMainWindow
 from PySide2 import QtWidgets
 import hou
 import _alembic_hom_extensions as abc
@@ -391,13 +390,6 @@ def main():
         m.move(1000, 250)
         m.show()
         app.exec_()
-        # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
-        # f.resize(800, 600)
-        # f.move(1000, 250)
-        # f.show()
-        # app.exec_()
-        # BlackPepper.publish_working_file(fx_type_name)
-        # hou_pepper.set_ffmpeg_seq_to_mov(fx_output, mov_output)
 
 
 if __name__ == "__main__":
