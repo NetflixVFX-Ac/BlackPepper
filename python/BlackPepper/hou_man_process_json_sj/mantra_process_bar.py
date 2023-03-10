@@ -24,7 +24,8 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             total_frame:
         """
         super().__init__()
-        self.p = None
+        self.render_dict = None
+        self.process_box = None
         self.is_interrupted = False
         self.total_frame = total_frame
         self.command = [
@@ -58,24 +59,24 @@ class MantraMainWindow(QtWidgets.QMainWindow):
 
         box_info = QtWidgets.QWidget()
         box_info.setStyleSheet(u"background-color: rgb(45, 45, 45);\n"
-                        "selection-background-color: rgb(45, 180, 198);\n"
-                        "font: 10pt\"Courier New\";\n"
-                        "color: rgb(180, 180, 180);\n")
+                               "selection-background-color: rgb(45, 180, 198);\n"
+                               "font: 10pt\"Courier New\";\n"
+                               "color: rgb(180, 180, 180);\n")
         box_info.setLayout(box)
         self.setCentralWidget(box_info)
 
-    def message(self, s):
+    def message(self, to_user_message):
         """
 
 
 
         Args:
-            s:
+            to_user_message:
 
         Returns:
 
         """
-        self.text.appendPlainText(s)
+        self.text.appendPlainText(to_user_message)
 
     def start_process(self):
         """
@@ -85,15 +86,15 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         Returns:
 
         """
-        if self.p is None:  # No process running.
+        if self.process_box is None:  # No process running.
             self.message("Executing process")
             self.btn_interrupt.setText("Interrupt")
-            self.p = QtCore.QProcess()  # Keep a reference to the QProcess (e.g. on self) while it's running.
-            self.p.readyReadStandardOutput.connect(self.handle_stdout)
-            self.p.readyReadStandardError.connect(self.handle_stderr)
-            self.p.stateChanged.connect(self.handle_state)
-            self.p.finished.connect(self.process_finished)  # Clean up once complete.
-            self.p.start(self.cmd)
+            self.process_box = QtCore.QProcess()  # Keep a reference to the QProcess (e.g. on self) while it's running.
+            self.process_box.readyReadStandardOutput.connect(self.handle_stdout)
+            self.process_box.readyReadStandardError.connect(self.handle_stderr)
+            self.process_box.stateChanged.connect(self.handle_state)
+            self.process_box.finished.connect(self.process_finished)  # Clean up once complete.
+            self.process_box.start(self.cmd)
 
     def handle_stderr(self):
         """
@@ -103,7 +104,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         Returns:
 
         """
-        data = self.p.readAllStandardError()
+        data = self.process_box.readAllStandardError()
         stderr = bytes(data).decode("utf8")
         progress = self.simple_percent_parser(stderr, self.total_frame)
         if progress:
@@ -119,7 +120,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         Returns:
 
         """
-        data = self.p.readAllStandardOutput()
+        data = self.process_box.readAllStandardOutput()
         stdout = bytes(data).decode("utf8")
         progress = self.simple_percent_parser(stdout, self.total_frame)
         if progress:
@@ -156,7 +157,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         """
         self.message("Process finished.")
         self.btn_interrupt.setText("Restart")
-        self.p = None
+        self.process_box = None
 
     def simple_percent_parser(self, output, total):
         """
@@ -185,8 +186,8 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.btn_interrupt.setText("Interrupt")
 
     def handle_interrupt(self):
-        if self.p is not None:
-            self.p.kill()
+        if self.process_box is not None:
+            self.process_box.kill()
             self.btn_interrupt.setText("Restart")
             self.btn_interrupt.clicked.connect(self.restart_process)
         else:
