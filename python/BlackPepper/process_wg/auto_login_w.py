@@ -10,8 +10,7 @@ class Auto_log:
         self.hklog = Logger()
         self.pr = Houpub()
 
-        self.user_dict = {}
-        self.user_dict['auto'] = []
+        self.user_dict = None
 
         self._user = None
         self._host = None
@@ -23,10 +22,8 @@ class Auto_log:
 
         self._auto_login = False
 
-        self.dir_path = ''
-        self.user_path = ''
-
-        self.home_json_path()
+        self.dir_path = os.path.expanduser('~/.config/Hook/')
+        self.user_path = os.path.join(self.dir_path, 'user.json')
 
         self.access_setting()
 
@@ -82,10 +79,6 @@ class Auto_log:
     def user(self):
         return self._user
 
-    @user.setter
-    def user(self, us):
-        self._user = us
-
     @property
     def auto_login(self):
         return self._auto_login
@@ -93,12 +86,6 @@ class Auto_log:
     @auto_login.setter
     def auto_login(self, value):
         self._auto_login = value
-
-    def home_json_path(self):
-        now_path = os.path.realpath(__file__)
-        split_path = now_path.split('/')[:-2]
-        self.dir_path = os.path.join('/'.join(split_path), '.config')
-        self.user_path = os.path.join(self.dir_path, 'user.json')
 
     def connect_login(self):
         self.pr.login(self.host, self.user_id, self.user_pw)
@@ -115,7 +102,7 @@ class Auto_log:
             log_in = self.pr.user
         except gazu.AuthFailedException:
             raise ValueError('Invalid user ID or password.')
-        self.user = log_in['user']
+        self._user = log_in['user']
         self._valid_user = True
         self.save_setting()
         self.hklog.enter_log(self.user['full_name'])
@@ -123,7 +110,7 @@ class Auto_log:
 
     def log_out(self):
         gazu.log_out()
-        self.user = None
+        self._user = None
         self.reset_setting()
         return True
 
@@ -143,16 +130,10 @@ class Auto_log:
     def load_setting(self):
         with open(self.user_path, 'r') as json_file:
             self.user_dict = json.load(json_file)
-            if 'auto' not in self.user_dict:
-                self.save_setting()
-                return
-            else:
-                for auto_value in self.user_dict['auto']:
-                    return auto_value
+        return self.user_dict
 
     def save_setting(self):
-        self.user_dict['auto'] = []
-        self.user_dict['auto'].append({
+        self.user_dict = {
             'host': self.host,
             'user_id': self.user_id,
             'user_pw': self.user_pw,
@@ -160,7 +141,7 @@ class Auto_log:
             'valid_host': self.valid_host,
             'valid_user': self.valid_user,
             'auto_login': self.auto_login
-        })
+        }
         with open(self.user_path, 'w') as json_file:
             json.dump(self.user_dict, json_file)
 
@@ -171,4 +152,5 @@ class Auto_log:
         self.valid_host = False
         self.valid_user = False
         self.auto_login = False
+
         self.save_setting()

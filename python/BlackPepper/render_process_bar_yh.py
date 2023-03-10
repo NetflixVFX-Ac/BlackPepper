@@ -118,9 +118,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             self.p.readyReadStandardError.connect(self.handle_stderr)
             self.p.stateChanged.connect(self.handle_state)
             self.p.finished.connect(self.process_finished)  # Clean up once complete.
-            timer = QtCore.QTimer()
-            timer.timeout.connect(self.log)
-            timer.start(10)
+
             self.p.start(cmd)
 
     def handle_stderr(self):

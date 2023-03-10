@@ -3,16 +3,16 @@ import os
 import glob
 import json
 import webbrowser
-from BlackPepper.mantra_process_bar import MantraMainWindow
+from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow
 from PySide2.QtGui import QKeySequence
-from PySide2.QtWidgets import QAction, QApplication
+from PySide2.QtWidgets import QAction, QApplication, QMenu
 from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
-from BlackPepper.houpepper import HouPepper
+from BlackPepper.process.houpepper import HouPepper
 from BlackPepper.ui.auto_login import Auto_log
 import hou
 from datetime import datetime
@@ -111,70 +111,34 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
-
         # set statusbar to window
         self.login_window.statusBar().showMessage('kitsu 로그인 하세요!  houdini 확장자 선택하세요!')
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
-
         # set main menubar
-
-        login_menu_bar = self.login_window.menuBar()
-        login_menu = login_menu_bar.addMenu('Menu')
-        exit_action = QAction('Exit', self.login_window)
-        exit_action.setShortcut('Ctrl+Q')
-        exit_action.setStatusTip('Exit application')
-        exit_action.triggered.connect(QApplication.instance().quit)
-        login_menu.addAction(exit_action)
-
-        self.main_menu_bar = self.main_window.menuBar()
-
-        self.main_menu_bar.setNativeMenuBar(False)
-        self.main_preset = self.main_menu_bar.addMenu('Menu')
-        self.save_precomp_list_json()
-        self.main_preset.addSeparator()
-        self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
-        self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
-
-        logout_action = QAction('Logout', self.main_window)
-        logout_action.setShortcut('Ctrl+L')
-        logout_action.setStatusTip('Logout application')
-        logout_action.triggered.connect(self.user_logout)
-        self.main_preset.addAction(logout_action)
-
-        # self.main_menu = self.main_menu_bar.addMenu('Menu')
-        exit_action = QAction('Exit', self.main_window)
-        exit_action.setShortcut('Ctrl+Q')
-        exit_action.setStatusTip('Exit application')
-        exit_action.triggered.connect(QApplication.instance().quit)
-        self.main_preset.addAction(exit_action)
-
-        # logoutAction = QAction('Logout', self.main_window)
-
-        main_helpmenu = self.main_menu_bar.addMenu('Help')
-        kisu_action = QAction('Kitsu', self.main_window)
-        kisu_action.setShortcut('F1')
-        kisu_action.setStatusTip('Kitsu site open')
-        kisu_action.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
-        main_helpmenu.addAction(kisu_action)
-
-        sidefx_action = QAction('Side Fx', self.main_window)
-        sidefx_action.setShortcut('F2')
-        sidefx_action.setStatusTip('Side Fx site open')
-        sidefx_action.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
-        main_helpmenu.addAction(sidefx_action)
-
+        self.set_login_menubar()
+        self.set_main_menubar()
+        # set auto login
         self.set_auto_login()
-        # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
 
     def set_auto_login(self):
-        log_value = self.login_log.load_setting()
         log_path = self.login_log.user_path
         log_id = self.login_window.input_id.text()
         log_pw = self.login_window.input_pw.text()
         log_sfw = self.login_window.hipbox.currentText()[1:]
-        if os.path.exists(log_path) and log_id != log_value['user_id'] or log_pw != log_value['user_pw'] \
-                or log_sfw != log_value['user_ext']:
+        self.login_log.reset_setting()
+        log_value = self.login_log.load_setting()
+        if os.path.exists(log_path) and (log_id != log_value['user_id'] or log_pw != log_value['user_pw']
+                                         or log_sfw != log_value['user_ext']):
             self.login_log.reset_setting()
+            self.login_log.host = "http://192.168.3.116/api"
+            self.login_log.user_id = log_id
+            self.login_log.user_pw = log_pw
+            self.login_log.user_ext = log_sfw
+            self.login_log.valid_host = True
+            self.login_log.valid_user = True
+            self.login_log.auto_login = True
+            self.login_log.save_setting()
+            return
         if log_value['valid_host'] and log_value['valid_user']:
             self.login_log.host = log_value['host']
             self.login_log.user_id = log_value['user_id']
@@ -400,6 +364,66 @@ class PepperWindow(QMainWindow):
         self.pepper.precomp_list = []
         self.render_model.pepperlist.clear()
         self.render_model.layoutChanged.emit()
+
+    def set_login_menubar(self):
+        """로그인 창의 메뉴바를 셋팅하는 함수이다.
+        메뉴바에 'Menu'를 만들고 'Menu'안에 'Exit'를 만들었고 'Ctrl+Q' 단축키 또는 'Exit' 클릭시 창의 X 와 같은 기능으로
+         어플리케이션이 종료 된다.
+        """
+        login_menu_bar = self.login_window.menuBar()
+        login_menu = login_menu_bar.addMenu('Menu')
+        exit_action = QAction('Exit', self.login_window)
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.setStatusTip('Exit application')
+        exit_action.triggered.connect(QApplication.instance().quit)
+        login_menu.addAction(exit_action)
+
+    def set_main_menubar(self):
+        """메인 창의 메뉴바를 셋팅하는 함수이다. 그리고 해당 함수에는 메뉴바에 preset 을 셋팅하는 함수를 포함 하고있다.
+        'Menu' 와 'Help' 메뉴바를 만들고 'Menu' 에는 먼저 set_main_window_preset() 함수의 'Recent Presets' 와
+        'Logout','Exit' 들을 추가하고 단축키와 클릭시 컨넥트 되어있는 함수가 발생한다.
+        'Help' 에는 Black Pepper 에 필요한 kitsu, SideFX등 같은 관련 사이트들 을 열수 있게 추가되어있다.
+        """
+        self.main_menu_bar = self.main_window.menuBar()
+        self.main_menu_bar.setNativeMenuBar(False)
+        # set Menu
+        self.main_menu = self.main_menu_bar.addMenu('Menu')
+        # set main window preset
+        self.set_mainwindow_preset()
+        # 구분자 추가
+        self.main_menu.addSeparator()
+        # set 'Logout'
+        logout_action = QAction('Logout', self.main_window)
+        logout_action.setShortcut('Ctrl+L')
+        logout_action.setStatusTip('Logout application')
+        logout_action.triggered.connect(self.user_logout)
+        self.main_menu.addAction(logout_action)
+        # set 'Exit'
+        exit_action = QAction('Exit', self.main_window)
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.setStatusTip('Exit application')
+        exit_action.triggered.connect(QApplication.instance().quit)
+        self.main_menu.addAction(exit_action)
+        # set Help
+        main_helpmenu = self.main_menu_bar.addMenu('Help')
+        # set kitsu
+        kisu_action = QAction('Kitsu', self.main_window)
+        kisu_action.setShortcut('F1')
+        kisu_action.setStatusTip('Kitsu site open')
+        kisu_action.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        main_helpmenu.addAction(kisu_action)
+        # set sidefx
+        sidefx_action = QAction('Side Fx', self.main_window)
+        sidefx_action.setShortcut('F2')
+        sidefx_action.setStatusTip('Side Fx site open')
+        sidefx_action.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
+        main_helpmenu.addAction(sidefx_action)
+        # set scanline vfx
+        scanline_action = QAction('Scanline VFX', self.main_window)
+        scanline_action.setShortcut('F3')
+        scanline_action.setStatusTip('Scanline VFX site open')
+        scanline_action.triggered.connect(lambda: webbrowser.open('https://www.scanlinevfx.com/'))
+        main_helpmenu.addAction(scanline_action)
 
     def save_precomp_list_json(self):
         """

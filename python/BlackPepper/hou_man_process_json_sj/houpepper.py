@@ -1,8 +1,6 @@
 import numpy as np
 from BlackPepper.pepper import Houpub
-from BlackPepper.ffmpeg_process_bar import FFmpegMainWindow
-from BlackPepper.mantra_process_bar_w import MantraMainWindow
-from BlackPepper.render_process_bar_yh import RenderMainWindow
+from BlackPepper.hou_man_process_json_sj.mantra_process_bar import MantraMainWindow
 from PySide2 import QtWidgets
 import hou
 import _alembic_hom_extensions as abc
@@ -344,7 +342,7 @@ def main():
     pepper = Houpub()
     pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
     pepper.project = 'PEPPER'
-    pepper.asset = 'temp_dancing_particle'
+    pepper.asset = 'temp_breaking_glass'
     pepper.entity = 'asset'
     # need software handling method
     pepper.software = 'hipnc'
@@ -386,24 +384,12 @@ def main():
             app = QtWidgets.QApplication(sys.argv)
         else:
             app = QtWidgets.QApplication.instance()
-        # m = MantraMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_next_output,
-        #                      layout_output_path, hou_pepper.cam_node, hou_pepper.abc_range[1]*hou.fps())
-        # m.resize(800, 600)
-        # m.move(1000, 250)
-        # m.show()
-        r = RenderMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_next_output,
-                             mov_next_output, layout_output_path, hou_pepper.cam_node)
-        r.resize(800, 600)
-        r.move(1000, 250)
-        r.show()
+        m = MantraMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_next_output,
+                             layout_output_path, hou_pepper.cam_node, hou_pepper.abc_range[1]*hou.fps())
+        m.resize(800, 600)
+        m.move(1000, 250)
+        m.show()
         app.exec_()
-        # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
-        # f.resize(800, 600)
-        # f.move(1000, 250)
-        # f.show()
-        # app.exec_()
-        # BlackPepper.publish_working_file(fx_type_name)
-        # hou_pepper.set_ffmpeg_seq_to_mov(fx_output, mov_output)
 
 
 if __name__ == "__main__":
