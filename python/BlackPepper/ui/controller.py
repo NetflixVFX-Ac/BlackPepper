@@ -3,7 +3,7 @@ import os
 import glob
 import json
 import webbrowser
-from BlackPepper.mantra_process_bar import MantraMainWindow
+from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow
@@ -12,7 +12,7 @@ from PySide2.QtWidgets import QAction, QApplication
 from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
-from BlackPepper.houpepper import HouPepper
+from BlackPepper.process.houpepper import HouPepper
 from BlackPepper.ui.auto_login import Auto_log
 import hou
 from datetime import datetime
@@ -163,26 +163,32 @@ class PepperWindow(QMainWindow):
         sidefx_action.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
         main_helpmenu.addAction(sidefx_action)
 
-        # self.set_auto_login()
+        self.set_auto_login()
+        # app.exec_() : 프로그램을 대기상태,즉 무한루프상태로 만들어준다.
 
     def set_auto_login(self):
+        log_value = self.login_log.load_setting()
         log_path = self.login_log.user_path
         log_id = self.login_window.input_id.text()
         log_pw = self.login_window.input_pw.text()
         log_sfw = self.login_window.hipbox.currentText()[1:]
-        log_value = self.login_log.load_setting()
-        if os.path.exists(log_path) and (log_id != log_value['user_id'] or log_pw != log_value['user_pw'] \
-                                         or log_sfw != log_value['user_ext']):
+        if os.path.exists(log_path) and log_id != log_value['user_id'] or log_pw != log_value['user_pw'] \
+                or log_sfw != log_value['user_ext']:
             self.login_log.reset_setting()
-            self.login_log.host = "http://192.168.3.116/api"
-            self.login_log.user_id = log_id
-            self.login_log.user_pw = log_pw
-            self.login_log.user_ext = log_sfw
-            self.login_log.valid_host = True
-            self.login_log.valid_user = True
-            self.login_log.auto_login = True
-            self.login_log.save_setting()
-            return
+        if log_value['valid_host'] and log_value['valid_user']:
+            self.login_log.host = log_value['host']
+            self.login_log.user_id = log_value['user_id']
+            self.login_log.user_pw = log_value['user_pw']
+            self.login_log.user_ext = log_value['user_ext']
+            self.pepper.login(self.login_log.host, self.login_log.user_id, self.login_log.user_pw)
+            self.pepper.software = self.login_log.user_ext
+            self.login_window.close()
+            self.open_main_window()
+        else:
+            pass
+
+    def set_auto_login(self):
+        log_value = self.login_log.load_setting()
         if log_value['valid_host'] and log_value['valid_user']:
             self.login_log.host = log_value['host']
             self.login_log.user_id = log_value['user_id']
