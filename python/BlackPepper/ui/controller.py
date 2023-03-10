@@ -1,6 +1,8 @@
 import sys
 import os
-import glob, json, webbrowser
+import glob
+import json
+import webbrowser
 from BlackPepper.mantra_process_bar import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
@@ -15,6 +17,7 @@ from BlackPepper.ui.auto_login import Auto_log
 import hou
 from datetime import datetime
 
+
 class PepperWindow(QMainWindow):
     def __init__(self):
         """이 모듈은 pepper를 통해 얻어 온 kitsu 상의 template asset과 casting 된 shot들의 정보들을 UI를 통해 보여준다.
@@ -23,7 +26,7 @@ class PepperWindow(QMainWindow):
         여러 개의 shot들을 한번에 선택해 조정할 수 있도록 shots와 rendelistes의 view는 ExtendedSelection으로 설정했다. \n
         PepperWindow 실행 시 self.login_ui가 우선 실행된다.
         """
-
+        super().__init__()
         self.pepper = Houpub()
         self.login_log = Auto_log()
         self.projects_selection = None
@@ -32,6 +35,8 @@ class PepperWindow(QMainWindow):
         self.renderlists_selection = None
         self.temp_rev = None
         self.cam_rev = None
+        self.mantra_window = None
+
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
@@ -121,25 +126,24 @@ class PepperWindow(QMainWindow):
         self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
         self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
 
-        logoutAction = QAction('Logout', self.main_window)
-        self.main_preset.addAction(logoutAction)
+        logout_action = QAction('Logout', self.main_window)
+        self.main_preset.addAction(logout_action)
 
         # self.main_menu = self.main_menu_bar.addMenu('Menu')
-        exitAction = QAction('Exit', self.main_window)
-        exitAction.setShortcut('Ctrl+Q')
-        exitAction.setStatusTip('Exit application')
-        exitAction.triggered.connect(QApplication.instance().quit)
-        self.main_preset.addAction(exitAction)
+        exit_action = QAction('Exit', self.main_window)
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.setStatusTip('Exit application')
+        exit_action.triggered.connect(QApplication.instance().quit)
+        self.main_preset.addAction(exit_action)
 
         # logoutAction = QAction('Logout', self.main_window)
 
-
         main_helpmenu = self.main_menu_bar.addMenu('Help')
-        kisuAction = QAction('Kitsu', self.main_window)
-        kisuAction.setShortcut('F1')
-        kisuAction.setStatusTip('Kitsu site open')
-        kisuAction.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
-        main_helpmenu.addAction(kisuAction)
+        kisu_action = QAction('Kitsu', self.main_window)
+        kisu_action.setShortcut('F1')
+        kisu_action.setStatusTip('Kitsu site open')
+        kisu_action.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        main_helpmenu.addAction(kisu_action)
 
         self.set_auto_login()
 
@@ -330,7 +334,7 @@ class PepperWindow(QMainWindow):
         for rev in rev_list:
             self.main_window.shot_rev_cbox.addItem(f'{rev}')
 
-    def append_render_list(self, event):
+    def append_render_list(self):
         """main window 의 append_btn 에 연결 되어 클릭시 사용 되는 함수 이다.
         선택된 shot 들의 shot_dict 를  pepper의 make_precomp_dict 를 사용하여 shot 별로 houdini에서 필요한
         path들을 딕셔너리로 만들고 self.precomp_list에 넣어주고 render_moderl.pepperlist clear 정리해준다.
@@ -428,8 +432,7 @@ class PepperWindow(QMainWindow):
             print(self.render_list_data)
 
     def precomp_list_len(self):
-        total = len(self.render_list_data)
-
+        # total = len(self.render_list_data)
         self.render_model.pepperlist.clear()
         for render in self.pepper.precomp_list:
             self.render_model.pepperlist.append(render['name'])
@@ -440,21 +443,19 @@ class PepperWindow(QMainWindow):
     def render_execute(self):
         houp = HouPepper()
         for precomp in self.pepper.precomp_list:
-            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path = self.path_seperator(precomp)
-            print(temp_working_path, layout_output_path, fx_working_path)
+            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+                = self.path_seperator(precomp)
             houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
         for precomp in self.pepper.precomp_list:
-            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path = self.path_seperator(precomp)
-            # if not QtWidgets.QApplication.instance():
-            #     app = QtWidgets.QApplication(sys.argv)
-            # else:
-            #     app = QtWidgets.QApplication.instance()
-            # m = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}', jpg_output_path,
-            #                      layout_output_path, houp.cam_node, houp.abc_range[1] * hou.fps())
-            # m.resize(800, 600)
-            # m.move(1000, 250)
-            # m.show()
+            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+                = self.path_seperator(precomp)
+            self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
+                                                  jpg_output_path, layout_output_path, houp.cam_node,
+                                                  houp.abc_range[1] * hou.fps())
+            self.mantra_window.resize(800, 600)
+            self.mantra_window.move(1000, 250)
+            self.mantra_window.show()
             # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
             # f.resize(800, 600)
             # f.move(1000, 250)
