@@ -3,16 +3,16 @@ import os
 import glob
 import json
 import webbrowser
-from BlackPepper.mantra_process_bar import MantraMainWindow
+from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow
 from PySide2.QtGui import QKeySequence
-from PySide2.QtWidgets import QAction, QApplication
+from PySide2.QtWidgets import QAction, QApplication, QMenu
 from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
-from BlackPepper.houpepper import HouPepper
+from BlackPepper.process.houpepper import HouPepper
 from BlackPepper.ui.auto_login import Auto_log
 import hou
 from datetime import datetime
@@ -117,52 +117,8 @@ class PepperWindow(QMainWindow):
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
 
         # set main menubar
-
-        login_menu_bar = self.login_window.menuBar()
-        login_menu = login_menu_bar.addMenu('Menu')
-        exit_action = QAction('Exit', self.login_window)
-        exit_action.setShortcut('Ctrl+Q')
-        exit_action.setStatusTip('Exit application')
-        exit_action.triggered.connect(QApplication.instance().quit)
-        login_menu.addAction(exit_action)
-
-        self.main_menu_bar = self.main_window.menuBar()
-
-        self.main_menu_bar.setNativeMenuBar(False)
-        self.main_preset = self.main_menu_bar.addMenu('Menu')
-        self.connect_precomp_list()
-        self.main_preset.addSeparator()
-        self.main_window.actionKitsu.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
-        self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
-
-        logout_action = QAction('Logout', self.main_window)
-        logout_action.setShortcut('Ctrl+L')
-        logout_action.setStatusTip('Logout application')
-        logout_action.triggered.connect(self.user_logout)
-        self.main_preset.addAction(logout_action)
-
-        # self.main_menu = self.main_menu_bar.addMenu('Menu')
-        exit_action = QAction('Exit', self.main_window)
-        exit_action.setShortcut('Ctrl+Q')
-        exit_action.setStatusTip('Exit application')
-        exit_action.triggered.connect(QApplication.instance().quit)
-        self.main_preset.addAction(exit_action)
-
-        # logoutAction = QAction('Logout', self.main_window)
-
-        main_helpmenu = self.main_menu_bar.addMenu('Help')
-        kisu_action = QAction('Kitsu', self.main_window)
-        kisu_action.setShortcut('F1')
-        kisu_action.setStatusTip('Kitsu site open')
-        kisu_action.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
-        main_helpmenu.addAction(kisu_action)
-
-        sidefx_action = QAction('Side Fx', self.main_window)
-        sidefx_action.setShortcut('F2')
-        sidefx_action.setStatusTip('Side Fx site open')
-        sidefx_action.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
-        main_helpmenu.addAction(sidefx_action)
-
+        self.set_login_menubar()
+        self.set_main_menubar()
         self.set_auto_login()
 
     def set_auto_login(self):
@@ -400,29 +356,88 @@ class PepperWindow(QMainWindow):
         self.render_model.pepperlist.clear()
         self.render_model.layoutChanged.emit()
 
-    def connect_precomp_list(self):
+    def set_login_menubar(self):
+        """로그인 창의 메뉴바를 셋팅하는 함수이다.
+        메뉴바에 'Menu'를 만들고 'Menu'안에 'Exit'를 만들었고 'Ctrl+Q' 단축키 또는 'Exit' 클릭시 창의 X 와 같은 기능으로
+         어플리케이션이 종료 된다.
         """
+        login_menu_bar = self.login_window.menuBar()
+        login_menu = login_menu_bar.addMenu('Menu')
+        exit_action = QAction('Exit', self.login_window)
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.setStatusTip('Exit application')
+        exit_action.triggered.connect(QApplication.instance().quit)
+        login_menu.addAction(exit_action)
 
-        Returns:
-
+    def set_main_menubar(self):
+        """메인 창의 메뉴바를 셋팅하는 함수이다. 그리고 해당 함수에는 메뉴바에 preset 을 셋팅하는 함수를 포함 하고있다.
+        'Menu' 와 'Help' 메뉴바를 만들고 'Menu' 에는 먼저 set_main_window_preset() 함수의 'Recent Presets' 와
+        'Logout','Exit' 들을 추가하고 단축키와 클릭시 컨넥트 되어있는 함수가 발생한다.
+        'Help' 에는 Black Pepper 에 필요한 kitsu, SideFX등 같은 관련 사이트들 을 열수 있게 추가되어있다.
         """
-        # self.main_preset = self.main_menu_bar.addMenu('Preset')
-        directory_path = '/home/rapa/git/hook/python/BlackPepper/ui/copy_sw'
+        self.main_menu_bar = self.main_window.menuBar()
+        self.main_menu_bar.setNativeMenuBar(False)
+        self.main_menu = self.main_menu_bar.addMenu('Menu')
+        # set main window preset
+        self.set_mainwindow_preset()
+
+        self.main_menu.addSeparator()
+
+        logout_action = QAction('Logout', self.main_window)
+        logout_action.setShortcut('Ctrl+L')
+        logout_action.setStatusTip('Logout application')
+        logout_action.triggered.connect(self.user_logout)
+        self.main_menu.addAction(logout_action)
+
+        exit_action = QAction('Exit', self.main_window)
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.setStatusTip('Exit application')
+        exit_action.triggered.connect(QApplication.instance().quit)
+        self.main_menu.addAction(exit_action)
+
+        main_helpmenu = self.main_menu_bar.addMenu('Help')
+        kisu_action = QAction('Kitsu', self.main_window)
+        kisu_action.setShortcut('F1')
+        kisu_action.setStatusTip('Kitsu site open')
+        kisu_action.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
+        main_helpmenu.addAction(kisu_action)
+
+        sidefx_action = QAction('Side Fx', self.main_window)
+        sidefx_action.setShortcut('F2')
+        sidefx_action.setStatusTip('Side Fx site open')
+        sidefx_action.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
+        main_helpmenu.addAction(sidefx_action)
+
+        scanline_action = QAction('Scanline VFX', self.main_window)
+        scanline_action.setShortcut('F3')
+        scanline_action.setStatusTip('Scanline VFX site open')
+        scanline_action.triggered.connect(lambda: webbrowser.open('https://www.scanlinevfx.com/'))
+        main_helpmenu.addAction(scanline_action)
+
+    def set_mainwindow_preset(self):
+        """Render 버튼을 누르면 main ui 의 preset 정보들이 json 으로 저장되는 함수이다.
+        """
+        imp_menu = QMenu('Recent Presets', self.main_window)
+
+        directory_path = '/home/rapa/git/hook/python/BlackPepper/ui'
         json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
 
         for file_path in json_files:
-            file_path = QAction(os.path.basename(file_path))
-            file_path.triggered.connect(lambda _, path=file_path: self.handle_file(path))
-            self.main_preset.addAction(file_path)
-
-        # self.main_preset.layoutChanged.emit()
-        # self.main_preset.addSeparator() # QMenu에 구분선 추가
+            file_action = QAction(os.path.basename(file_path), self)
+            file_action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+            imp_menu.addAction(file_action)
+        self.main_menu.addMenu(imp_menu)
 
     def handle_file(self, file_path):
         # TODO: 파일 내용 처리하기
-        pass
+        self.load_preset_set()
+        # pass
 
     def save_preset_json(self):
+        """
+        Render 버튼을 누르면 main ui 의 preset 정보들이 json 으로 저장되는 함수이다.
+
+        """
         now = datetime.now()
         base_filename = f'{self.pepper.identif}_{now.date()}_time_{now.hour}:{now.minute}'
 
@@ -440,8 +455,7 @@ class PepperWindow(QMainWindow):
 
         self.render_model.pepperlist.clear()
         for render in self.pepper.precomp_list:
-            self.render_list_data.append(render)
-            # self.render_list_data.append(render['name'])
+            self.render_list_data.append(render['name'])
         with open(self.filename, "w") as f:
             json.dump(self.render_list_data, f, ensure_ascii=False)
 
@@ -460,21 +474,21 @@ class PepperWindow(QMainWindow):
         self.renderlists_selection.clear()
 
     def render_execute(self):
-        houp = HouPepper()
-        for precomp in self.pepper.precomp_list:
-            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-                = self.path_seperator(precomp)
-            houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
-                                         f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
-        for precomp in self.pepper.precomp_list:
-            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-                = self.path_seperator(precomp)
-            self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
-                                                  jpg_output_path, layout_output_path, houp.cam_node,
-                                                  houp.abc_range[1] * hou.fps())
-            self.mantra_window.resize(800, 600)
-            self.mantra_window.move(1000, 250)
-            self.mantra_window.show()
+        # houp = HouPepper()
+        # for precomp in self.pepper.precomp_list:
+        #     temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+        #         = self.path_seperator(precomp)
+        #     houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
+        #                                  f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
+        # for precomp in self.pepper.precomp_list:
+        #     temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+        #         = self.path_seperator(precomp)
+        #     self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
+        #                                           jpg_output_path, layout_output_path, houp.cam_node,
+        #                                           houp.abc_range[1] * hou.fps())
+        #     self.mantra_window.resize(800, 600)
+        #     self.mantra_window.move(1000, 250)
+        #     self.mantra_window.show()
             # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
             # f.resize(800, 600)
             # f.move(1000, 250)
