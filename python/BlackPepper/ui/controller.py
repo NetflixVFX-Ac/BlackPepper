@@ -117,6 +117,15 @@ class PepperWindow(QMainWindow):
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
 
         # set main menubar
+
+        login_menu_bar = self.login_window.menuBar()
+        login_menu = login_menu_bar.addMenu('Menu')
+        exit_action = QAction('Exit', self.login_window)
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.setStatusTip('Exit application')
+        exit_action.triggered.connect(QApplication.instance().quit)
+        login_menu.addAction(exit_action)
+
         self.main_menu_bar = self.main_window.menuBar()
 
         self.main_menu_bar.setNativeMenuBar(False)
@@ -127,6 +136,9 @@ class PepperWindow(QMainWindow):
         self.main_window.actionSidefx.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
 
         logout_action = QAction('Logout', self.main_window)
+        logout_action.setShortcut('Ctrl+L')
+        logout_action.setStatusTip('Logout application')
+        logout_action.triggered.connect(self.user_logout)
         self.main_preset.addAction(logout_action)
 
         # self.main_menu = self.main_menu_bar.addMenu('Menu')
@@ -144,6 +156,12 @@ class PepperWindow(QMainWindow):
         kisu_action.setStatusTip('Kitsu site open')
         kisu_action.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
         main_helpmenu.addAction(kisu_action)
+
+        sidefx_action = QAction('Side Fx', self.main_window)
+        sidefx_action.setShortcut('F2')
+        sidefx_action.setStatusTip('Side Fx site open')
+        sidefx_action.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
+        main_helpmenu.addAction(sidefx_action)
 
         self.set_auto_login()
 
@@ -295,7 +313,7 @@ class PepperWindow(QMainWindow):
         self.shot_model.layoutChanged.emit()
         self.shots_selection.clear()
         self.renderlists_selection.clear()
-        self.main_window.statusBar().showMessage('shots 를 선택하세요 ! 다중A선택가능 ! ')
+        self.main_window.statusBar().showMessage('shots 를 선택하세요 ! 다중선택가능 ! ')
 
     def renew_template_info(self):
         revision = self.main_window.temp_rev_cbox.currentText()

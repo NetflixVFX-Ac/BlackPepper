@@ -22,8 +22,7 @@ color: rgb(180, 180, 180);
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
-    <string notr="true">
-</string>
+    <string notr="true"/>
    </property>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
@@ -268,12 +267,6 @@ color: rgb(45, 45, 45);</string>
      <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuLogin_Menu">
-    <property name="title">
-     <string>Login Menu</string>
-    </property>
-   </widget>
-   <addaction name="menuLogin_Menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
