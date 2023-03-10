@@ -1,7 +1,7 @@
 import numpy as np
 from BlackPepper.pepper import Houpub
-from BlackPepper.ffmpeg_process_bar import FFmpegMainWindow
-from BlackPepper.mantra_process_bar_w import MantraMainWindow
+from BlackPepper.process.ffmpeg_process_bar import FFmpegMainWindow
+from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
 from PySide2 import QtWidgets
 import hou
 import _alembic_hom_extensions as abc
