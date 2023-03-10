@@ -28,7 +28,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.check = None
         # self.is_interrupted = None
         self.total_frame = total_frame
-        self.command = [
+        self.mantra_command = [
             'python',
             '/home/rapa/git/hook/python/BlackPepper/mantra_render.py',
             next_fx_path,
@@ -37,8 +37,9 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             cam_node
         ]
 
-        self.cmd = (' '.join(str(s) for s in self.command))
+        self.mantra_cmd = (' '.join(str(s) for s in self.command))
 
+        self.filecnt = 0
         self.ffmpeg_command = [
             'ffmpeg',
             "-framerate", '24',  # 초당프레임
