@@ -343,7 +343,7 @@ def main():
     pepper = Houpub()
     pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
     pepper.project = 'PEPPER'
-    pepper.asset = 'temp_fire'
+    pepper.asset = 'temp_breaking_glass'
     pepper.entity = 'asset'
     # need software handling method
     pepper.software = 'hipnc'
