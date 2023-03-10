@@ -46,6 +46,9 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         # self.btn.pressed.connect(self.start_process)
         self.btn_interrupt = QtWidgets.QPushButton("Interrupt")
         self.btn_interrupt.clicked.connect(self.handle_interrupt)
+        #
+        # #for json
+        # self.frame_dict =
 
         l = QtWidgets.QVBoxLayout()
         # l.addWidget(self.btn)
@@ -110,11 +113,6 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             self.progress.setValue(progress)
 
         self.message(stderr)
-        #
-        # if "Process finished." in stderr:
-        #     self.btn_interrupt.setText("Restart")
-        #     self.btn_interrupt.clicked.disconnect(self.handle_interrupt)
-        #     self.btn_interrupt.clicked.connect(self.start_process)
 
     def handle_stdout(self):
         """
@@ -199,30 +197,4 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         else:
             self.btn_interrupt.setText("Interrupt")
             self.start_process()
-        #     if self.is_interrupted:
-        #         self.btn_interrupt.setText("Interrupt")
-        #         self.is_interrupted = False
-        #         self.p.write(b'c')
-        #     else:
-        #         self.btn_interrupt.setText("Restart")
-        #         self.is_interrupted = True
-        #
-        # self.btn_interrupt.clicked.connect(on_interrupt_clicked)
 
-        #     if self.btn_interrupt.isChecked():
-        #         self.btn_interrupt.
-        #
-        #
-        #
-        #
-        # #     if hasattr(self, 'is_interrupted') and self.is_interrupted:
-        # #         pass
-        # #     else:
-        # #         self.is_interrupted = True
-        # #         self.p.kill()
-        # #         self.message("Process Interrupted")
-        # #         self.btn_interrupt.setText("Restart")
-        # #         self.btn_interrupt.clicked.disconnect(self.handle_interrupt)
-        # #         self.btn_interrupt.clicked.connect(self.start_process)
-        # # self.is_interrupted = False
-        # self.start_process()
