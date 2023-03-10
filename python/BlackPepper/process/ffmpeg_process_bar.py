@@ -2,7 +2,7 @@ import re
 from PySide2 import QtWidgets, QtCore
 import os
 import glob
-
+.
 
 class FFmpegMainWindow(QtWidgets.QMainWindow):
     """
