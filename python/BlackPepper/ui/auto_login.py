@@ -6,12 +6,12 @@ import gazu
 
 
 class Auto_log:
+    """
+    이 모듈은 precomp를 하기 위한 login을 할 때 전에 login한 기록이 있다면 자동으로 로그인을 도와준다. \n
+    login 정보의 경우 json파일에 'auto'라는 이름의 key값으로 저장되며 해당 값에는 host, id, password, auto login이력의 정보가 적혀있다.
+    해당모듈은 ui가 실행하면 작동한다.
+    """
     def __init__(self):
-        """
-        이 모듈은 precomp를 하기 위한 login을 할 때 전에 login한 기록이 있다면 자동으로 로그인을 도와준다. \n
-        login 정보의 경우 json파일에 'auto'라는 이름의 key값으로 저장되며 해당 값에는 host, id, password, auto login이력의 정보가 적혀있다.
-        해당모듈은 ui가 실행하면 작동한다.
-        """
         self.hklog = Logger()
         self.pr = Houpub()
 
