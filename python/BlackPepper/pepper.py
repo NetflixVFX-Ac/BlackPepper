@@ -887,7 +887,6 @@ BlackPepper = Houpub()
 BlackPepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
 BlackPepper.software = 'hipnc'
 BlackPepper.project = 'PEPPER'
-print(BlackPepper.project)
 # BlackPepper.asset = 'temp_dancing_particle'
 # css = BlackPepper.get_casting_path_for_asset()
 # for cs in css:

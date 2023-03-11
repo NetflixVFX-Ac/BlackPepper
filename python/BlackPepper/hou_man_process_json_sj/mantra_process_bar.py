@@ -41,7 +41,6 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             abc_path,
             cam_node
         ]
-
         self.cmd = (' '.join(str(command_string) for command_string in self.command))
 
         # Create the "Interrupt" Button
