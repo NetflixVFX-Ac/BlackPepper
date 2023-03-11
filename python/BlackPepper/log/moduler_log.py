@@ -5,7 +5,13 @@ import os
 class Logger:
     def __init__(self):
         self.log = None
-        self.dir_path = os.path.expanduser('~/.config/Hook')
+        self.dir_path = ''
+        self.home_json_path()
+
+    def home_json_path(self):
+        now_path = os.path.realpath(__file__)
+        split_path = now_path.split('/')[:-2]
+        self.dir_path = os.path.join('/'.join(split_path), '.config')
         if not os.path.exists(self.dir_path):
             try:
                 os.makedirs(self.dir_path)
