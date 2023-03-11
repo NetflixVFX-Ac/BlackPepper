@@ -1,4 +1,5 @@
 import re
+import os
 import json
 from PySide2 import QtWidgets, QtCore
 
@@ -24,6 +25,10 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             total_frame:
         """
         super().__init__()
+        self.exc_dict = {}
+        self.dir_path = ''
+        self.user_path = ''
+
         self.render_dict = None
         self.process_box = None
         self.is_interrupted = False
@@ -37,7 +42,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             cam_node
         ]
 
-        self.cmd = (' '.join(str(s) for s in self.command))
+        self.cmd = (' '.join(str(command_string) for command_string in self.command))
 
         # Create the "Interrupt" Button
         self.progress = QtWidgets.QProgressBar()
@@ -50,6 +55,18 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.box_layout()
 
         self.start_process()
+
+    def home_json_path(self):
+        now_path = os.path.realpath(__file__)
+        split_path = now_path.split('/')[:-2]
+        self.dir_path = os.path.join('/'.join(split_path), '.config')
+        self.user_path = os.path.join(self.dir_path, 'user.json')
+
+    def save_frame_setting(self):
+        self.exc_dict['frame'] = []
+        self.exc_dict['frame'].append({
+
+        })
 
     def box_layout(self):
         box = QtWidgets.QVBoxLayout()

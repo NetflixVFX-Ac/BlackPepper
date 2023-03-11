@@ -1,6 +1,5 @@
 import gazu
-# from BlackPepper.log.log_pepper import make_logger
-from BlackPepper.log.login_log import Logger
+from BlackPepper.log.moduler_log import Logger
 
 
 class Houpub:

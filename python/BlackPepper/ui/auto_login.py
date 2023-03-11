@@ -1,4 +1,4 @@
-from BlackPepper.log.login_log import Logger
+from BlackPepper.log.moduler_log import Logger
 from BlackPepper.pepper import Houpub
 import os
 import json
@@ -7,11 +7,15 @@ import gazu
 
 class Auto_log:
     def __init__(self):
+        """
+        이 모듈은 precomp를 하기 위한 login을 할 때 전에 login한 기록이 있다면 자동으로 로그인을 도와준다. \n
+        login 정보의 경우 json파일에 'auto'라는 이름의 key값으로 저장되며 해당 값에는 host, id, password, auto login이력의 정보가 적혀있다.
+        해당모듈은 ui가 실행하면 작동한다.
+        """
         self.hklog = Logger()
         self.pr = Houpub()
 
         self.user_dict = {}
-        self.user_dict['auto'] = []
 
         self._user = None
         self._host = None
@@ -36,6 +40,18 @@ class Auto_log:
 
     @valid_host.setter
     def valid_host(self, value):
+        """웹에 연결된 host에 대한 연결상태를 True, False로 기록한다. True의 경우 연결이 된 것이고, False의 경우는 연결이 되지 않은 것이다.
+
+        Examples:
+            Auto_log.valid_host = Ture
+
+        Args:
+            value: True or False
+
+        Returns:
+            True or False
+
+        """
         self._valid_host = value
 
     @property
@@ -44,6 +60,18 @@ class Auto_log:
 
     @valid_user.setter
     def valid_user(self, value):
+        """host를 연결하고 ui에서 적은 id와 password의 연결 된 적이 있는지 파악하는 역할을 한다. 이력이 있으면 True를 가지고
+        없다면 False를 가진다.
+
+        Examples:
+            Auto_log.valid_user = True
+
+        Args:
+            value: True or False
+
+        Returns:
+            True or False
+        """
         self._valid_user = value
 
     @property
@@ -52,6 +80,18 @@ class Auto_log:
 
     @host.setter
     def host(self, hos):
+        """ host의 정보를 받아온다.
+
+        Auto_log.host = "http://192.168.3.116/api"
+
+        Args:
+            hos(str): host url
+
+         Raises:
+            ConnectionError: Host ip에 다른 값이 있을 때
+            ServerErrorException: Host의 주소가 맞지 않을 때
+
+        """
         self._host = hos
 
     @property
@@ -60,6 +100,17 @@ class Auto_log:
 
     @user_id.setter
     def user_id(self, uid):
+        """ id 정보를 받아온다.
+
+        Examples:
+            Auto_log.user_id = "pipeline@rapa.org"
+
+        Args:
+            uid(str): user id
+
+        Raises:
+            AuthFailedException: id가 맞지 않을 때
+        """
         self._user_id = uid
 
     @property
@@ -68,6 +119,17 @@ class Auto_log:
 
     @user_pw.setter
     def user_pw(self, upw):
+        """password 정보를 받아온다.
+
+        Examples:
+            Auto_log.user_pw = "netflixacademy"
+
+        Args:
+            upw(str): user password
+
+        Raises:
+            AuthFailedException: password가 맞지 않을 때
+        """
         self._user_pw = upw
 
     @property
@@ -76,6 +138,17 @@ class Auto_log:
 
     @user_ext.setter
     def user_ext(self, ext):
+        """houdini의 extension을 hip, hipnc, hiplc타입을 가져온다.
+
+        Examples:
+            Auto_log.user_ext = 'hip'
+
+        Args:
+            ext(str): 'hip', 'hipnc', or 'hiplc'
+
+        Raises:
+            Exception: If software_name is not hip, hipnc, or hiplc.
+        """
         self._user_ext = ext
 
     @property
@@ -84,6 +157,20 @@ class Auto_log:
 
     @user.setter
     def user(self, us):
+        """user의 id의 full_name정보를 가져오기 위해 사용한다.
+
+        Examples:
+            Auto_log.user = Hou_pub.user['user']
+
+        Args:
+            us(dict): user information
+
+        Returns:
+            user information dict
+
+        Raises:
+            AuthFailedException: id나 password가 맞지 않을 때
+        """
         self._user = us
 
     @property
@@ -91,16 +178,33 @@ class Auto_log:
         return self._auto_login
 
     @auto_login.setter
-    def auto_login(self, value):
-        self._auto_login = value
+    def auto_login(self, tr):
+        """auto login의 성공여부를 True 혹은 False로 나타낸다.
+
+        Args:
+            tr: True or False
+
+        Returns:
+            True or False
+        """
+        self._auto_login = tr
 
     def home_json_path(self):
+        """auto login을 할 수 있는 json 파일의 생성경로를 지정한다. 파일의 root는 현재 python 파일이 위치한 곳으로 한다.
+
+        Examples:
+            home_json_path()
+        """
         now_path = os.path.realpath(__file__)
         split_path = now_path.split('/')[:-2]
         self.dir_path = os.path.join('/'.join(split_path), '.config')
         self.user_path = os.path.join(self.dir_path, 'user.json')
 
     def connect_login(self):
+        """
+
+
+        """
         self.pr.login(self.host, self.user_id, self.user_pw)
         self.pr.software = self.user_ext
         self.hklog.set_logger(self.user_id)
