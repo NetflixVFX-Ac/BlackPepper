@@ -201,8 +201,17 @@ class Auto_log:
         self.user_path = os.path.join(self.dir_path, 'user.json')
 
     def connect_login(self):
-        """
+        """kitsu에 login과 software정보를 입력한다. 로그인이 성공할 시 host의 연결과 user의 vaild를 기록한다.
+        호스트, 로그인이 실패할 경우 log를 남기고 로그인 후에도 해당 정보를 log에 남긴다.
 
+        Examples:
+            Auto_log.connect_login()
+
+        Returns: True
+
+        Raises:
+            Exception: 'Invalid host URL.'
+            Exception: 'Invalid user ID or password.'
 
         """
         self.pr.login(self.host, self.user_id, self.user_pw)
@@ -226,12 +235,32 @@ class Auto_log:
         return True
 
     def log_out(self):
+        """ kitsu에 log out한다. json파일에도 user정보와 host정보를 모두 초기화한다.
+
+        Examples:
+            Auto_log.log_out()
+
+        Returns: True
+
+        """
         gazu.log_out()
         self.user = None
         self.reset_setting()
         return True
 
     def access_setting(self):
+        """ home_path에 지정한 directory가 존재하지 않으면 만들어준다.
+        또한 user 정보가 기록된 json파일이 없을 경우 user와 host정보를 초기화한다.
+
+        Examples:
+            Auto_log.access_setting()
+
+        Raises:
+            OSError: Failed to create the directory.
+            OSError: Failed to create user.json file.
+
+        Returns: True
+        """
         if not os.path.exists(self.dir_path):
             try:
                 os.makedirs(self.dir_path)
@@ -245,6 +274,14 @@ class Auto_log:
         return True
 
     def load_setting(self):
+        """json파일에 user, host, 연결상태등의 정보를 불러온다.
+
+        Examples:
+            Auto_log.load_setting()
+
+        Returns: 'auto' key의 values
+
+        """
         with open(self.user_path, 'r') as json_file:
             self.user_dict = json.load(json_file)
             if 'auto' not in self.user_dict:
@@ -255,6 +292,13 @@ class Auto_log:
                     return auto_value
 
     def save_setting(self):
+        """'auto'라는 이름의 key로 host, id, password, ext, vail_host, valid_user, auto_login 정보를 저장한다.
+        그 후 json파일에 해당 정보를 기록한다.
+
+        Examples:
+            Auto_log.save_setting()
+
+        """
         self.user_dict['auto'] = []
         self.user_dict['auto'].append({
             'host': self.host,
@@ -269,6 +313,12 @@ class Auto_log:
             json.dump(self.user_dict, json_file)
 
     def reset_setting(self):
+        """ host, id, password, valid_host, valid_user, auto_login정보를 모두 초기화시킨다.
+        이후 해당 정보를 self.user_dict에 저장한다.
+
+        Examples:
+            Auto_log.reset_setting()
+        """
         self.host = ''
         self.user_id = ''
         self.user_pw = ''
