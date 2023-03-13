@@ -7,6 +7,9 @@ from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow
+from PySide2.QtWidgets import QAction, QApplication
+from BlackPepper.ui.model import PepperModel, PepperDnDModel
+from BlackPepper.ui.view import PepperView, PepperDnDView
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import QAction, QApplication, QMenu
 from BlackPepper.ui.model import PepperModel
@@ -46,12 +49,12 @@ class PepperWindow(QMainWindow):
         self.project_model = PepperModel()
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
-        self.render_model = PepperModel()
+        self.render_model = PepperDnDModel()
         # listview instance
         self.projects_listview = PepperView(self)
         self.templates_listview = PepperView(self)
         self.shots_listview = PepperView(self)
-        self.renderlists_listview = PepperView(self)
+        self.renderlists_listview = PepperDnDView(self)
         self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         # setModel
@@ -283,7 +286,8 @@ class PepperWindow(QMainWindow):
     def renew_template_info(self):
         revision = self.main_window.temp_rev_cbox.currentText()
         name, time, rev = self.pepper.get_working_file_data('simulation', revision, 'asset')
-        self.main_window.template_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
+        time = 'Date ' + time[:10] + ' Time ' + time[11:]
+        self.main_window.template_info_label.setText(f"{name}, {time}, Revision : ")
 
     def shot_selected(self, event):
         """Shots 를 선택 시 선택한 shot 의 정보(dict)를 self.all_shots = [] 에 담는 함수 이다.\n
@@ -297,7 +301,7 @@ class PepperWindow(QMainWindow):
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
         self.pepper.entity = 'shot'
-        rev_list = self.pepper.get_every_revision_for_output_file('Camera_cache', 'layout')
+        rev_list = self.pepper.get_every_revision_for_output_file('camera_cache', 'layout')
         self.renew_shot_cbox(rev_list)
         self.renew_shot_info()
         self.renderlists_selection.clear()
@@ -305,7 +309,8 @@ class PepperWindow(QMainWindow):
     def renew_shot_info(self):
         revision = self.main_window.shot_rev_cbox.currentText()
         name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', revision, 'shot')
-        self.main_window.shot_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
+        time = 'Date ' + time[:10] + ' Time ' + time[11:]
+        self.main_window.shot_info_label.setText(f"{name}, {time}, Revision : ")
 
     def renew_template_cbox(self, rev_list):
         self.main_window.temp_rev_cbox.clear()
@@ -426,7 +431,7 @@ class PepperWindow(QMainWindow):
         main_helpmenu.addAction(scanline_action)
 
     def set_mainwindow_preset(self):
-        """Render 버튼을 누르면 main ui 의 preset 정보들이 json 으로 저장되는 함수이다.
+        """메뉴바 'Menu' 에 'Recent Presets'메뉴에 path 에 있는 최신 5개의 json 파일들을 내림차순으로 보여준다.
         """
         recent_menu = QMenu('Recent Presets', self.main_window)
 
@@ -441,7 +446,8 @@ class PepperWindow(QMainWindow):
 
     def handle_file(self, file_path):
         # TODO: 파일 내용 처리하기
-        self.load_preset_set()
+        # self.load_preset_set()
+        pass
 
     def save_preset_json(self):
         """
@@ -503,6 +509,7 @@ class PepperWindow(QMainWindow):
             # f.move(1000, 250)
             # f.show()
 
+        # pepper.precomp_list 의 갯수가 0개이면 반환하는 값이 없다.
         if len(self.pepper.precomp_list) == 0:
             return
 
