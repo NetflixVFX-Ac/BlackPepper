@@ -14,7 +14,7 @@ class PepperView(QtWidgets.QListView):
 class PepperDnDView(QtWidgets.QListView):
     def __init__(self, parent):
         super(PepperDnDView, self).__init__(parent=None)
-        self.setDragEnabled(True)
+        self.setDragEnabled(True)   
         self.setAcceptDrops(True)
         self.setDragDropMode(self.DragDrop)
         self.startIndex = None
