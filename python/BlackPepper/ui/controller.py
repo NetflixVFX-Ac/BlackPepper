@@ -294,8 +294,9 @@ class PepperWindow(QMainWindow):
     def renew_template_info(self):
         revision = self.main_window.temp_rev_cbox.currentText()
         name, time, rev = self.pepper.get_working_file_data('simulation', revision, 'asset')
-        time = 'Date ' + time[:10] + ' Time ' + time[11:]
-        self.main_window.template_info_label.setText(f"{name}, {time}, Revision : ")
+        date = time[:10]
+        clock = time[11:]
+        self.main_window.template_info_label.setText(f"{name}\n{date}\n{clock}")
 
     def shot_selected(self, event):
         """Shots 를 선택 시 선택한 shot 의 정보(dict)를 self.all_shots = [] 에 담는 함수 이다.\n
@@ -317,8 +318,9 @@ class PepperWindow(QMainWindow):
     def renew_shot_info(self):
         revision = self.main_window.shot_rev_cbox.currentText()
         name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', revision, 'shot')
-        time = 'Date ' + time[:10] + ' Time ' + time[11:]
-        self.main_window.shot_info_label.setText(f"{name}, {time}, Revision : ")
+        date = time[:10]
+        clock = time[11:]
+        self.main_window.shot_info_label.setText(f"{name}\n{date}\n{clock}")
 
     def renew_template_cbox(self, rev_list):
         self.main_window.temp_rev_cbox.clear()
