@@ -538,10 +538,11 @@ class Houpub:
         precomp = {'name': name, 'temp_working_path': temp_working_path,
                    'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
                    'jpg_output_path': jpg_output_path, 'video_output_path': video_output_path}
-        if precomp in self.precomp_list:
-            return
-        self.precomp_list.append(precomp)
-        return
+        return precomp
+        # if precomp in self.precomp_list:
+        #     return
+        # self.precomp_list.append(precomp)
+        # return
 
     def delete_precomp_dict(self, name):
         for precomp in self.precomp_list:
@@ -699,6 +700,13 @@ class Houpub:
         self.dict_check(self.shot, 'no_shot')
         return [(asset['asset_type_name'] + ':' + asset['asset_name'])
                 for asset in gazu.casting.get_shot_casting(self.shot)]
+
+    def check_asset_type(self, asset_name, asset_type_name):
+        asset = gazu.asset.get_asset_by_name(self.project, asset_name)
+        asset_type = gazu.asset.get_asset_type_from_asset(asset)
+        if asset_type['name'] == asset_type_name:
+            return asset_name
+        return
 
     # ----------------------------------
     # ----------user 관련 메소드----------
