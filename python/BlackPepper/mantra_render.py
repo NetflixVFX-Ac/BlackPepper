@@ -48,7 +48,7 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
         if len(error_list) == 0:
             shutil.rmtree(home_path + '/temp')
         else:
-            print("render error")
+            print("jpg.mantra checkpoint exists")
     else:
         print("missing sequence frame")
 

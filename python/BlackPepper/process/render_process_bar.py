@@ -93,6 +93,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.p.readyReadStandardError.connect(self.handle_stderr)
         self.p.stateChanged.connect(self.handle_state)
         self.p.finished.connect(self.process_finished)  # Clean up once complete.
+        print('check check')
         self.p.start(cmd)
 
     def handle_stderr(self):
@@ -153,7 +154,9 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             print("ttttttttttttttmddd :", cmd)
             print('cmd_list :', self.cmd_list)
             print('len cmd_list :', len(self.cmd_list))
+            # self.p = None
             self.start_process(cmd)
+            # self.p.waitForFinished()
         else:
             return
 
