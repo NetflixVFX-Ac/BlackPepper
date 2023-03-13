@@ -7,9 +7,6 @@ from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow
-from PySide2.QtWidgets import QAction, QApplication
-from BlackPepper.ui.model import PepperModel, PepperDnDModel
-from BlackPepper.ui.view import PepperView, PepperDnDView
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import QAction, QApplication, QMenu
 from BlackPepper.ui.model import PepperModel
@@ -49,12 +46,12 @@ class PepperWindow(QMainWindow):
         self.project_model = PepperModel()
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
-        self.render_model = PepperDnDModel()
+        self.render_model = PepperModel()
         # listview instance
         self.projects_listview = PepperView(self)
         self.templates_listview = PepperView(self)
         self.shots_listview = PepperView(self)
-        self.renderlists_listview = PepperDnDView(self)
+        self.renderlists_listview = PepperView(self)
         self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         # setModel
@@ -114,33 +111,25 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
+
         # set statusbar to window
         self.login_window.statusBar().showMessage('kitsu 로그인 하세요!  houdini 확장자 선택하세요!')
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
+
         # set main menubar
         self.set_login_menubar()
         self.set_main_menubar()
-        # set auto login
         self.set_auto_login()
 
     def set_auto_login(self):
+        log_value = self.login_log.load_setting()
         log_path = self.login_log.user_path
         log_id = self.login_window.input_id.text()
         log_pw = self.login_window.input_pw.text()
         log_sfw = self.login_window.hipbox.currentText()[1:]
-        log_value = self.login_log.load_setting()
-        if os.path.exists(log_path) and (log_id != log_value['user_id'] or log_pw != log_value['user_pw']
-                                         or log_sfw != log_value['user_ext']):
+        if os.path.exists(log_path) and log_id != log_value['user_id'] or log_pw != log_value['user_pw'] \
+                or log_sfw != log_value['user_ext']:
             self.login_log.reset_setting()
-            self.login_log.host = "http://192.168.3.116/api"
-            self.login_log.user_id = log_id
-            self.login_log.user_pw = log_pw
-            self.login_log.user_ext = log_sfw
-            self.login_log.valid_host = True
-            self.login_log.valid_user = True
-            self.login_log.auto_login = True
-            self.login_log.save_setting()
-            return
         if log_value['valid_host'] and log_value['valid_user']:
             self.login_log.host = log_value['host']
             self.login_log.user_id = log_value['user_id']
@@ -285,8 +274,7 @@ class PepperWindow(QMainWindow):
     def renew_template_info(self):
         revision = self.main_window.temp_rev_cbox.currentText()
         name, time, rev = self.pepper.get_working_file_data('simulation', revision, 'asset')
-        time = 'Date ' + time[:10] + ' Time ' + time[11:]
-        self.main_window.template_info_label.setText(f"{name}, {time}, Revision : ")
+        self.main_window.template_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
 
     def shot_selected(self, event):
         """Shots 를 선택 시 선택한 shot 의 정보(dict)를 self.all_shots = [] 에 담는 함수 이다.\n
@@ -300,7 +288,7 @@ class PepperWindow(QMainWindow):
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
         self.pepper.entity = 'shot'
-        rev_list = self.pepper.get_every_revision_for_output_file('camera_cache', 'layout')
+        rev_list = self.pepper.get_every_revision_for_output_file('Camera_cache', 'layout')
         self.renew_shot_cbox(rev_list)
         self.renew_shot_info()
         self.renderlists_selection.clear()
@@ -308,8 +296,7 @@ class PepperWindow(QMainWindow):
     def renew_shot_info(self):
         revision = self.main_window.shot_rev_cbox.currentText()
         name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', revision, 'shot')
-        time = 'Date ' + time[:10] + ' Time ' + time[11:]
-        self.main_window.shot_info_label.setText(f"{name}, {time}, Revision : ")
+        self.main_window.shot_info_label.setText(f"Artist : {name}, Created Time : {time}, Revision : {rev}")
 
     def renew_template_cbox(self, rev_list):
         self.main_window.temp_rev_cbox.clear()
@@ -390,39 +377,37 @@ class PepperWindow(QMainWindow):
         """
         self.main_menu_bar = self.main_window.menuBar()
         self.main_menu_bar.setNativeMenuBar(False)
-        # set Menu
         self.main_menu = self.main_menu_bar.addMenu('Menu')
         # set main window preset
         self.set_mainwindow_preset()
-        # 구분자 추가
+
         self.main_menu.addSeparator()
-        # set 'Logout'
+
         logout_action = QAction('Logout', self.main_window)
         logout_action.setShortcut('Ctrl+L')
         logout_action.setStatusTip('Logout application')
         logout_action.triggered.connect(self.user_logout)
         self.main_menu.addAction(logout_action)
-        # set 'Exit'
+
         exit_action = QAction('Exit', self.main_window)
         exit_action.setShortcut('Ctrl+Q')
         exit_action.setStatusTip('Exit application')
         exit_action.triggered.connect(QApplication.instance().quit)
         self.main_menu.addAction(exit_action)
-        # set Help
+
         main_helpmenu = self.main_menu_bar.addMenu('Help')
-        # set kitsu
         kisu_action = QAction('Kitsu', self.main_window)
         kisu_action.setShortcut('F1')
         kisu_action.setStatusTip('Kitsu site open')
         kisu_action.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
         main_helpmenu.addAction(kisu_action)
-        # set sidefx
+
         sidefx_action = QAction('Side Fx', self.main_window)
         sidefx_action.setShortcut('F2')
         sidefx_action.setStatusTip('Side Fx site open')
         sidefx_action.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
         main_helpmenu.addAction(sidefx_action)
-        # set scanline vfx
+
         scanline_action = QAction('Scanline VFX', self.main_window)
         scanline_action.setShortcut('F3')
         scanline_action.setStatusTip('Scanline VFX site open')
@@ -430,7 +415,7 @@ class PepperWindow(QMainWindow):
         main_helpmenu.addAction(scanline_action)
 
     def set_mainwindow_preset(self):
-        """메뉴바 'Menu' 에 'Recent Presets'메뉴에 path 에 있는 최신 5개의 json 파일들을 내림차순으로 보여준다.
+        """Render 버튼을 누르면 main ui 의 preset 정보들이 json 으로 저장되는 함수이다.
         """
         recent_menu = QMenu('Recent Presets', self.main_window)
 
@@ -445,8 +430,8 @@ class PepperWindow(QMainWindow):
 
     def handle_file(self, file_path):
         # TODO: 파일 내용 처리하기
-        # self.load_preset_set()
-        pass
+        self.load_preset_set()
+        # pass
 
     def save_preset_json(self):
         """
@@ -488,27 +473,26 @@ class PepperWindow(QMainWindow):
         self.renderlists_selection.clear()
 
     def render_execute(self):
-        houp = HouPepper()
-        for precomp in self.pepper.precomp_list:
-            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-                = self.path_seperator(precomp)
-            houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
-                                         f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
-        for precomp in self.pepper.precomp_list:
-            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-                = self.path_seperator(precomp)
-            self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
-                                                  jpg_output_path, layout_output_path, houp.cam_node,
-                                                  houp.abc_range[1] * hou.fps())
-            self.mantra_window.resize(800, 600)
-            self.mantra_window.move(1000, 250)
-            self.mantra_window.show()
+        # houp = HouPepper()
+        # for precomp in self.pepper.precomp_list:
+        #     temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+        #         = self.path_seperator(precomp)
+        #     houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
+        #                                  f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
+        # for precomp in self.pepper.precomp_list:
+        #     temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+        #         = self.path_seperator(precomp)
+        #     self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
+        #                                           jpg_output_path, layout_output_path, houp.cam_node,
+        #                                           houp.abc_range[1] * hou.fps())
+        #     self.mantra_window.resize(800, 600)
+        #     self.mantra_window.move(1000, 250)
+        #     self.mantra_window.show()
             # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
             # f.resize(800, 600)
             # f.move(1000, 250)
             # f.show()
 
-        # pepper.precomp_list 의 갯수가 0개이면 반환하는 값이 없다.
         if len(self.pepper.precomp_list) == 0:
             return
 
