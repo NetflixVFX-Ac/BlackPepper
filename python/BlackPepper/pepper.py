@@ -519,8 +519,8 @@ class Houpub:
 
         Args:
             casted_shot(dict): shot dict
-            temp_revision(int):
-            cam_revision(int):
+            temp_revision:
+            cam_revision:
         """
         sequence_name = casted_shot['sequence_name']
         shot_name = casted_shot['shot_name']
