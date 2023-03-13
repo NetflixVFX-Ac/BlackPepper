@@ -29,7 +29,7 @@ class PepperDnDView(QtWidgets.QListView):
         # super(PepperView, self).dragEnterEvent(event)
         print("drag", event)
         self.startIndex = ''
-        event.
+        # event.
         event.accept()
 
     # def dragMoveEvent(self, event):
