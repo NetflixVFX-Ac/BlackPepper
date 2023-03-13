@@ -158,8 +158,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         """
         self.message("Process finished.")
-        self.p.kill()
-        # self.p = None
+        self.p.terminate()
         self.ffmpeg_start_process()
 
     def mantra_simple_percent_parser(self, output, total):
@@ -198,17 +197,19 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         print('ffmpeg cmd :', self.ffmpeg_cmd)
         print('ffmpeg total frame :', self.ffmpeg_total_frame)
+        print('Process #2', self.p2)
 
         if not os.path.isdir(self.output_dir):
             os.makedirs(self.output_dir)
 
-        if self.p2 is None:
-            self.p2 = QtCore.QProcess()  # Keep a reference to the QProcess (e.g. on self) while it's running.
-            self.p2.readyReadStandardOutput.connect(self.ffmpeg_handle_stdout)
-            self.p2.readyReadStandardError.connect(self.ffmpeg_handle_stderr)
-            self.p2.stateChanged.connect(self.ffmpeg_handle_state)
-            self.p2.finished.connect(self.ffmpeg_process_finished)  # Clean up once complete.
-            self.p2.start(self.ffmpeg_cmd)
+
+        self.p2 = QtCore.QProcess()  # Keep a reference to the QProcess (e.g. on self) while it's running.
+        self.p2.waitForFinished()
+        self.p2.readyReadStandardOutput.connect(self.ffmpeg_handle_stdout)
+        self.p2.readyReadStandardError.connect(self.ffmpeg_handle_stderr)
+        self.p2.stateChanged.connect(self.ffmpeg_handle_state)
+        self.p2.finished.connect(self.ffmpeg_process_finished)  # Clean up once complete.
+        self.p2.start(self.ffmpeg_cmd)
 
     def ffmpeg_handle_stderr(self):
         """ QProcess Error정보를 받아온다. 바이트 신호를 번역하고 백분율 계산 함수를 실행시키고 컴퓨터가 보낸 정보를 Text에 출력한다.
@@ -302,27 +303,19 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.mantra_start_process(self.mantra_cmd)
         self.btn_interrupt.setText("Interrupt")
 
+    def ffmpeg_restart_process(self):
+        self.progress.setValue(0)
+        self.ffmpeg_start_process()
+        self.btn_interrupt.setText("Interrupt")
+
     def handle_interrupt(self):
+        print('p :', self.p)
+        print('p2 :', self.p2)
         if self.p is not None:
             self.p.kill()
             self.btn_interrupt.setText("Restart")
             self.btn_interrupt.clicked.connect(self.restart_process)
         else:
             self.btn_interrupt.setText("Interrupt")
-            self.mantra_start_process(self.mantra_cmd)
+            self.start_process()
 
-############################################################################################
-
-    def ffmpeg_restart_process(self):
-        self.progress.setValue(0)
-        self.ffmpeg_start_process()
-        self.btn_interrupt.setText("Interrupt")
-
-    def ffmpeg_handle_interrupt(self):
-        if self.p2 is not None:
-            self.p2.kill()
-            self.btn_interrupt.setText("Restart")
-            self.btn_interrupt.clicked.connect(self.ffmpeg_restart_process)
-        else:
-            self.btn_interrupt.setText("Interrupt")
-            self.ffmpeg_start_process()
