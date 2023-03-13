@@ -389,7 +389,10 @@ def main():
         m.resize(800, 600)
         m.move(1000, 250)
         m.show()
+        if hou_pepper.abc_range[1] * hou.fps() == m.padding_frame:
+            m.reset_setting()
         app.exec_()
+
 
 
 if __name__ == "__main__":

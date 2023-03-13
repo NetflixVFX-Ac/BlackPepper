@@ -13,24 +13,17 @@ class MantraMainWindow(QtWidgets.QMainWindow):
     """
 
     def __init__(self, next_fx_path, output_path, abc_path, cam_node, total_frame):
-        """
-
-
-
-        Args:
-            next_fx_path:
-            output_path:
-            abc_path:
-            cam_node:
-            total_frame:
-        """
         super().__init__()
         self.exc_dict = {}
         self.dir_path = ''
         self.user_path = ''
 
+        self.padding_frame = None
+        self.stop_sig = False
+
         self.render_dict = None
         self.process_box = None
+
         self.is_interrupted = False
         self.total_frame = total_frame
         self.command = [
@@ -42,6 +35,9 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             cam_node
         ]
         self.cmd = (' '.join(str(command_string) for command_string in self.command))
+        # print("aaa", output_path)
+        # print("bbb", next_fx_path)
+        self.output_path = output_path
 
         # Create the "Interrupt" Button
         self.progress = QtWidgets.QProgressBar()
@@ -53,19 +49,11 @@ class MantraMainWindow(QtWidgets.QMainWindow):
 
         self.box_layout()
 
+        self.home_json_path()
+
+        self.access_setting()
+
         self.start_process()
-
-    def home_json_path(self):
-        now_path = os.path.realpath(__file__)
-        split_path = now_path.split('/')[:-2]
-        self.dir_path = os.path.join('/'.join(split_path), '.config')
-        self.user_path = os.path.join(self.dir_path, 'user.json')
-
-    def save_frame_setting(self):
-        self.exc_dict['frame'] = []
-        self.exc_dict['frame'].append({
-
-        })
 
     def box_layout(self):
         box = QtWidgets.QVBoxLayout()
@@ -82,26 +70,9 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(box_info)
 
     def message(self, to_user_message):
-        """
-
-
-
-        Args:
-            to_user_message:
-
-        Returns:
-
-        """
         self.text.appendPlainText(to_user_message)
 
     def start_process(self):
-        """
-
-
-
-        Returns:
-
-        """
         if self.process_box is None:  # No process running.
             self.message("Executing process")
             self.btn_interrupt.setText("Interrupt")
@@ -113,13 +84,6 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             self.process_box.start(self.cmd)
 
     def handle_stderr(self):
-        """
-
-
-
-        Returns:
-
-        """
         data = self.process_box.readAllStandardError()
         stderr = bytes(data).decode("utf8")
         progress = self.simple_percent_parser(stderr, self.total_frame)
@@ -129,13 +93,6 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.message(stderr)
 
     def handle_stdout(self):
-        """
-
-
-
-        Returns:
-
-        """
         data = self.process_box.readAllStandardOutput()
         stdout = bytes(data).decode("utf8")
         progress = self.simple_percent_parser(stdout, self.total_frame)
@@ -145,16 +102,6 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.message(stdout)
 
     def handle_state(self, state):
-        """
-
-
-
-        Args:
-            state:
-
-        Returns:
-
-        """
         states = {
             QtCore.QProcess.NotRunning: 'Not running',
             QtCore.QProcess.Starting: 'Starting',
@@ -164,40 +111,27 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.message(f"State changed: {state_name}")
 
     def process_finished(self):
-        """
-
-
-
-        Returns:
-
-        """
         self.message("Process finished.")
+        self.stop_sig = True
+        if self.stop_sig is True:
+            self.save_frame_setting()
         self.btn_interrupt.setText("Restart")
         self.process_box = None
 
     def simple_percent_parser(self, output, total):
-        """
-
-
-
-        Args:
-            output:
-            total:
-
-        Returns:
-
-        """
         progress_re = re.compile('_(\d+)\.jpg')
-        m = progress_re.search(output)
-        print("m :", m)
-        if m:
-            pc_complete = m.group(1)
-            if pc_complete:
-                pc = int(int(pc_complete) / total * 100)
-                return pc
+        match_out_put = progress_re.search(output)
+        print("match_out_put :", match_out_put)
+        if match_out_put:
+            padding_frame = match_out_put.group(1)
+            if padding_frame:
+                self.padding_frame = int(padding_frame)
+                frame_per = int(int(padding_frame) / total * 100)
+                return frame_per
 
     def restart_process(self):
         self.progress.setValue(0)
+        self.stop_sig = False
         self.start_process()
         self.btn_interrupt.setText("Interrupt")
 
@@ -206,6 +140,57 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             self.process_box.kill()
             self.btn_interrupt.setText("Restart")
             self.btn_interrupt.clicked.connect(self.restart_process)
+            self.stop_sig = True
+            if self.stop_sig is True:
+                self.save_frame_setting()
         else:
             self.btn_interrupt.setText("Interrupt")
+            self.stop_sig = False
             self.start_process()
+
+    def home_json_path(self):
+        now_path = os.path.realpath(__file__)
+        split_path = now_path.split('/')[:-2]
+        self.dir_path = os.path.join('/'.join(split_path), '.config')
+        self.user_path = os.path.join(self.dir_path, 'user.json')
+
+    def access_setting(self):
+        if not os.path.exists(self.dir_path):
+            try:
+                os.makedirs(self.dir_path)
+            except OSError:
+                raise ValueError("Failed to create the directory.")
+        try:
+            if not os.path.exists(self.user_path):
+                self.user_path = os.path.join(self.dir_path, 'user.json')
+                self.reset_setting()
+        except OSError:
+            raise ValueError("Failed to create user.json file.")
+        return True
+
+    def load_setting(self):
+        with open(self.user_path, 'r') as json_file:
+            self.exc_dict = json.load(json_file)
+            if 'frame' not in self.exc_dict:
+                self.save_frame_setting()
+                return
+            else:
+                for frame_value in self.exc_dict['frame']:
+                    return frame_value
+
+    def save_frame_setting(self):
+        if os.path.exists(self.user_path):
+            with open(self.user_path, 'r') as json_file:
+                data = json.load(json_file)
+                data['frame'] = []
+                data['frame'].append({
+                    'last_frame': self.padding_frame,
+                    'output_path': self.output_path
+                })
+            with open(self.user_path, 'w') as json_file:
+                json.dump(data, json_file)
+
+    def reset_setting(self):
+        self.padding_frame = None
+        self.output_path = None
+        self.save_frame_setting()
