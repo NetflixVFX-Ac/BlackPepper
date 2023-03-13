@@ -344,36 +344,39 @@ class HouPepper:
         self.cam_path.clear()
 
     def make_cmd(self, precomp_list):
-        cmd_list = self.cmd_list
         total_frame = self.abc_range[1] * hou.fps()
 
         self.mantra_command = [
             'python',
             '/home/rapa/git/hook/python/BlackPepper/mantra_render.py',
-            precomp_list.get('fx_working_path'),
+            f'{precomp_list.get("fx_working_path")}.hipnc',
             precomp_list.get('jpg_output_path'),
             self.abc_path,
             self.cam_node
         ]
         self.mantra_cmd = (' '.join(str(s) for s in self.mantra_command))
+        self.cmd_list.append(self.mantra_cmd)
+
         self.sequence_path = precomp_list.get('jpg_output_path')[:-17] + \
                              precomp_list.get('jpg_output_path')[-4:] + '_%04d.jpg'
+
         self.ffmpeg_command = [
             "ffmpeg",
             "-framerate 24",  # 초당프레임
             "-i", self.sequence_path,  # 입력할 파일 이름
             "-q 0",  # 출력품질 정함(숫자가 높을 수록 품질이 떨어짐)
             "-threads 8",  # 속도향상을 위해 멀티쓰레드를 지정
-            "-c:v", "prores_ks",  # 코덱
+            "-c:v", "libx264",  # 코덱
             "-pix_fmt", "yuv420p",  # 포맷양식
             "-y",  # 출력파일을 쓸 때 같은 이름의 파일이 있어도 확인없이 덮어씀
             "-loglevel", "debug",  # 인코딩 과정로그를 보여줌
-            precomp_list.get('mov_output_path') + '.mov'
+            f'{precomp_list.get("mov_output_path")}.mov'
         ]
-
+        self.ffmpeg_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
+        # self.cmd_list.append(self.ffmpeg_cmd)
+        cmd_list = self.cmd_list
 
         return cmd_list, total_frame
-
 
 
 def main():
@@ -418,8 +421,8 @@ def main():
                                            f'{next_fx_path}.{pepper.software.get("file_extension")}')
         # hou_pepper.set_mantra_for_render(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output)
         # print("hou_cam_node :", hou_pepper.cam_node)
-    #
-        pepper.make_precomp_dict(shot)
+        aaa = pepper.make_precomp_dict(shot)
+        ccc, ddd = hou_pepper.make_cmd(aaa)
     #
     #     if not QtWidgets.QApplication.instance():
     #         app = QtWidgets.QApplication(sys.argv)
@@ -447,24 +450,22 @@ def main():
     # r.move(1000, 250)
     # r.show()
     # app.exec_()
-
+    print(ccc)
+    print(ddd)
 ###############################################################################################
 
     # cmd_list, total_frame = make_cmd(pepper.precomp_list)
     #
-    # cmd_list = ["python /home/rapa/git/hook/python/BlackPepper/mantra_render.py /mnt/project/hook/pepper/shots/sq01/0010/fx/working/v069/pepper_sq01_0010_fx_069.hipnc /mnt/project/hook/pepper/shots/sq01/0010/fx/output/jpg_sequence/v002/pepper_sq01_0010_jpg_sequence_v002 /mnt/project/hook/pepper/shots/sq01/0010/layout/output/camera_cache/v001/pepper_sq01_0010_camera_cache_v001.abc cam1Camera",
-    #             "python /home/rapa/git/hook/python/BlackPepper/mantra_render.py /mnt/project/hook/pepper/shots/sq01/0030/fx/working/v026/pepper_sq01_0030_fx_026.hipnc /mnt/project/hook/pepper/shots/sq01/0030/fx/output/jpg_sequence/v002/pepper_sq01_0030_jpg_sequence_v002 /mnt/project/hook/pepper/shots/sq01/0030/layout/output/camera_cache/v001/pepper_sq01_0030_camera_cache_v001.abc cam2Camera"]
-    #
-    # if not QtWidgets.QApplication.instance():
-    #     app = QtWidgets.QApplication(sys.argv)
-    # else:
-    #     app = QtWidgets.QApplication.instance()
-    #
-    # r = RenderMainWindow(cmd_list, total_frame)
-    # r.resize(800, 600)
-    # r.move(1000, 250)
-    # r.show()
-    # app.exec_()
+    cmd_list = ["python /home/rapa/git/hook/python/BlackPepper/mantra_render.py /mnt/project/hook/pepper/shots/sq01/0010/fx/working/v069/pepper_sq01_0010_fx_069.hipnc /mnt/project/hook/pepper/shots/sq01/0010/fx/output/jpg_sequence/v002/pepper_sq01_0010_jpg_sequence_v002 /mnt/project/hook/pepper/shots/sq01/0010/layout/output/camera_cache/v001/pepper_sq01_0010_camera_cache_v001.abc cam1Camera",
+                "python /home/rapa/git/hook/python/BlackPepper/mantra_render.py /mnt/project/hook/pepper/shots/sq01/0030/fx/working/v026/pepper_sq01_0030_fx_026.hipnc /mnt/project/hook/pepper/shots/sq01/0030/fx/output/jpg_sequence/v002/pepper_sq01_0030_jpg_sequence_v002 /mnt/project/hook/pepper/shots/sq01/0030/layout/output/camera_cache/v001/pepper_sq01_0030_camera_cache_v001.abc cam2Camera"]
+
+    app = QtWidgets.QApplication(sys.argv)
+
+    r = RenderMainWindow(ccc, ddd)
+    r.resize(800, 600)
+    r.move(1000, 250)
+    r.show()
+    app.exec_()
 
 
 if __name__ == "__main__":

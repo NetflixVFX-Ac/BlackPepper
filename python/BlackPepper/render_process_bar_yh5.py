@@ -26,6 +26,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.cmd_list = cmd_list
         self.total_frame = total_frame
 
+        self.mantra_check = re.compile('^python')
+        self.ffmpeg_check = re.compile('^ffmpeg')
         self.progress = QtWidgets.QProgressBar()
         self.progress.setRange(0, 100)
 
@@ -52,6 +54,11 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         if len(self.cmd_list) == 0:
             return
         cmd = self.cmd_list.pop(0)
+        self.mc = self.mantra_check.search(cmd)
+        self.fc = self.ffmpeg_check.search(cmd)
+        print('mantra :', self.mc)
+        print('ffmpeg :', self.fc)
+        print("ccccccccccmddd :", cmd)
         self.start_process(cmd)
 
 
@@ -96,7 +103,10 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """
         data = self.p.readAllStandardError()
         stderr = bytes(data).decode("utf8")
-        progress = self.ffmpeg_simple_percent_parser(stderr, self.total_frame)
+        if self.ffmpeg_check:
+            progress = self.ffmpeg_simple_percent_parser(stderr, self.total_frame)
+        if self.mantra_check:
+            progress = self.mantra_simple_percent_parser(stderr, self.total_frame)
         if progress:
             self.progress.setValue(progress)
         self.message(stderr)
@@ -107,7 +117,10 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """
         data = self.p.readAllStandardOutput()
         stdout = bytes(data).decode("utf8")
-        progress = self.mantra_simple_percent_parser(stdout, self.total_frame)
+        if self.ffmpeg_check:
+            progress = self.ffmpeg_simple_percent_parser(stdout, self.total_frame)
+        if self.mantra_check:
+            progress = self.mantra_simple_percent_parser(stdout, self.total_frame)
         if progress:
             self.progress.setValue(progress)
 
@@ -138,6 +151,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         if len(self.cmd_list) == 0:
             return
         cmd = self.cmd_list.pop(0)
+        print("ttttttttttttttmddd :", cmd)
+        print('cmd_list :', self.cmd_list)
         self.start_process(cmd)
 
     def mantra_simple_percent_parser(self, output, total):
