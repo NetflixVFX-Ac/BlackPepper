@@ -283,3 +283,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             self.btn_interrupt.setText("Interrupt")
             self.start_process()
 
+    def closeEvent(self, event):
+        if self.p is not None and self.p.state() == QtCore.QProcess.Running:
+            self.p.terminate()
+        super().closeEvent(event)
+

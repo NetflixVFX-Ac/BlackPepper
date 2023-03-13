@@ -3,7 +3,7 @@ import os
 import glob
 import json
 import webbrowser
-from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
+from BlackPepper.process.render_process_bar import RenderMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow
@@ -38,7 +38,7 @@ class PepperWindow(QMainWindow):
         self.renderlists_selection = None
         self.temp_rev = None
         self.cam_rev = None
-        self.mantra_window = None
+        self.render_window = None
         self.main_menu = None
         self.main_menu_bar = None
 
@@ -538,17 +538,18 @@ class PepperWindow(QMainWindow):
         for precomp in self.pepper.precomp_list:
             temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
                 = self.path_seperator(precomp)
+            print("temp :", temp_working_path)
+            print("layout :", layout_output_path)
+            print("fx :", fx_working_path)
+            print("jpg :", jpg_output_path)
+            print("video :", video_output_path)
             houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
-        for precomp in self.pepper.precomp_list:
-            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-                = self.path_seperator(precomp)
-            self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
-                                                  jpg_output_path, layout_output_path, houp.cam_node,
-                                                  houp.abc_range[1] * hou.fps())
-            self.mantra_window.resize(800, 600)
-            self.mantra_window.move(1000, 250)
-            self.mantra_window.show()
+            self.render_window = RenderMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
+                                                  jpg_output_path, video_output_path, layout_output_path, houp.cam_node)
+            self.render_window.resize(800, 600)
+            self.render_window.move(1000, 250)
+            self.render_window.show()
             # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
             # f.resize(800, 600)
             # f.move(1000, 250)

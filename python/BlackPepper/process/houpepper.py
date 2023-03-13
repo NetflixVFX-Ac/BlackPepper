@@ -17,6 +17,11 @@ class HouPepper:
     def __init__(self):
         self.cam_list = []
         self.cam_path = []
+
+###############################################################################
+
+        self.cmd_list = []
+
         self.cam_node = None
         self._abc_path = None
         self._abc_tree_all = None
@@ -338,6 +343,38 @@ class HouPepper:
         self.cam_list.clear()
         self.cam_path.clear()
 
+    def make_cmd(self, precomp_list):
+        cmd_list = self.cmd_list
+        total_frame = self.abc_range[1] * hou.fps()
+
+        self.mantra_command = [
+            'python',
+            '/home/rapa/git/hook/python/BlackPepper/mantra_render.py',
+            precomp_list.get('fx_working_path'),
+            precomp_list.get('jpg_output_path'),
+            self.abc_path,
+            self.cam_node
+        ]
+        self.mantra_cmd = (' '.join(str(s) for s in self.mantra_command))
+        self.sequence_path = precomp_list.get('jpg_output_path')[:-17] + \
+                             precomp_list.get('jpg_output_path')[-4:] + '_%04d.jpg'
+        self.ffmpeg_command = [
+            "ffmpeg",
+            "-framerate 24",  # 초당프레임
+            "-i", self.sequence_path,  # 입력할 파일 이름
+            "-q 0",  # 출력품질 정함(숫자가 높을 수록 품질이 떨어짐)
+            "-threads 8",  # 속도향상을 위해 멀티쓰레드를 지정
+            "-c:v", "prores_ks",  # 코덱
+            "-pix_fmt", "yuv420p",  # 포맷양식
+            "-y",  # 출력파일을 쓸 때 같은 이름의 파일이 있어도 확인없이 덮어씀
+            "-loglevel", "debug",  # 인코딩 과정로그를 보여줌
+            precomp_list.get('mov_output_path') + '.mov'
+        ]
+
+
+        return cmd_list, total_frame
+
+
 
 def main():
     pepper = Houpub()
@@ -370,32 +407,32 @@ def main():
         output_type_name = 'movie_file'
         mov_output = pepper.output_file_path(output_type_name, fx_type_name)
         mov_next_output = pepper.make_next_output_path(output_type_name, fx_type_name)
-        print("fx_path :", fx_path)
-        print("next_fx_path :", next_fx_path)
-        print("fx_output :", fx_output)
-        print("layout_output_path :", layout_output_path)
-        print("mov_output :", mov_output)
-        print("fx_next_output :", fx_next_output)
-        print("mov_next_output :", mov_next_output)
+        # print("fx_path :", fx_path)
+        # print("next_fx_path :", next_fx_path)
+        # print("fx_output :", fx_output)
+        # print("layout_output_path :", layout_output_path)
+        # print("mov_output :", mov_output)
+        # print("fx_next_output :", fx_next_output)
+        # print("mov_next_output :", mov_next_output)
         hou_pepper.set_fx_working_for_shot(simulation_path, layout_output_path,
                                            f'{next_fx_path}.{pepper.software.get("file_extension")}')
         # hou_pepper.set_mantra_for_render(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output)
-        print("hou_cam_node :", hou_pepper.cam_node)
-
+        # print("hou_cam_node :", hou_pepper.cam_node)
+    #
         pepper.make_precomp_dict(shot)
-
-        # if not QtWidgets.QApplication.instance():
-        #     app = QtWidgets.QApplication(sys.argv)
-        # else:
-        #     app = QtWidgets.QApplication.instance()
-        #
-        # r = RenderMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_next_output,
-        #                      mov_next_output, layout_output_path, hou_pepper.cam_node)
-        # r.resize(800, 600)
-        # r.move(1000, 250)
-        # r.show()
-        # app.exec_()
-    pprint.pp(pepper.precomp_list)
+    #
+    #     if not QtWidgets.QApplication.instance():
+    #         app = QtWidgets.QApplication(sys.argv)
+    #     else:
+    #         app = QtWidgets.QApplication.instance()
+    #
+    #     r = RenderMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_next_output,
+    #                          mov_next_output, layout_output_path, hou_pepper.cam_node)
+    #     r.resize(800, 600)
+    #     r.move(1000, 250)
+    #     r.show()
+    #     app.exec_()
+    # pprint.pp(pepper.precomp_list)
     # self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
     #                                       jpg_output_path, layout_output_path, houp.cam_node,
     #                                       houp.abc_range[1] * hou.fps())
@@ -411,7 +448,26 @@ def main():
     # r.show()
     # app.exec_()
 
-# if __name__ == "__main__":
-#     main()
+###############################################################################################
+
+    # cmd_list, total_frame = make_cmd(pepper.precomp_list)
+    #
+    # cmd_list = ["python /home/rapa/git/hook/python/BlackPepper/mantra_render.py /mnt/project/hook/pepper/shots/sq01/0010/fx/working/v069/pepper_sq01_0010_fx_069.hipnc /mnt/project/hook/pepper/shots/sq01/0010/fx/output/jpg_sequence/v002/pepper_sq01_0010_jpg_sequence_v002 /mnt/project/hook/pepper/shots/sq01/0010/layout/output/camera_cache/v001/pepper_sq01_0010_camera_cache_v001.abc cam1Camera",
+    #             "python /home/rapa/git/hook/python/BlackPepper/mantra_render.py /mnt/project/hook/pepper/shots/sq01/0030/fx/working/v026/pepper_sq01_0030_fx_026.hipnc /mnt/project/hook/pepper/shots/sq01/0030/fx/output/jpg_sequence/v002/pepper_sq01_0030_jpg_sequence_v002 /mnt/project/hook/pepper/shots/sq01/0030/layout/output/camera_cache/v001/pepper_sq01_0030_camera_cache_v001.abc cam2Camera"]
+    #
+    # if not QtWidgets.QApplication.instance():
+    #     app = QtWidgets.QApplication(sys.argv)
+    # else:
+    #     app = QtWidgets.QApplication.instance()
+    #
+    # r = RenderMainWindow(cmd_list, total_frame)
+    # r.resize(800, 600)
+    # r.move(1000, 250)
+    # r.show()
+    # app.exec_()
+
+
+if __name__ == "__main__":
+    main()
 
 
