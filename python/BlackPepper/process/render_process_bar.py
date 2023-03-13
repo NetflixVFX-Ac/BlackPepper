@@ -3,7 +3,6 @@ import time
 from PySide2 import QtWidgets, QtCore
 
 
-
 class RenderMainWindow(QtWidgets.QMainWindow):
     """
     FFmpeg으로 Sequence file을 mov로 컨버팅하는 UI이다. 터미널에 명령하고 출력되는 정보를 Text Widget에 보여준다.

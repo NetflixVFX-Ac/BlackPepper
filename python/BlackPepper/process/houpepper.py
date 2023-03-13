@@ -1,6 +1,6 @@
 import numpy as np
 from BlackPepper.pepper import Houpub
-from BlackPepper.render_process_bar_yh5 import RenderMainWindow
+from BlackPepper.process.render_process_bar import RenderMainWindow
 from PySide2 import QtWidgets
 import hou
 import _alembic_hom_extensions as abc
