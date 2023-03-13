@@ -3,7 +3,7 @@
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="enabled">
-   <bool>false</bool>
+   <bool>true</bool>
   </property>
   <property name="geometry">
    <rect>
@@ -31,7 +31,7 @@ color: rgb(180, 180, 180);
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="styleSheet">
     <string notr="true"/>
@@ -273,7 +273,7 @@ color: rgb(45, 45, 45);</string>
      <x>0</x>
      <y>0</y>
      <width>485</width>
-     <height>20</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>
