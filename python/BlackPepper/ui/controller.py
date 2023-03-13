@@ -39,6 +39,8 @@ class PepperWindow(QMainWindow):
         self.temp_rev = None
         self.cam_rev = None
         self.mantra_window = None
+        self.main_menu = None
+        self.main_menu_bar = None
 
         self.my_projects = []
         self.all_assets = []
