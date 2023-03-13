@@ -4,7 +4,7 @@ from BlackPepper.pepper import Houpub
 # <<<<<<< HEAD:python/BlackPepper/houpepper.py
 # from BlackPepper.ffmpeg_process_bar import FFmpegMainWindow
 # from BlackPepper.mantra_process_bar_w import MantraMainWindow
-from BlackPepper.render_process_bar_yh import RenderMainWindow
+from BlackPepper.render_process_bar_yh2 import RenderMainWindow
 from BlackPepper.process.ffmpeg_process_bar import FFmpegMainWindow
 from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
 # >>>>>>> 390c1a8aad690b9ec434e566b87fcc1d398abc4e:python/BlackPepper/process/houpepper.py
