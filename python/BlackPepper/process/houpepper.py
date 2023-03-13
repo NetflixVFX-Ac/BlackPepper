@@ -21,6 +21,9 @@ class HouPepper:
 ###############################################################################
 
         self.cmd_list = []
+        self.total_frame_list = []
+
+###############################################################################
 
         self.cam_node = None
         self._abc_path = None
@@ -356,6 +359,7 @@ class HouPepper:
         ]
         self.mantra_cmd = (' '.join(str(s) for s in self.mantra_command))
         self.cmd_list.append(self.mantra_cmd)
+        self.total_frame_list.append(total_frame)
 
         self.sequence_path = precomp_list.get('jpg_output_path')[:-17] + \
                              precomp_list.get('jpg_output_path')[-4:] + '_%04d.jpg'
@@ -372,11 +376,15 @@ class HouPepper:
             "-loglevel", "debug",  # 인코딩 과정로그를 보여줌
             f'{precomp_list.get("video_output_path")}.mov'
         ]
+
         self.ffmpeg_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
         self.cmd_list.append(self.ffmpeg_cmd)
-        cmd_list = self.cmd_list
+        self.total_frame_list.append(total_frame)
 
-        return cmd_list, total_frame
+        cmd_list = self.cmd_list
+        total_frame_list = self.total_frame_list
+
+        return cmd_list, total_frame_list
 
 
 def main():
@@ -385,7 +393,6 @@ def main():
     pepper.project = 'PEPPER'
     pepper.asset = 'temp_fire'
     pepper.entity = 'asset'
-    # need software handling method
     pepper.software = 'hipnc'
     simulation_type_name = 'simulation'
     simulation_path = pepper.working_file_path(simulation_type_name)
@@ -401,70 +408,22 @@ def main():
         layout_output_path = pepper.output_file_path(output_type_name, layout_type_name)
         pepper.software = 'hipnc'
         fx_type_name = 'fx'
-        # BlackPepper.publish_working_file(fx_type_name)
-        fx_path = pepper.working_file_path(fx_type_name)
         next_fx_path = pepper.make_next_working_path(fx_type_name)
-        output_type_name = 'jpg_sequence'
-        fx_output = pepper.output_file_path(output_type_name, fx_type_name)
-        fx_next_output = pepper.make_next_output_path(output_type_name, fx_type_name)
-        output_type_name = 'movie_file'
-        mov_output = pepper.output_file_path(output_type_name, fx_type_name)
-        mov_next_output = pepper.make_next_output_path(output_type_name, fx_type_name)
-        # print("fx_path :", fx_path)
-        # print("next_fx_path :", next_fx_path)
-        # print("fx_output :", fx_output)
-        # print("layout_output_path :", layout_output_path)
-        # print("mov_output :", mov_output)
-        # print("fx_next_output :", fx_next_output)
-        # print("mov_next_output :", mov_next_output)
+
         hou_pepper.set_fx_working_for_shot(simulation_path, layout_output_path,
                                            f'{next_fx_path}.{pepper.software.get("file_extension")}')
-        # hou_pepper.set_mantra_for_render(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output)
-        # print("hou_cam_node :", hou_pepper.cam_node)
         aaa = pepper.make_precomp_dict(shot)
-        ccc, ddd = hou_pepper.make_cmd(aaa)
-    #
-    #     if not QtWidgets.QApplication.instance():
-    #         app = QtWidgets.QApplication(sys.argv)
-    #     else:
-    #         app = QtWidgets.QApplication.instance()
-    #
-    #     r = RenderMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_next_output,
-    #                          mov_next_output, layout_output_path, hou_pepper.cam_node)
-    #     r.resize(800, 600)
-    #     r.move(1000, 250)
-    #     r.show()
-    #     app.exec_()
-    # pprint.pp(pepper.precomp_list)
-    # self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
-    #                                       jpg_output_path, layout_output_path, houp.cam_node,
-    #                                       houp.abc_range[1] * hou.fps())
+        bbb, ccc = hou_pepper.make_cmd(aaa)
 
-    # if not QtWidgets.QApplication.instance():
-    #     app = QtWidgets.QApplication(sys.argv)
-    # else:
-    #     app = QtWidgets.QApplication.instance()
-    # r = RenderMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_next_output,
-    #                      mov_next_output, layout_output_path, hou_pepper.cam_node)
-    # r.resize(800, 600)
-    # r.move(1000, 250)
-    # r.show()
-    # app.exec_()
-    print(ccc)
-    print(ddd)
+
 ###############################################################################################
-
-    # cmd_list, total_frame = make_cmd(pepper.precomp_list)
-    #
-    cmd_list = ["python /home/rapa/git/hook/python/BlackPepper/mantra_render.py /mnt/project/hook/pepper/shots/sq01/0010/fx/working/v069/pepper_sq01_0010_fx_069.hipnc /mnt/project/hook/pepper/shots/sq01/0010/fx/output/jpg_sequence/v002/pepper_sq01_0010_jpg_sequence_v002 /mnt/project/hook/pepper/shots/sq01/0010/layout/output/camera_cache/v001/pepper_sq01_0010_camera_cache_v001.abc cam1Camera",
-                "python /home/rapa/git/hook/python/BlackPepper/mantra_render.py /mnt/project/hook/pepper/shots/sq01/0030/fx/working/v026/pepper_sq01_0030_fx_026.hipnc /mnt/project/hook/pepper/shots/sq01/0030/fx/output/jpg_sequence/v002/pepper_sq01_0030_jpg_sequence_v002 /mnt/project/hook/pepper/shots/sq01/0030/layout/output/camera_cache/v001/pepper_sq01_0030_camera_cache_v001.abc cam2Camera"]
 
     if not QtWidgets.QApplication.instance():
         app = QtWidgets.QApplication(sys.argv)
     else:
         app = QtWidgets.QApplication.instance()
 
-    r = RenderMainWindow(ccc, ddd)
+    r = RenderMainWindow(bbb, ccc)
     r.resize(800, 600)
     r.move(1000, 250)
     r.show()

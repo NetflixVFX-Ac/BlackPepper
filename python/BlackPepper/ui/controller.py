@@ -3,7 +3,8 @@ import os
 import glob
 import json
 import webbrowser
-from BlackPepper.process.render_process_bar import RenderMainWindow
+# from BlackPepper.process.render_process_bar import RenderMainWindow
+from BlackPepper.render_process_bar_yh5 import RenderMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow
@@ -558,19 +559,33 @@ class PepperWindow(QMainWindow):
                 = self.path_seperator(precomp)
             houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
-        for precomp in self.render_model.pepperlist:
-            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-                = self.path_seperator(precomp)
-            self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
-                                                  jpg_output_path, layout_output_path, houp.cam_node,
-                                                  houp.abc_range[1] * hou.fps())
-            self.mantra_window.resize(800, 600)
-            self.mantra_window.move(1000, 250)
-            self.mantra_window.show()
+            cmd_list, total_frame_list = houp.make_cmd(precomp)
+
+        # for precomp in self.render_model.pepperlist:
+        #     temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+        #         = self.path_seperator(precomp)
+        #     houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
+        #                                  f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
+        # for precomp in self.render_model.pepperlist:
+        #     temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+        #         = self.path_seperator(precomp)
+        #     self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
+        #                                           jpg_output_path, layout_output_path, houp.cam_node,
+        #                                           houp.abc_range[1] * hou.fps())
+        #     self.mantra_window.resize(800, 600)
+        #     self.mantra_window.move(1000, 250)
+        #     self.mantra_window.show()
             # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
             # f.resize(800, 600)
             # f.move(1000, 250)
             # f.show()
+
+        print('cmd_list :', cmd_list)
+        print('total_frame_list :', total_frame_list)
+        r = RenderMainWindow(cmd_list, total_frame_list)
+        r.resize(800, 600)
+        r.move(1000, 250)
+        r.show()
 
         # pepper.precomp_list 의 갯수가 0 이면 return !
         if len(self.pepper.precomp_list) == 0:

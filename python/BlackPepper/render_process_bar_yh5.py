@@ -1,4 +1,5 @@
 import re
+import time
 from PySide2 import QtWidgets, QtCore
 
 
@@ -9,7 +10,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
     정규표현을 활용하여 터미널에 출력되는 정보에서 컨버팅 중인 프레임을 파악하고 전체 프레임과 비교하여 Progress Widget으로
     진행사항을 유저에게 시각적으로 알려준다.
     """
-    def __init__(self, cmd_list, total_frame):
+    def __init__(self, cmd_list, total_frame_list):
         """Sequence file이 있는 경로와 mov파일이 저장될 경로, fps를 지정한다. 해당 인자들은 터미널에 명령내릴 command에 입력된다.
 
 
@@ -20,8 +21,15 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.p = None
         self.is_interrupted = False
+
+########################################################
+
+
         self.cmd_list = cmd_list
-        self.total_frame = total_frame
+        self.total_frame_list = total_frame_list
+
+
+########################################################
 
         self.mantra_check = re.compile('^python')
         self.ffmpeg_check = re.compile('^ffmpeg')
@@ -50,8 +58,12 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         if len(self.cmd_list) == 0:
             return
         cmd = self.cmd_list.pop(0)
+        self.total_frame = self.total_frame_list.pop(0)
+
         self.mc = self.mantra_check.search(cmd)
         self.fc = self.ffmpeg_check.search(cmd)
+        print('start total_frame :', self.total_frame)
+        print('start total_frame_list :', self.total_frame_list)
         print('mantra :', self.mc)
         print('ffmpeg :', self.fc)
         print("ccccccccccmddd :", cmd)
@@ -132,16 +144,17 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         print("fin")
         self.message("Process finished.")
         self.p.terminate()
-        # while not self.p.finished:
-        #     self.p.waitForFinished()
-
-        # time.sleep(3)
+        self.p.waitForFinished()
 
         if len(self.cmd_list) > 0:
             cmd = self.cmd_list.pop(0)
+            self.total_frame = self.total_frame_list.pop(0)
+            print('next total_frame :', self.total_frame)
+            print('next total_frame_list :', self.total_frame_list)
             print("ttttttttttttttmddd :", cmd)
             print('cmd_list :', self.cmd_list)
             print('len cmd_list :', len(self.cmd_list))
+            time.sleep(5)
             self.start_process(cmd)
         else:
             return
@@ -159,6 +172,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         Returns:
 
         """
+        print("mantra total :", total)
+
         progress_re = re.compile('_(\d+)\.jpg')
         m = progress_re.search(output)
         print("m :", m)
@@ -181,6 +196,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         Returns: pc(progress percent)
 
         """
+        print("ffmpeg total :", total)
+
         progress_re = re.compile("frame=   (\d+)")
         m = progress_re.search(output)
         print("m search :", m)
