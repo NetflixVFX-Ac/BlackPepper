@@ -1,5 +1,7 @@
 import re
+
 from PySide2 import QtWidgets, QtCore
+from PySide2.QtWidgets import QDialog
 
 
 class MantraMainWindow(QtWidgets.QMainWindow):
@@ -37,18 +39,18 @@ class MantraMainWindow(QtWidgets.QMainWindow):
 
         self.cmd = (' '.join(str(s) for s in self.command))
 
+        #Second Button
+        self.SecondWindow.clicked.connect(self.button_sec)
+
         # Create the "Interrupt" Button
         self.progress = QtWidgets.QProgressBar()
         self.progress.setRange(0, 100)
         self.text = QtWidgets.QPlainTextEdit()
         self.text.setReadOnly(True)
-        # self.btn = QtWidgets.QPushButton("MANTRA SEQUENCE RENDERING")
-        # self.btn.pressed.connect(self.start_process)
         self.btn_interrupt = QtWidgets.QPushButton("Interrupt")
         self.btn_interrupt.clicked.connect(self.handle_interrupt)
-        #
-        # #for json
-        # self.frame_dict =
+
+
 
         l = QtWidgets.QVBoxLayout()
         # l.addWidget(self.btn)
@@ -203,5 +205,15 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             self.p.kill()
         super().closeEvent(event)
 
+    # def button_sec(self):
+    #     #버튼추가
+    #     self.hide()
+    #     btnDialog = QtWidgets.QPushButton("Ok", self.dialog)
+    #     btnDialog.setGeometry(10, 10, 200, 50)
+    #     btnDialog.clicked.connect(self.dialog_close)
+    #
+    #     #QDialog 세팅
+    #     self.dialog.setWindowTitle('Confirmation')
+    #     self.Qtwidgets.dialog.setWindowModality(Qt.WindowModal)
 
 
