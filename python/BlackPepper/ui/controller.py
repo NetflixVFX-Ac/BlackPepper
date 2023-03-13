@@ -121,9 +121,13 @@ class PepperWindow(QMainWindow):
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
         # set main menubar
         self.set_login_menubar()
-        self.set_main_menubar()
+
+        # self.set_main_menubar()
+
         # set auto login
         self.set_auto_login()
+        self.set_main_menubar()
+
 
     def set_auto_login(self):
         log_path = self.login_log.user_path
@@ -403,19 +407,13 @@ class PepperWindow(QMainWindow):
         self.set_mainwindow_preset()
         # 구분자 추가
         self.main_menu.addSeparator()
-        # set 'Logout'
-        logout_action = QAction('Logout', self.main_window)
-        logout_action.setShortcut('Ctrl+L')
-        logout_action.setStatusTip('Logout application')
-        logout_action.triggered.connect(self.user_logout)
-        self.main_menu.addAction(logout_action)
-        # set 'Exit'
+        # addMenu 'Exit'
         exit_action = QAction('Exit', self.main_window)
         exit_action.setShortcut('Ctrl+Q')
         exit_action.setStatusTip('Exit application')
         exit_action.triggered.connect(QApplication.instance().quit)
         self.main_menu.addAction(exit_action)
-        # set Help
+        # addMenu Help
         main_helpmenu = self.main_menu_bar.addMenu('Help')
         # set kitsu
         kisu_action = QAction('Kitsu', self.main_window)
@@ -435,6 +433,19 @@ class PepperWindow(QMainWindow):
         scanline_action.setStatusTip('Scanline VFX site open')
         scanline_action.triggered.connect(lambda: webbrowser.open('https://www.scanlinevfx.com/'))
         main_helpmenu.addAction(scanline_action)
+        # addMenu 'User'
+        self.main_user = self.main_menu_bar.addMenu('User')
+        host_info = QAction(f'host : {self.login_log.host}', self.main_window)
+        self.main_user.addAction(host_info)
+        id_info = QAction(f'id : {self.login_log.user_id}', self.main_window)
+        self.main_user.addAction(id_info)
+        self.main_user.addSeparator()
+        # set 'Logout'
+        logout_action = QAction('Logout', self.main_window)
+        logout_action.setShortcut('Ctrl+L')
+        logout_action.setStatusTip('Logout application')
+        logout_action.triggered.connect(self.user_logout)
+        self.main_user.addAction(logout_action)
 
     def set_mainwindow_preset(self):
         """메인창의 메뉴바에 Recent precet 메뉴를 만들어주 함수이다.
