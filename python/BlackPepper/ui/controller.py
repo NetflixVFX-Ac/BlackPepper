@@ -111,7 +111,7 @@ class PepperWindow(QMainWindow):
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
         # self.main_window.logout_btn.clicked.connect(self.user_logout)
-        self.main_window.temp_rev_cbox.currentTextChanged.connect(self.renew_template_info)
+        self.main_window.template_rev_cbox.currentTextChanged.connect(self.renew_template_info)
         # add listview to ui
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
@@ -217,6 +217,10 @@ class PepperWindow(QMainWindow):
         for my_project in self.my_projects:
             self.project_model.pepperlist.append(my_project)
         self.main_window.show()
+        self.main_window.template_info_label.setText("")
+        self.main_window.shot_info_label.setText("")
+        self.main_window.template_rev_cbox.clear()
+        self.main_window.shot_rev_cbox.clear()
 
     def project_selected(self, event):
         """projects_listview 의 project 를 클릭 시 실행 되는 함수이다.
@@ -292,7 +296,7 @@ class PepperWindow(QMainWindow):
         self.main_window.statusBar().showMessage('shots 를 선택하세요 ! 다중선택가능 ! ')
 
     def renew_template_info(self):
-        revision = self.main_window.temp_rev_cbox.currentText()
+        revision = self.main_window.template_rev_cbox.currentText()
         name, time, rev = self.pepper.get_working_file_data('simulation', revision, 'asset')
         date = time[:10]
         clock = time[11:]
@@ -323,9 +327,9 @@ class PepperWindow(QMainWindow):
         self.main_window.shot_info_label.setText(f"{name}\n{date}\n{clock}")
 
     def renew_template_cbox(self, rev_list):
-        self.main_window.temp_rev_cbox.clear()
+        self.main_window.template_rev_cbox.clear()
         for rev in rev_list:
-            self.main_window.temp_rev_cbox.addItem(f'{rev}')
+            self.main_window.template_rev_cbox.addItem(f'{rev}')
 
     def renew_shot_cbox(self, rev_list):
         self.main_window.shot_rev_cbox.clear()
@@ -343,7 +347,7 @@ class PepperWindow(QMainWindow):
         selections = self.shots_selection.selectedRows()
         if len(selections) == 0:
             return
-        temp_rev = int(self.main_window.temp_rev_cbox.currentText())
+        temp_rev = int(self.main_window.template_rev_cbox.currentText())
         shot_rev = self.main_window.shot_rev_cbox.currentText()
         if shot_rev == '':
             shot_rev = None
