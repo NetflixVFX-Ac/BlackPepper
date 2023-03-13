@@ -40,6 +40,7 @@ class PepperWindow(QMainWindow):
         self.cam_rev = None
         self.render_window = None
         self.main_menu = None
+        self.main_user = None
         self.main_menu_bar = None
 
         self.my_projects = []
@@ -58,7 +59,7 @@ class PepperWindow(QMainWindow):
         self.shots_listview = PepperView(self)
         self.renderlists_listview = PepperDnDView(self)
         self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        # self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         # setModel
         self.projects_listview.setModel(self.project_model)
         self.projects_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
@@ -109,7 +110,7 @@ class PepperWindow(QMainWindow):
         self.main_window.render_btn.clicked.connect(self.render_execute)
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
-        self.main_window.logout_btn.clicked.connect(self.user_logout)
+        # self.main_window.logout_btn.clicked.connect(self.user_logout)
         self.main_window.temp_rev_cbox.currentTextChanged.connect(self.renew_template_info)
         # add listview to ui
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
@@ -127,7 +128,6 @@ class PepperWindow(QMainWindow):
         # set auto login
         self.set_auto_login()
         self.set_main_menubar()
-
 
     def set_auto_login(self):
         log_path = self.login_log.user_path
@@ -235,7 +235,10 @@ class PepperWindow(QMainWindow):
         # event
         project_name = self.my_projects[event.row()]
         self.pepper.project = project_name
-        self.all_assets = self.pepper.get_all_assets()
+        self.all_assets = []
+        for asset in self.pepper.get_all_assets():
+            if self.pepper.check_asset_type(asset, 'fx_template') is not None:
+                self.all_assets.append(asset)
         self.template_model.pepperlist.clear()
         self.shot_model.pepperlist.clear()
 
@@ -292,8 +295,9 @@ class PepperWindow(QMainWindow):
     def renew_template_info(self):
         revision = self.main_window.temp_rev_cbox.currentText()
         name, time, rev = self.pepper.get_working_file_data('simulation', revision, 'asset')
-        time = 'Date ' + time[:10] + ' Time ' + time[11:]
-        self.main_window.template_info_label.setText(f"{name}, {time}, Revision : ")
+        date = time[:10]
+        clock = time[11:]
+        self.main_window.template_info_label.setText(f"{name}\n{date}\n{clock}")
 
     def shot_selected(self, event):
         """Shots 를 선택 시 선택한 shot 의 정보(dict)를 self.all_shots = [] 에 담는 함수 이다.\n
@@ -315,8 +319,9 @@ class PepperWindow(QMainWindow):
     def renew_shot_info(self):
         revision = self.main_window.shot_rev_cbox.currentText()
         name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', revision, 'shot')
-        time = 'Date ' + time[:10] + ' Time ' + time[11:]
-        self.main_window.shot_info_label.setText(f"{name}, {time}, Revision : ")
+        date = time[:10]
+        clock = time[11:]
+        self.main_window.shot_info_label.setText(f"{name}\n{date}\n{clock}")
 
     def renew_template_cbox(self, rev_list):
         self.main_window.temp_rev_cbox.clear()
@@ -347,20 +352,27 @@ class PepperWindow(QMainWindow):
             shot_rev = int(shot_rev)
         if len(selections) == 1:
             shot_dict = self.all_shots[selections[0].row()]
-            self.pepper.make_precomp_dict(shot_dict, temp_revision=temp_rev, cam_revision=shot_rev)
+            precomp = self.pepper.make_precomp_dict(shot_dict, temp_revision=temp_rev, cam_revision=shot_rev)
+            self.check_and_append_render_list(precomp)
             self.renew_render_list()
-            self.shots_selection.clear()
             return
         for idx in selections:
             shot_dict = self.all_shots[idx.row()]
-            self.pepper.make_precomp_dict(shot_dict, temp_revision=temp_rev)
-            self.shots_selection.clear()
+            precomp = self.pepper.make_precomp_dict(shot_dict, temp_revision=temp_rev)
+            self.check_and_append_render_list(precomp)
         self.renew_render_list()
 
+    def check_and_append_render_list(self, path_dict):
+        if path_dict in self.render_model.pepperlist:
+            return
+        self.render_model.pepperlist.append(path_dict)
+        return
+
     def renew_render_list(self):
-        self.render_model.pepperlist.clear()
-        for render in self.pepper.precomp_list:
-            self.render_model.pepperlist.append(render['name'])
+        # self.render_model.pepperlist.clear()
+        # for render in self.pepper.precomp_list:
+        #     self.render_model.pepperlist.append(render)
+        self.shots_selection.clear()
         self.render_model.layoutChanged.emit()
         self.renderlists_selection.clear()
 
@@ -372,8 +384,10 @@ class PepperWindow(QMainWindow):
         그리고 pepper 의 precomp_list를 render_moderl.pepperlist 에 append 한다.
         추가로 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
         """
-        for idx in self.renderlists_selection.selectedRows():
-            self.pepper.delete_precomp_dict(idx.data())
+        idx = self.renderlists_selection.selectedRows()[0]
+        for precomp in self.render_model.pepperlist:
+            if precomp['name'] == idx.data():
+                self.render_model.pepperlist.remove(precomp)
         self.renew_render_list()
 
     def clear_list(self):
@@ -470,7 +484,7 @@ class PepperWindow(QMainWindow):
             recent_menu.addAction(file_action)
         self.main_menu.addMenu(recent_menu)
 
-    def handle_file(self, file_path):  #수정예정
+    def handle_file(self, file_path):  # 수정예정
         """
 
         Args:
@@ -483,7 +497,7 @@ class PepperWindow(QMainWindow):
         # self.load_preset_set()
         pass
 
-    def save_preset_json(self):  #  json파일이 게속만들어짐. json파일 하나로 수정 예정
+    def save_preset_json(self):  # json파일이 게속만들어짐. json파일 하나로 수정 예정
         """Render 버튼을 누르면 main ui 의 preset 정보들이 json 으로 저장되는 함수이다.
 
             로그인한 사용자의 id와 파일 생성 시간으로 json파일을 저장하고 중복되는 파일 이름은 최대 5개의 json파일이 저장되고
@@ -535,21 +549,20 @@ class PepperWindow(QMainWindow):
 
     def render_execute(self):
         houp = HouPepper()
-        for precomp in self.pepper.precomp_list:
+        for precomp in self.render_model.pepperlist:
             temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
                 = self.path_seperator(precomp)
-            print("temp :", temp_working_path)
-            print("layout :", layout_output_path)
-            print("fx :", fx_working_path)
-            print("jpg :", jpg_output_path)
-            print("video :", video_output_path)
             houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
-            self.render_window = RenderMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
-                                                  jpg_output_path, video_output_path, layout_output_path, houp.cam_node)
-            self.render_window.resize(800, 600)
-            self.render_window.move(1000, 250)
-            self.render_window.show()
+        for precomp in self.render_model.pepperlist:
+            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+                = self.path_seperator(precomp)
+            self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
+                                                  jpg_output_path, layout_output_path, houp.cam_node,
+                                                  houp.abc_range[1] * hou.fps())
+            self.mantra_window.resize(800, 600)
+            self.mantra_window.move(1000, 250)
+            self.mantra_window.show()
             # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
             # f.resize(800, 600)
             # f.move(1000, 250)
