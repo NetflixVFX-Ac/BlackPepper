@@ -42,11 +42,11 @@ class PepperWindow(QMainWindow):
         self.main_menu = None
         self.main_user = None
         self.main_menu_bar = None
+        self.render_list_data = None
 
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
-        self.render_list_data = []
         self.filename = []
         # model instance
         self.project_model = PepperModel()
@@ -500,42 +500,50 @@ class PepperWindow(QMainWindow):
         # self.load_preset_set()
         pass
 
-    def save_preset_json(self):  # json파일이 게속만들어짐. json파일 하나로 수정 예정
-        """Render 버튼을 누르면 main ui 의 preset 정보들이 json 으로 저장되는 함수이다.
+    def save_preset_json(self):
+        """save preset json path 의 json 을 불러오고 recent key 값에 정보를 저장하는 함수이다.
 
-            로그인한 사용자의 id와 파일 생성 시간으로 json파일을 저장하고 중복되는 파일 이름은 최대 5개의 json파일이 저장되고
-            파일 이름 중복시 v1~v5로 만들어지고 v1으로 덮어씌워진다.
+            docs 수정예정
         """
-        now = datetime.now()
-        base_filename = f'{self.pepper.identif}_{now.date()}_time_{now.hour}:{now.minute}'
+        self.preset_json_path = 'render_check_list.json'
 
-        # base_filename = 'render_check_list'
-        ext = '.json'
-        i = 1
-        while i <= 5:
-            self.filename = f"{base_filename}_v{i}{ext}"
-            if not os.path.isfile(self.filename):
-                break
-            i += 1
-        if i > 5:
-            i = 1
-        self.filename = f"{base_filename}_v{i}{ext}"
+        if os.path.exists(self.preset_json_path) == False:
+            self.presave_preset_json()
 
-        self.render_model.pepperlist.clear()
-        for render in self.pepper.precomp_list:
-            self.render_list_data.append(render['name'])
-        with open(self.filename, "w") as f:
-            json.dump(self.render_list_data, f, ensure_ascii=False)
-
-    def load_preset_set(self):  # 함수수정예정
-        """preset이 저장되어있는 json파일을 load하는 함수이다.
-
-            render 클릭시 저장된 precomp list 정보들을 담고 있는 json파일을 load 하고  main window preset 셋팅하고
-        메뉴바의 Recent preset 에  connect 되어 클릭시 실행되는 함수이다.
-        """
-        with open(self.render_list_path, "r") as f:
+        with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
-            print(self.render_list_data)
+
+        recent_data = self.render_list_data.get('recent', [])
+
+        now = datetime.now()
+
+        # 최대 인덱스 5까지 새로운 value가 추가되도록 수정
+        if len(recent_data) >= 5:
+            recent_data.pop(0)  # 가장 오래된 데이터 삭제
+        # recent_index = len(recent_data) + 1
+        # for render in self.pepper.precomp_list:
+        recent_data.append({
+             f'recent_{now.date()}_time_{now.hour}:{now.minute}': self.render_model.pepperlist
+        })
+
+        self.render_list_data['recent'] = recent_data
+        data_to_save = self.render_list_data  # 'recent' key 값의 value로 저장
+
+        with open(self.preset_json_path, "w") as f:
+            json.dump(data_to_save, f, ensure_ascii=False)
+
+    def presave_preset_json(self):  # 함수수정예정
+        """preset이 저장되어있는 json파일이 없으면 json 파일을 만들어주는 함수이다.
+
+
+        """
+        self.preset_json_path = 'render_check_list.json'
+
+        self.render_list_data = {}
+        data_to_save = self.render_list_data  # 'recent' key 값의 value로 저장
+
+        with open(self.preset_json_path, "w") as f:
+            json.dump(data_to_save, f, ensure_ascii=False)
 
     def precomp_list_len(self):  # 함수수정예정
         """추가된 precom list 의 갯수를 반환하는 함수이다.
@@ -551,28 +559,28 @@ class PepperWindow(QMainWindow):
         self.renderlists_selection.clear()
 
     def render_execute(self):
-        houp = HouPepper()
-        for precomp in self.render_model.pepperlist:
-            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-                = self.path_seperator(precomp)
-            houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
-                                         f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
-        for precomp in self.render_model.pepperlist:
-            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-                = self.path_seperator(precomp)
-            self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
-                                                  jpg_output_path, layout_output_path, houp.cam_node,
-                                                  houp.abc_range[1] * hou.fps())
-            self.mantra_window.resize(800, 600)
-            self.mantra_window.move(1000, 250)
-            self.mantra_window.show()
+        # houp = HouPepper()
+        # for precomp in self.render_model.pepperlist:
+        #     temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+        #         = self.path_seperator(precomp)
+        #     houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
+        #                                  f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
+        # for precomp in self.render_model.pepperlist:
+        #     temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+        #         = self.path_seperator(precomp)
+        #     self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
+        #                                           jpg_output_path, layout_output_path, houp.cam_node,
+        #                                           houp.abc_range[1] * hou.fps())
+        #     self.mantra_window.resize(800, 600)
+        #     self.mantra_window.move(1000, 250)
+        #     self.mantra_window.show()
             # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
             # f.resize(800, 600)
             # f.move(1000, 250)
             # f.show()
 
         # pepper.precomp_list 의 갯수가 0 이면 return !
-        if len(self.pepper.precomp_list) == 0:
+        if len(self.render_model.pepperlist) == 0:
             return
 
         self.save_preset_json()
