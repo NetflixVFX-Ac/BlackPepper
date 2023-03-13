@@ -38,9 +38,9 @@ class PepperDnDView(QtWidgets.QListView):
 
     def dropEvent(self, event):
         # super(PepperDnDView, self).dropEvent(event)
+        print(event.source)
         print("drop", event)
-        index = event.KeyPress
-        model = self.model().setData(self.startIndex, index)
+        # model = self.model().setData(self.startIndex, index)
         event.accept()
 
 
