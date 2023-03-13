@@ -1,13 +1,6 @@
 import numpy as np
 from BlackPepper.pepper import Houpub
-# from BlackPepper.
-# <<<<<<< HEAD:python/BlackPepper/houpepper.py
-# from BlackPepper.ffmpeg_process_bar import FFmpegMainWindow
-# from BlackPepper.mantra_process_bar_w import MantraMainWindow
-from BlackPepper.render_process_bar_yh2 import RenderMainWindow
-from BlackPepper.process.ffmpeg_process_bar import FFmpegMainWindow
-from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
-# >>>>>>> 390c1a8aad690b9ec434e566b87fcc1d398abc4e:python/BlackPepper/process/houpepper.py
+from BlackPepper.render_process_bar_yh3 import RenderMainWindow
 from PySide2 import QtWidgets
 import hou
 import _alembic_hom_extensions as abc
