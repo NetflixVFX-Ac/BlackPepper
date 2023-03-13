@@ -154,7 +154,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             print("ttttttttttttttmddd :", cmd)
             print('cmd_list :', self.cmd_list)
             print('len cmd_list :', len(self.cmd_list))
-            time.sleep(5)
             self.start_process(cmd)
         else:
             return

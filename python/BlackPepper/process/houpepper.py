@@ -378,8 +378,8 @@ class HouPepper:
         ]
 
         self.ffmpeg_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
-        self.cmd_list.append(self.ffmpeg_cmd)
-        self.total_frame_list.append(total_frame)
+        # self.cmd_list.append(self.ffmpeg_cmd)
+        # self.total_frame_list.append(total_frame)
 
         cmd_list = self.cmd_list
         total_frame_list = self.total_frame_list
@@ -428,9 +428,9 @@ def main():
     r.move(1000, 250)
     r.show()
     app.exec_()
-
-
-if __name__ == "__main__":
-    main()
+#
+#
+# if __name__ == "__main__":
+#     main()
 
 

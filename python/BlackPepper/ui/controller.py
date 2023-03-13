@@ -43,6 +43,7 @@ class PepperWindow(QMainWindow):
         self.main_menu = None
         self.main_user = None
         self.main_menu_bar = None
+        self.render_process = None
 
         self.my_projects = []
         self.all_assets = []
@@ -582,10 +583,10 @@ class PepperWindow(QMainWindow):
 
         print('cmd_list :', cmd_list)
         print('total_frame_list :', total_frame_list)
-        r = RenderMainWindow(cmd_list, total_frame_list)
-        r.resize(800, 600)
-        r.move(1000, 250)
-        r.show()
+        self.render_process = RenderMainWindow(cmd_list, total_frame_list)
+        self.render_process.resize(800, 600)
+        self.render_process.move(1000, 250)
+        self.render_process.show()
 
         # pepper.precomp_list 의 갯수가 0 이면 return !
         if len(self.pepper.precomp_list) == 0:
