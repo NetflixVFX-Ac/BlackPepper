@@ -215,3 +215,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                 pc = int(int(pc_complete) / total * 100)
                 return pc  # 백분율을 통해 process bar에 보여질 값
 
+    def closeEvent(self, event):
+        if self.p is not None and self.p.state() == QtCore.QProcess.Running:
+            self.p.terminate()
+        super().closeEvent(event)
