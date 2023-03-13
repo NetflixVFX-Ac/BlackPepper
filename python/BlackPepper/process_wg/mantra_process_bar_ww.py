@@ -204,17 +204,17 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         else:
             self.btn_interrupt.setText("Interrupt")
             self.start_process()
-            
-    def load_setting(self):
-        with open(self.user_path, 'r') as json_file:
-            self.user_dict = json.load(json_file)
-        return self.user_dict
-    
-    def data_list(self):
-
-
-
-    def json_info(self):
-        self.btn_interrupt = True
+    #
+    # def load_setting(self):
+    #     with open(self.user_path, 'r') as json_file:
+    #         self.user_dict = json.load(json_file)
+    #     return self.user_dict
+    #
+    # def data_list(self):
+    #
+    #
+    #
+    # def json_info(self):
+    #     self.btn_interrupt = True
 
 
