@@ -1,10 +1,11 @@
 import numpy as np
 from BlackPepper.pepper import Houpub
-from BlackPepper.render_process_bar_yh3 import RenderMainWindow
+from BlackPepper.render_process_bar_yh5 import RenderMainWindow
 from PySide2 import QtWidgets
 import hou
 import _alembic_hom_extensions as abc
 import sys
+import pprint
 
 class HouPepper:
     """
@@ -342,7 +343,7 @@ def main():
     pepper = Houpub()
     pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
     pepper.project = 'PEPPER'
-    pepper.asset = 'temp_dancing_particle'
+    pepper.asset = 'temp_fire'
     pepper.entity = 'asset'
     # need software handling method
     pepper.software = 'hipnc'
@@ -380,31 +381,37 @@ def main():
                                            f'{next_fx_path}.{pepper.software.get("file_extension")}')
         # hou_pepper.set_mantra_for_render(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_output)
         print("hou_cam_node :", hou_pepper.cam_node)
-        if not QtWidgets.QApplication.instance():
-            app = QtWidgets.QApplication(sys.argv)
-        else:
-            app = QtWidgets.QApplication.instance()
-        # m = MantraMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_next_output,
-        #                      layout_output_path, hou_pepper.cam_node, hou_pepper.abc_range[1]*hou.fps())
-        # m.resize(800, 600)
-        # m.move(1000, 250)
-        # m.show()
-        r = RenderMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_next_output,
-                             mov_next_output, layout_output_path, hou_pepper.cam_node)
-        r.resize(800, 600)
-        r.move(1000, 250)
-        r.show()
-        app.exec_()
-        # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
-        # f.resize(800, 600)
-        # f.move(1000, 250)
-        # f.show()
+
+        pepper.make_precomp_dict(shot)
+
+        # if not QtWidgets.QApplication.instance():
+        #     app = QtWidgets.QApplication(sys.argv)
+        # else:
+        #     app = QtWidgets.QApplication.instance()
+        #
+        # r = RenderMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_next_output,
+        #                      mov_next_output, layout_output_path, hou_pepper.cam_node)
+        # r.resize(800, 600)
+        # r.move(1000, 250)
+        # r.show()
         # app.exec_()
-        # BlackPepper.publish_working_file(fx_type_name)
-        # hou_pepper.set_ffmpeg_seq_to_mov(fx_output, mov_output)
+    pprint.pp(pepper.precomp_list)
+    # self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
+    #                                       jpg_output_path, layout_output_path, houp.cam_node,
+    #                                       houp.abc_range[1] * hou.fps())
 
+    # if not QtWidgets.QApplication.instance():
+    #     app = QtWidgets.QApplication(sys.argv)
+    # else:
+    #     app = QtWidgets.QApplication.instance()
+    # r = RenderMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_next_output,
+    #                      mov_next_output, layout_output_path, hou_pepper.cam_node)
+    # r.resize(800, 600)
+    # r.move(1000, 250)
+    # r.show()
+    # app.exec_()
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
 
 

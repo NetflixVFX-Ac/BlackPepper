@@ -22,7 +22,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """
         super().__init__()
         self.p = None
-        self.p2 = None
         self.is_interrupted = False
         self.abc_range = abc.alembicTimeRange(abc_path)
 
@@ -76,12 +75,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.btn_interrupt = QtWidgets.QPushButton("Interrupt")
         self.btn_interrupt.clicked.connect(self.handle_interrupt)
 
-###########################################################################################
-
-
-
-###########################################################################################
-
         l = QtWidgets.QVBoxLayout()
         l.addWidget(self.btn_interrupt)
         l.addWidget(self.progress)
@@ -112,13 +105,39 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """
         if self.p is None:
             self.p = QtCore.QProcess()  # Keep a reference to the QProcess (e.g. on self) while it's running.
-            self.p.readyReadStandardOutput.connect(self.mantra_handle_stdout)
-            self.p.readyReadStandardError.connect(self.mantra_handle_stderr)
-            self.p.stateChanged.connect(self.mantra_handle_state)
+            self.p.readyReadStandardOutput.connect(self.handle_stdout)
+            self.p.readyReadStandardError.connect(self.handle_stderr)
+            self.p.stateChanged.connect(self.handle_state)
             self.p.finished.connect(self.mantra_process_finished)  # Clean up once complete.
             self.p.start(cmd)
 
-    def mantra_handle_stderr(self):
+    def ffmpeg_start_process(self):
+        """ Qprocess를 활용하여 터미널에 명령을 내려주고 터미널 신호에 따라 출력하는 내용을 달리한다. \n
+        진행 중, 오류, 변동, 마무리 단계마다 Text Widget에 상태를 Handling 한다.
+
+        """
+        self.output_dir = os.path.dirname(self.mov_output_path)
+        self.seq_dir = os.path.dirname(self.jpg_output_path)
+        self.ffmpeg_total_frame = self.ffmpeg_tree(self.seq_dir)
+        print(self.ffmpeg_total_frame, self.mantra_total_frame)
+        if self.ffmpeg_total_frame != self.mantra_total_frame:
+            return
+        self.ffmpeg_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
+
+        print('ffmpeg cmd :', self.ffmpeg_cmd)
+        print('ffmpeg total frame :', self.ffmpeg_total_frame)
+        print('p :', self.p)
+
+        if not os.path.isdir(self.output_dir):
+            os.makedirs(self.output_dir)
+
+        self.p.readyReadStandardOutput.connect(self.handle_stdout)
+        self.p.readyReadStandardError.connect(self.handle_stderr)
+        self.p.stateChanged.connect(self.handle_state)
+        self.p.finished.connect(self.ffmpeg_process_finished)  # Clean up once complete.
+        self.p.start(self.ffmpeg_cmd)
+
+    def handle_stderr(self):
         """ QProcess Error정보를 받아온다. 바이트 신호를 번역하고 백분율 계산 함수를 실행시키고 컴퓨터가 보낸 정보를 Text에 출력한다.
 
         """
@@ -129,7 +148,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             self.progress.setValue(progress)
         self.message(stderr)
 
-    def mantra_handle_stdout(self):
+    def handle_stdout(self):
         """ QProcess Output정보를 받아온다. 바이트 신호를 번역한 정보를 Text에 출력한다.
 
         """
@@ -141,7 +160,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         self.message(stdout)
 
-    def mantra_handle_state(self, state):
+    def handle_state(self, state):
         """Qprocess state에 변동이 있을 경우, 해당 변화 정보를 출력한다.
 
         """
@@ -159,7 +178,20 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """
         self.message("Process finished.")
         self.p.terminate()
+        self.p.waitForFinished()
         self.ffmpeg_start_process()
+
+    def ffmpeg_process_finished(self):
+        """Qprocess finish가 날 경우, 바이트 신호를 번역한 정보를 Text에 출력한다.
+
+        """
+        self.message("Process finished.")
+        self.p.terminate()
+        while not self.p.finished:
+            self.p.waitForFinished()
+        self.p.close()
+        self.p.deleteLater()
+        self.close()
 
     def mantra_simple_percent_parser(self, output, total):
         """
@@ -181,90 +213,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             if pc_complete:
                 pc = int(int(pc_complete) / total * 100)
                 return pc
-
-
-############################################################################################
-
-    def ffmpeg_start_process(self):
-        """ Qprocess를 활용하여 터미널에 명령을 내려주고 터미널 신호에 따라 출력하는 내용을 달리한다. \n
-        진행 중, 오류, 변동, 마무리 단계마다 Text Widget에 상태를 Handling 한다.
-
-        """
-        self.output_dir = os.path.dirname(self.mov_output_path)
-        self.seq_dir = os.path.dirname(self.jpg_output_path)
-        self.ffmpeg_total_frame = self.ffmpeg_tree(self.seq_dir)
-        self.ffmpeg_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
-
-        print('ffmpeg cmd :', self.ffmpeg_cmd)
-        print('ffmpeg total frame :', self.ffmpeg_total_frame)
-        print('p :', self.p)
-        print('p2 :', self.p2)
-
-        if not os.path.isdir(self.output_dir):
-            os.makedirs(self.output_dir)
-
-        if self.p2 is None:
-            self.p2 = QtCore.QProcess()  # Keep a reference to the QProcess (e.g. on self) while it's running.
-            self.p2.waitForFinished()
-            self.p2.readyReadStandardOutput.connect(self.ffmpeg_handle_stdout)
-            self.p2.readyReadStandardError.connect(self.ffmpeg_handle_stderr)
-            self.p2.stateChanged.connect(self.ffmpeg_handle_state)
-            self.p2.finished.connect(self.ffmpeg_process_finished)  # Clean up once complete.
-            self.p2.start(self.ffmpeg_cmd)
-
-    def ffmpeg_handle_stderr(self):
-        """ QProcess Error정보를 받아온다. 바이트 신호를 번역하고 백분율 계산 함수를 실행시키고 컴퓨터가 보낸 정보를 Text에 출력한다.
-
-        """
-        data = self.p2.readAllStandardError()
-        stderr = bytes(data).decode("utf8")
-        progress = self.ffmpeg_simple_percent_parser(stderr, self.ffmpeg_total_frame)
-        if progress:
-            self.progress.setValue(progress)
-        self.message(stderr)
-
-    def ffmpeg_handle_stdout(self):
-        """ QProcess Output정보를 받아온다. 바이트 신호를 번역한 정보를 Text에 출력한다.
-
-        """
-        data = self.p2.readAllStandardOutput()
-        stdout = bytes(data).decode("utf8")
-        self.message(stdout)
-
-    def ffmpeg_handle_state(self, state):
-        """Qprocess state에 변동이 있을 경우, 해당 변화 정보를 출력한다.
-
-        """
-        states = {
-            QtCore.QProcess.NotRunning: 'Not running',
-            QtCore.QProcess.Starting: 'Starting',
-            QtCore.QProcess.Running: 'Running',
-        }
-        state_name = states[state]
-        self.message(f"State changed: {state_name}")
-
-    def ffmpeg_process_finished(self):
-        """Qprocess finish가 날 경우, 바이트 신호를 번역한 정보를 Text에 출력한다.
-
-        """
-        self.message("Process finished.")
-        self.p2 = None
-
-    def ffmpeg_tree(self, path):
-        """ Sequence file이 있는 경로 내 파일의 갯수를 파악하여 Total frame을 계산한다.
-
-        Args:
-            path (str): Sequence file path
-
-        Returns: filecnt
-
-        """
-        for x in sorted(glob.glob(path + "/*")):
-            if os.path.isfile(x):
-                self.filecnt += 1
-            else:
-                print("unknown:", x)
-        return int(self.filecnt)
 
     def ffmpeg_simple_percent_parser(self, output, total):
         """Progress bar에 넣을 정보를 백분율로 계산한다. \n
@@ -297,6 +245,22 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                 pc = int(int(pc_complete) / total * 100)
                 return pc  # 백분율을 통해 process bar에 보여질 값
 
+    def ffmpeg_tree(self, path):
+        """ Sequence file이 있는 경로 내 파일의 갯수를 파악하여 Total frame을 계산한다.
+
+        Args:
+            path (str): Sequence file path
+
+        Returns: filecnt
+
+        """
+        for x in sorted(glob.glob(path + "/*")):
+            if os.path.isfile(x):
+                self.filecnt += 1
+            else:
+                print("unknown:", x)
+        return int(self.filecnt)
+
 ############################################################################################
 
     def restart_process(self):
@@ -311,7 +275,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
     def handle_interrupt(self):
         print('p :', self.p)
-        print('p2 :', self.p2)
         if self.p is not None:
             self.p.kill()
             self.btn_interrupt.setText("Restart")
