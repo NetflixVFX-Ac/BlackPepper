@@ -370,10 +370,10 @@ class HouPepper:
             "-pix_fmt", "yuv420p",  # 포맷양식
             "-y",  # 출력파일을 쓸 때 같은 이름의 파일이 있어도 확인없이 덮어씀
             "-loglevel", "debug",  # 인코딩 과정로그를 보여줌
-            f'{precomp_list.get("mov_output_path")}.mov'
+            f'{precomp_list.get("video_output_path")}.mov'
         ]
         self.ffmpeg_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
-        # self.cmd_list.append(self.ffmpeg_cmd)
+        self.cmd_list.append(self.ffmpeg_cmd)
         cmd_list = self.cmd_list
 
         return cmd_list, total_frame
@@ -459,7 +459,10 @@ def main():
     cmd_list = ["python /home/rapa/git/hook/python/BlackPepper/mantra_render.py /mnt/project/hook/pepper/shots/sq01/0010/fx/working/v069/pepper_sq01_0010_fx_069.hipnc /mnt/project/hook/pepper/shots/sq01/0010/fx/output/jpg_sequence/v002/pepper_sq01_0010_jpg_sequence_v002 /mnt/project/hook/pepper/shots/sq01/0010/layout/output/camera_cache/v001/pepper_sq01_0010_camera_cache_v001.abc cam1Camera",
                 "python /home/rapa/git/hook/python/BlackPepper/mantra_render.py /mnt/project/hook/pepper/shots/sq01/0030/fx/working/v026/pepper_sq01_0030_fx_026.hipnc /mnt/project/hook/pepper/shots/sq01/0030/fx/output/jpg_sequence/v002/pepper_sq01_0030_jpg_sequence_v002 /mnt/project/hook/pepper/shots/sq01/0030/layout/output/camera_cache/v001/pepper_sq01_0030_camera_cache_v001.abc cam2Camera"]
 
-    app = QtWidgets.QApplication(sys.argv)
+    if not QtWidgets.QApplication.instance():
+        app = QtWidgets.QApplication(sys.argv)
+    else:
+        app = QtWidgets.QApplication.instance()
 
     r = RenderMainWindow(ccc, ddd)
     r.resize(800, 600)

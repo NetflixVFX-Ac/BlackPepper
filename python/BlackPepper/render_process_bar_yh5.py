@@ -1,9 +1,6 @@
 import re
 from PySide2 import QtWidgets, QtCore
-# import os
-# import glob
-# import hou
-# import _alembic_hom_extensions as abc
+
 
 
 class RenderMainWindow(QtWidgets.QMainWindow):
@@ -50,7 +47,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         self.setCentralWidget(w)
 
-        # self.start()
         if len(self.cmd_list) == 0:
             return
         cmd = self.cmd_list.pop(0)
@@ -60,20 +56,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         print('ffmpeg :', self.fc)
         print("ccccccccccmddd :", cmd)
         self.start_process(cmd)
-
-
-    # def start(self):
-    #     for cmd in self.cmd_list:
-    #         # if not self.p:
-    #         #     self.p = QtCore.QProcess()
-    #         self.start_process(cmd)
-    #         self.p.waitForFinished()
-    #         self.p.close()
-    #         # while not self.p.waitForFinished():
-    #         #     print("wait...", self.p.waitForFinished())
-    #     # self.p.close()
-    #     self.p.deleteLater()
-    #     self.close()
 
     def message(self, s):
         """  Text Widget에 메시지를 출력한다
@@ -88,8 +70,13 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         진행 중, 오류, 변동, 마무리 단계마다 Text Widget에 상태를 Handling 한다.
 
         """
+
+        print("start!!!!!!!")
+
         if not self.p:
             self.p = QtCore.QProcess()
+
+        self.p.waitForFinished()
 
         self.p.readyReadStandardOutput.connect(self.handle_stdout)
         self.p.readyReadStandardError.connect(self.handle_stderr)
@@ -145,15 +132,20 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         print("fin")
         self.message("Process finished.")
         self.p.terminate()
-        while not self.p.finished:
-            self.p.waitForFinished()
+        # while not self.p.finished:
+        #     self.p.waitForFinished()
 
-        if len(self.cmd_list) == 0:
+        # time.sleep(3)
+
+        if len(self.cmd_list) > 0:
+            cmd = self.cmd_list.pop(0)
+            print("ttttttttttttttmddd :", cmd)
+            print('cmd_list :', self.cmd_list)
+            print('len cmd_list :', len(self.cmd_list))
+            self.start_process(cmd)
+        else:
             return
-        cmd = self.cmd_list.pop(0)
-        print("ttttttttttttttmddd :", cmd)
-        print('cmd_list :', self.cmd_list)
-        self.start_process(cmd)
+
 
     def mantra_simple_percent_parser(self, output, total):
         """
