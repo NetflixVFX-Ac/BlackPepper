@@ -18,6 +18,8 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.dir_path = ''
         self.user_path = ''
 
+        self.output_path = output_path
+
         self.padding_frame = None
         self.stop_sig = False
 
@@ -35,9 +37,6 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             cam_node
         ]
         self.cmd = (' '.join(str(command_string) for command_string in self.command))
-        # print("aaa", output_path)
-        # print("bbb", next_fx_path)
-        self.output_path = output_path
 
         # Create the "Interrupt" Button
         self.progress = QtWidgets.QProgressBar()
@@ -52,6 +51,8 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.home_json_path()
 
         self.access_setting()
+
+        self.load_setting()
 
         self.start_process()
 
@@ -114,6 +115,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.message("Process finished.")
         self.stop_sig = True
         if self.stop_sig is True:
+            self.load_setting()
             self.save_frame_setting()
         self.btn_interrupt.setText("Restart")
         self.process_box = None
@@ -142,6 +144,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
             self.btn_interrupt.clicked.connect(self.restart_process)
             self.stop_sig = True
             if self.stop_sig is True:
+                self.load_setting()
                 self.save_frame_setting()
         else:
             self.btn_interrupt.setText("Interrupt")
@@ -181,16 +184,21 @@ class MantraMainWindow(QtWidgets.QMainWindow):
     def save_frame_setting(self):
         if os.path.exists(self.user_path):
             with open(self.user_path, 'r') as json_file:
-                data = json.load(json_file)
-                data['frame'] = []
-                data['frame'].append({
+                self.exc_dict = json.load(json_file)
+                self.exc_dict['frame'] = []
+                self.exc_dict['frame'].append({
                     'last_frame': self.padding_frame,
                     'output_path': self.output_path
                 })
-            with open(self.user_path, 'w') as json_file:
-                json.dump(data, json_file)
+        elif not os.path.exists(self.user_path):
+            self.exc_dict['frame'] = []
+            self.exc_dict['frame'].append({
+                'last_frame': self.padding_frame,
+                'output_path': self.output_path
+            })
+        with open(self.user_path, 'w') as json_file:
+            json.dump(self.exc_dict, json_file)
 
     def reset_setting(self):
         self.padding_frame = None
-        self.output_path = None
         self.save_frame_setting()

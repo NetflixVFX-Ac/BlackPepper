@@ -6,7 +6,6 @@ import hou
 import _alembic_hom_extensions as abc
 import sys
 
-
 class HouPepper:
     """
     이 모듈은 Template으로 정한 Houdini 파일에 Alembic 파일의 카메라값을 불러와 FX working file path에 저장한다. Alembic 파일은
@@ -14,7 +13,6 @@ class HouPepper:
     Temp 내 복사한 FX working file을 이용한다. FX output file path에 시퀀스 파일을 저장하고 사용한 Temp를 지워주면서 Publish를
     진행한다.
     """
-
     def __init__(self):
         self.cam_list = []
         self.cam_path = []
@@ -387,14 +385,14 @@ def main():
         else:
             app = QtWidgets.QApplication.instance()
         m = MantraMainWindow(f'{next_fx_path}.{pepper.software.get("file_extension")}', fx_next_output,
-                             layout_output_path, hou_pepper.cam_node, hou_pepper.abc_range[1] * hou.fps())
+                             layout_output_path, hou_pepper.cam_node, hou_pepper.abc_range[1]*hou.fps())
         m.resize(800, 600)
         m.move(1000, 250)
         m.show()
-        if hou_pepper.abc_range[1] * hou.fps() == m.padding_frame:
-            m.reset_setting()
         app.exec_()
 
 
 if __name__ == "__main__":
     main()
+
+
