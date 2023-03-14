@@ -202,3 +202,5 @@ class MantraMainWindow(QtWidgets.QMainWindow):
     def reset_setting(self):
         self.padding_frame = None
         self.save_frame_setting()
+
+##
