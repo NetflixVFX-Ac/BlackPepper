@@ -59,7 +59,7 @@ class PepperWindow(QMainWindow):
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
         self.render_model = PepperDnDModel()
-        self.render_list_model = PepperDnDModel()
+        self.render_list_model = PepperModel()
         # listview instance
         self.projects_listview = PepperView(self)
         self.templates_listview = PepperView(self)
@@ -601,10 +601,14 @@ class PepperWindow(QMainWindow):
                 json.dump(data_to_save, f, ensure_ascii=False)
 
     def render_file_check(self):
-
         self.render_list_model.pepperlist.clear()
-        for render in self.render_model.pepperlist:
-            self.render_list_model.pepperlist.append(render['name'])
+        for render_file in self.render_model.pepperlist:
+            self.render_list_model.pepperlist.append(f"\n{render_file['name']} : \n "
+                                                     f"{render_file['temp_working_path']}\n "
+                                                     f"{render_file['layout_output_path']}\n "
+                                                     f"{render_file['fx_working_path']}\n "
+                                                     f"{render_file['jpg_output_path']}\n "
+                                                     f"{render_file['video_output_path']}\n")
         self.render_list_model.layoutChanged.emit()
         self.check_window.show()
         # self.check_window.yesyes_btn.clicked.connect(self.render_yes)

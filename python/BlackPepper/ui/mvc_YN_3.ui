@@ -9,13 +9,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>1200</width>
     <height>600</height>
    </rect>
   </property>
   <property name="maximumSize">
    <size>
-    <width>600</width>
+    <width>1200</width>
     <height>600</height>
    </size>
   </property>
@@ -194,7 +194,7 @@ color: rgb(45, 45, 45);
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>600</width>
+     <width>1200</width>
      <height>20</height>
     </rect>
    </property>
