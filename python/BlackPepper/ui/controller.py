@@ -114,7 +114,7 @@ class PepperWindow(QMainWindow):
         self.main_window.render_btn.clicked.connect(self.render_execute)
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
-        # self.main_window.logout_btn.clicked.connect(self.user_logout)
+        self.main_window.save_btn.clicked.connect(self.render_preset_json)
         self.main_window.template_rev_cbox.currentTextChanged.connect(self.renew_template_info)
         # add listview to ui
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
@@ -517,12 +517,9 @@ class PepperWindow(QMainWindow):
             path 에 json 파일이 없으면 json 을 만들어주는 함수를 사용하여 json 을 만들어주고 json을 load 하여 'recent' key에
             render_moderl.pepperlist(렌다할 render files들) dict 들을 날짜,시간별로 리스트로 json을 저장한다.
         """
-
         if len(self.render_model.pepperlist) == 0:
             return
-
         self.preset_json_path = 'render_check_list.json'
-
         if not os.path.exists(self.preset_json_path):
             self.presave_preset_json()
         with open(self.preset_json_path, 'r') as f:
@@ -533,7 +530,7 @@ class PepperWindow(QMainWindow):
         if len(recent_data) >= 5:
             recent_data.pop(0)  # 가장 오래된 데이터 삭제
         recent_data.append({
-             f'recent_{now.date()}_time_{now.hour}:{now.minute}': self.render_model.pepperlist
+            f'recent_{now.date()}_time_{now.hour}:{now.minute}': self.render_model.pepperlist
         })
         # 'recent' key 값의 value로 저장
         self.render_list_data['recent'] = recent_data

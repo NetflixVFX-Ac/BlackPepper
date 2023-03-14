@@ -20,7 +20,6 @@ class Houpub:
         self.identif = None
         self.user = None
         self.mylog = Logger()
-        self.precomp_list = []
         pass
 
     def login(self, host, identify, password):
@@ -508,9 +507,7 @@ class Houpub:
         return casted_shots
 
     def make_precomp_dict(self, casted_shot, temp_revision=None, cam_revision=None):
-        """shot 별로 houdini에서 필요한 path들을 딕셔너리로 만들어준다. \n
-        이 딕셔너리들은 self.precomp_list에 들어가며,
-        render list가 모두 정리된 뒤 self.precomp_list를 받아서 houdini에서 작업할 수 있다. \n
+        """shot 별로 houdini에서 필요한 path들을 딕셔너리로 만들어준다.
 
         Example:
             for shot in render_shots:
@@ -539,15 +536,6 @@ class Houpub:
                    'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
                    'jpg_output_path': jpg_output_path, 'video_output_path': video_output_path}
         return precomp
-        # if precomp in self.precomp_list:
-        #     return
-        # self.precomp_list.append(precomp)
-        # return
-
-    def delete_precomp_dict(self, name):
-        for precomp in self.precomp_list:
-            if precomp['name'] == name:
-                self.precomp_list.remove(precomp)
 
     def publish_precomp_working(self, precomp):
         """self.make_precomp_dict 의 정보들로 fx의 working file을 publish 해준다. \n
@@ -586,20 +574,44 @@ class Houpub:
         self.publish_output_file('FX', 'Movie_file', 'test_precomp')
 
     def get_every_revision_for_working_file(self, task_name):
+        """self.entity의 task_name에 해당하는 task의 모든 working file의 revision이 담긴 list를 반환한다.
+
+        Example:
+            rev_list = pepper.get_every_revision_for_working_file('fx_template')
+
+        Args:
+            task_name(str): working file을 찾을 task의 이름
+
+        Returns:
+            [9, 8, 7, 6, 5, 4, 3, 2, 1]
+        """
         working_files = gazu.files.get_all_working_files_for_entity(self.entity)
-        revision_list = []
+        revision_list = [working_file['revision'] for working_file in working_files
+                         if gazu.task.get_task(working_file['task_id'])['entity_type']['name'] == task_name]
         for working_file in working_files:
-            if gazu.task.get_task(working_file['task_id'])['entity_type']['name'] == task_name:
+            task_dict = gazu.task.get_task(working_file['task_id'])
+            if task_dict['entity_type']['name'] == task_name:
                 revision_list.append(working_file['revision'])
         return revision_list
 
     def get_every_revision_for_output_file(self, output_type_name, task_type_name):
+        """self.entity의 task_name에 해당하는 task의 모든 output file의 revision이 담긴 list를 반환한다.
+
+        Example:
+            rev_list = pepper.get_every_revision_for_output_file('fx_template')
+
+        Args:
+            output_type_name(str): output file의 output task 이름
+            task_type_name(str): output file을 찾을 task type의 이름
+
+        Returns:
+            [9, 8, 7, 6, 5, 4, 3, 2, 1]
+        """
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         task_type = gazu.task.get_task_type_by_name(task_type_name)
         output_files = gazu.files.all_output_files_for_entity(self.entity, output_type, task_type)
         revision_list = [output_file['revision'] for output_file in output_files]
         return revision_list
-        # self.publish_output_file(task_type_name, output_type_name, "test publish for getting every rev")
 
     # -------------------------------------------
     # ----------- get all 관련 메소드들 -----------
@@ -702,6 +714,10 @@ class Houpub:
                 for asset in gazu.casting.get_shot_casting(self.shot)]
 
     def check_asset_type(self, asset_name, asset_type_name):
+        """asset의 asset type이 asset_type_name과 일치하는지 확인해주고 일치한다면 asset을 그대로 반환해준다.
+
+
+        """
         asset = gazu.asset.get_asset_by_name(self.project, asset_name)
         asset_type = gazu.asset.get_asset_type_from_asset(asset)
         if asset_type['name'] == asset_type_name:
@@ -726,6 +742,18 @@ class Houpub:
         return my_projects
 
     def get_working_file_data(self, task_type_name, revision, entity_type):
+        """task의 working file의 revision에 맞는 데이터를 반환해준다.
+
+                Example:
+                    name, time, rev = pepper.get_working_file_data('simulation', 5, 'asset')
+                Args:
+                    task_type_name(str):
+                    revision:
+                    entity_type(str):
+
+                Returns:
+                    JaehyukLee, Date-Time, 1
+                """
         global the_working_file
         self.entity = entity_type
         _, task = self.get_task(task_type_name)
@@ -733,7 +761,6 @@ class Houpub:
         for check_file in working_files:
             if str(check_file['revision']) == revision:
                 the_working_file = check_file
-        # working_file = gazu.files.get_last_working_files(task)
         created_time = the_working_file['created_at']
         rev = the_working_file['revision']
         person_id = the_working_file['person_id']
@@ -741,11 +768,23 @@ class Houpub:
         return person['first_name'] + person['last_name'], created_time, rev
 
     def get_output_file_data(self, output_type_name, task_type_name, revision, entity_type):
+        """task의 output file의 revision에 맞는 데이터를 반환해준다.
+
+        Example:
+            name, time, rev = pepper.get_output_file_data('camera_cache', 'layout', 10, 'shot')
+        Args:
+            output_type_name(str):
+            task_type_name(str):
+            revision:
+            entity_type(str):
+
+        Returns:
+            JaehyukLee, Date-Time, 1
+        """
         global the_output_file
         self.entity = entity_type
         task_type, _ = self.get_task(task_type_name)
         output_type = gazu.files.get_output_type_by_name(output_type_name)
-        # output_file = gazu.files.get_last_output_files_for_entity(self.entity, output_type, task_type)[0]
         output_files = gazu.files.all_output_files_for_entity(self.entity, output_type, task_type)
         for check_file in output_files:
             if str(check_file['revision']) == revision:
@@ -904,16 +943,6 @@ BlackPepper.project = 'PEPPER'
 # nwp = BlackPepper.make_next_working_path('FX')
 # nop = BlackPepper.make_next_output_path('test', 'FX')
 # print(nwp)
-
-# for casted_shot in casted_shots:
-#     BlackPepper.make_precomp_dict(casted_shot)
-# print(BlackPepper.precomp_list)
-# for pc in BlackPepper.precomp_list:
-#     print(pc)
-# for precomp in BlackPepper.precomp_list:
-#     BlackPepper.publish_precomp_working(precomp)
-# for precomp in BlackPepper.precomp_list:
-#     BlackPepper.publish_precomp_output(precomp)
 
 # -----------Unused methods----------
 
