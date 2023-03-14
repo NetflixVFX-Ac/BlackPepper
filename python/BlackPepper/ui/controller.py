@@ -293,7 +293,6 @@ class PepperWindow(QMainWindow):
         self.pepper.entity = 'asset'
         rev_list = self.pepper.get_every_revision_for_working_file('fx_template')
         self.renew_template_cbox(rev_list)
-
         self.renew_template_info()
         # set template info label
         # name, time, rev = self.pepper.get_working_file_data('simulation', 'asset')
@@ -311,14 +310,6 @@ class PepperWindow(QMainWindow):
         self.renderlists_selection.clear()
         self.main_window.statusBar().showMessage('shots 를 선택하세요 ! 다중선택가능 ! ')
 
-    def renew_template_info(self):
-        revision = self.main_window.template_rev_cbox.currentText()
-        name, time, rev = self.pepper.get_working_file_data('simulation', revision, 'asset')
-
-        date = time[:10]
-        clock = time[11:]
-        self.main_window.template_info_label.setText(f"{name}\n{date}\n{clock}")
-
     def shot_selected(self, event):
         """Shots 를 선택 시 선택한 shot 의 정보(dict)를 self.all_shots = [] 에 담는 함수 이다.\n
         추가로 하단 Shot info 에 created Artist,Time,Revision 정보를 보여 준다.
@@ -335,6 +326,13 @@ class PepperWindow(QMainWindow):
         self.renew_shot_cbox(rev_list)
         self.renew_shot_info()
         self.renderlists_selection.clear()
+
+    def renew_template_info(self):
+        revision = self.main_window.template_rev_cbox.currentText()
+        name, time, rev = self.pepper.get_working_file_data('simulation', revision, 'asset')
+        date = time[:10]
+        clock = time[11:]
+        self.main_window.template_info_label.setText(f"{name}\n{date}\n{clock}")
 
     def renew_shot_info(self):
         revision = self.main_window.shot_rev_cbox.currentText()
