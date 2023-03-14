@@ -67,6 +67,7 @@ color: rgb(180, 180, 180);
              <font>
               <family>Courier New</family>
               <pointsize>10</pointsize>
+              <weight>50</weight>
               <italic>false</italic>
               <bold>false</bold>
              </font>
@@ -175,6 +176,7 @@ Time :</string>
              <font>
               <family>Courier New</family>
               <pointsize>10</pointsize>
+              <weight>50</weight>
               <italic>false</italic>
               <bold>false</bold>
              </font>
@@ -217,6 +219,7 @@ Time :</string>
              <font>
               <family>Courier New</family>
               <pointsize>10</pointsize>
+              <weight>50</weight>
               <italic>false</italic>
               <bold>false</bold>
              </font>
@@ -261,6 +264,7 @@ Time :</string>
                  <font>
                   <family>Courier New</family>
                   <pointsize>10</pointsize>
+                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -308,6 +312,7 @@ color: rgb(45, 45, 45);</string>
                <font>
                 <family>Courier New</family>
                 <pointsize>10</pointsize>
+                <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>
                </font>
@@ -345,6 +350,7 @@ color: rgb(45, 45, 45);</string>
                <font>
                 <family>Courier New</family>
                 <pointsize>10</pointsize>
+                <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>
                </font>
@@ -488,16 +494,6 @@ Time :</string>
      </layout>
     </item>
    </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1064</width>
-     <height>20</height>
-    </rect>
-   </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="quit_act">
