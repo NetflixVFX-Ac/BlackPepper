@@ -83,7 +83,7 @@ class PepperWindow(QMainWindow):
         # path.realpath(파일이름) : 현재 파일의  표준 경로+이름 을 반환
         script_path = os.path.dirname(os.path.realpath(__file__))
         # login Ui loader
-        login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login_3.ui'))
+        login_ui = QtCore.QFile(os.path.join(script_path, 'ui_backup/mvc_login_3.ui'))
         login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
@@ -91,7 +91,7 @@ class PepperWindow(QMainWindow):
         self.login_window.move(1000, 300)
         self.login_window.show()
         # main Ui loader
-        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_3.ui'))
+        main_ui = QtCore.QFile(os.path.join(script_path, 'ui_backup/mvc_main_3.ui'))
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)

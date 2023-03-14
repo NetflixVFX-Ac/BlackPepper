@@ -41,7 +41,7 @@ class PepperWindow(QMainWindow):
         self.temp_rev = None
         self.cam_rev = None
         self.mantra_window = None
-        self.main_menu = None
+        # self.main_filemenu = None
         self.main_user = None
         self.main_menu_bar = None
         self.render_process = None
@@ -88,7 +88,7 @@ class PepperWindow(QMainWindow):
         # path.realpath(파일이름) : 현재 파일의  표준 경로+이름 을 반환
         script_path = os.path.dirname(os.path.realpath(__file__))
         # login Ui loader
-        login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login_3.ui'))
+        login_ui = QtCore.QFile(os.path.join(script_path, 'ui_backup/mvc_login_3.ui'))
         login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
@@ -96,7 +96,7 @@ class PepperWindow(QMainWindow):
         self.login_window.move(1000, 300)
         self.login_window.show()
         # main Ui loader
-        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_3.ui'))
+        main_ui = QtCore.QFile(os.path.join(script_path, 'ui_backup/mvc_main_3.ui'))
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
@@ -114,8 +114,9 @@ class PepperWindow(QMainWindow):
         self.main_window.render_btn.clicked.connect(self.render_execute)
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
-        # self.main_window.logout_btn.clicked.connect(self.user_logout)
+        self.main_window.save_btn.clicked.connect(self.render_preset_json)
         self.main_window.template_rev_cbox.currentTextChanged.connect(self.renew_template_info)
+
         # add listview to ui
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
@@ -126,8 +127,6 @@ class PepperWindow(QMainWindow):
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
         # set main menubar
         self.set_login_menubar()
-
-        # self.set_main_menubar()
 
         # set auto login
         self.set_auto_login()
@@ -430,17 +429,19 @@ class PepperWindow(QMainWindow):
         self.main_menu_bar = self.main_window.menuBar()
         self.main_menu_bar.setNativeMenuBar(False)
         # set Menu
-        self.main_menu = self.main_menu_bar.addMenu('Menu')
+        self.main_filemenu = self.main_menu_bar.addMenu('File')
+        # 동적으로 메뉴를 채워주는 부분
+        self.main_filemenu.aboutToShow.connect(self.set_main_open_recent)
         # set main window preset
         self.set_main_open_recent()
         # 구분자 추가
-        self.main_menu.addSeparator()
+        self.main_filemenu.addSeparator()
         # addMenu 'Exit'
         exit_action = QAction('Exit', self.main_window)
         exit_action.setShortcut('Ctrl+Q')
         exit_action.setStatusTip('Exit application')
         exit_action.triggered.connect(QApplication.instance().quit)
-        self.main_menu.addAction(exit_action)
+        self.main_filemenu.addAction(exit_action)
         # addMenu Help
         main_helpmenu = self.main_menu_bar.addMenu('Help')
         # set kitsu
@@ -481,13 +482,14 @@ class PepperWindow(QMainWindow):
             메뉴바 'Menu' 에 'Recent Presets는'메뉴에 path json file 을 불러오고 최신 5개의 json render_model.pepperlist
             5번 인덱스가 제일 최신 json dict 정보이다.
         """
+        self.main_filemenu.clear()
         self.preset_json_path = 'render_check_list.json'
 
         if not os.path.exists(self.preset_json_path):
             self.presave_preset_json()
         pass
 
-        self.recent_menu = QMenu('Recent Presets', self.main_window)
+        self.recent_menu = QMenu('Open Recent Presets', self.main_window)
 
         with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
@@ -502,16 +504,10 @@ class PepperWindow(QMainWindow):
                 file_action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
                 self.recent_menu.addAction(file_action)
 
-        self.main_menu.addMenu(self.recent_menu)
+        self.main_filemenu.addMenu(self.recent_menu)
 
-    def handle_file(self, file_path):  # 수정예정
-        """
-
-        Args:
-            file_path:
-
-        Returns:
-
+    def handle_file(self, file_path):
+        """메뉴바의 recent preset
         """
         # TODO: 파일 내용 처리하기
         # self.load_preset_set()
@@ -523,47 +519,34 @@ class PepperWindow(QMainWindow):
             path 에 json 파일이 없으면 json 을 만들어주는 함수를 사용하여 json 을 만들어주고 json을 load 하여 'recent' key에
             render_moderl.pepperlist(렌다할 render files들) dict 들을 날짜,시간별로 리스트로 json을 저장한다.
         """
-
         if len(self.render_model.pepperlist) == 0:
             return
-
         self.preset_json_path = 'render_check_list.json'
-
         if not os.path.exists(self.preset_json_path):
             self.presave_preset_json()
-
         with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
-
         recent_data = self.render_list_data.get('recent', [])
-
         now = datetime.now()
-
         # 최대 인덱스 5까지 새로운 value가 추가되도록 수정
         if len(recent_data) >= 5:
             recent_data.pop(0)  # 가장 오래된 데이터 삭제
-        # recent_index = len(recent_data) + 1
-        # for render in self.pepper.precomp_list:
         recent_data.append({
-             f'recent_{now.date()}_time_{now.hour}:{now.minute}': self.render_model.pepperlist
+            f'recent_{now.date()}_time_{now.hour}:{now.minute}': self.render_model.pepperlist
         })
-
+        # 'recent' key 값의 value로 저장
         self.render_list_data['recent'] = recent_data
-        data_to_save = self.render_list_data  # 'recent' key 값의 value로 저장
-
+        data_to_save = self.render_list_data
         with open(self.preset_json_path, "w") as f:
             json.dump(data_to_save, f, ensure_ascii=False)
 
     def presave_preset_json(self):
         """preset이 저장되어있는 json파일이 없으면 json 파일을 만들어주는 함수이다.
-
         """
-
         self.render_list_data = {
             "recent": []
-
         }
-        data_to_save = self.render_list_data  # 'recent' key 값의 value로 저장
+        data_to_save = self.render_list_data
 
         with open(self.preset_json_path, "w") as f:
             json.dump(data_to_save, f, ensure_ascii=False)
@@ -605,7 +588,7 @@ class PepperWindow(QMainWindow):
 
         self.render_preset_json()
 
-        self.pepper.precomp_list.clear()
+        # self.pepper.precomp_list.clear()
         self.render_list_data.clear()
 
         self.render_model.layoutChanged.emit()
