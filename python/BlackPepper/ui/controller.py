@@ -59,13 +59,14 @@ class PepperWindow(QMainWindow):
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
         self.render_model = PepperDnDModel()
+        self.render_list_model = PepperDnDModel()
         # listview instance
         self.projects_listview = PepperView(self)
         self.templates_listview = PepperView(self)
         self.shots_listview = PepperView(self)
         self.renderlists_listview = PepperDnDView(self)
         self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        # self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         # setModel
         self.projects_listview.setModel(self.project_model)
         self.projects_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
@@ -104,6 +105,19 @@ class PepperWindow(QMainWindow):
         self.main_window = self.main_ui_loader.load(main_ui)
         self.main_window.setWindowTitle('BlackPepper 0.1')
         self.main_window.move(700, 250)
+        # check Ui loader
+        check_ui = QtCore.QFile(os.path.join(script_path, 'mvc_YN_3.ui'))
+        check_ui.open(QtCore.QFile.ReadOnly)
+        self.check_ui_loader = QUiLoader()
+        self.check_window = self.login_ui_loader.load(check_ui)
+        self.check_window.setWindowTitle('Render Check List')
+        self.check_window.move(1000, 300)
+        # self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        # self.check_window.connect(self.renew_template_info)
+        self.check_window.checklist.setModel(self.render_list_model)
+        # Render check list button
+        self.check_window.yesyes_btn.clicked.connect(self.render_yes)
+        self.check_window.nono_btn.clicked.connect(self.render_no)
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
@@ -113,7 +127,7 @@ class PepperWindow(QMainWindow):
         self.templates_listview.clicked.connect(self.template_selected)
         self.shots_listview.clicked.connect(self.shot_selected)
         self.main_window.reset_btn.clicked.connect(self.clear_list)
-        self.main_window.render_btn.clicked.connect(self.render_execute)
+        self.main_window.render_btn.clicked.connect(self.render_file_check)
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
         self.main_window.save_btn.clicked.connect(self.save_user_renderlists)
@@ -590,6 +604,23 @@ class PepperWindow(QMainWindow):
 
             with open(self.preset_json_path, "w") as f:
                 json.dump(data_to_save, f, ensure_ascii=False)
+
+    def render_file_check(self):
+
+        self.render_list_model.pepperlist.clear()
+        for render in self.render_model.pepperlist:
+            self.render_list_model.pepperlist.append(render['name'])
+        self.render_list_model.layoutChanged.emit()
+        self.check_window.show()
+        # self.check_window.yesyes_btn.clicked.connect(self.render_yes)
+        # self.check_window.nono_btn.clicked.connect(self.render_no)
+
+    def render_yes(self):
+        self.check_window.close()
+        self.render_execute()
+
+    def render_no(self):
+        self.check_window.close()
 
     def render_execute(self):
         houp = HouPepper()
