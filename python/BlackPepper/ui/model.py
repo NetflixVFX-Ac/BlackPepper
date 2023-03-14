@@ -46,6 +46,8 @@ class PepperDnDModel(QtCore.QAbstractListModel):
         return False
 
     def rowCount(self, index):
+        if not self.pepperlist:
+            return 0
         return len(self.pepperlist)
 
     def flags(self, index):
