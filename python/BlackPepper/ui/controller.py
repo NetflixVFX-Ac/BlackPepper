@@ -506,6 +506,7 @@ class PepperWindow(QMainWindow):
 
         """
         # TODO: 파일 내용 처리하기
+        print("test")
         # self.load_preset_set()
         pass
 
@@ -515,6 +516,10 @@ class PepperWindow(QMainWindow):
             path 에 json 파일이 없으면 json 을 만들어주는 함수를 사용하여 json 을 만들어주고 json을 load 하여 'recent' key에
             render_moderl.pepperlist(렌다할 render files들) dict 들을 날짜,시간별로 리스트로 json을 저장한다.
         """
+        # pepper.precomp_list 의 갯수가 0 이면 return !
+        if len(self.render_model.pepperlist) == 0:
+            return
+
         self.preset_json_path = 'render_check_list.json'
 
         if not os.path.exists(self.preset_json_path):
@@ -568,32 +573,27 @@ class PepperWindow(QMainWindow):
         self.renderlists_selection.clear()
 
     def render_execute(self):
-        # houp = HouPepper()
-        # for precomp in self.render_model.pepperlist:
-        #     temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-        #         = self.path_seperator(precomp)
-        #     houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
-        #                                  f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
-        # for precomp in self.render_model.pepperlist:
-        #     temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-        #         = self.path_seperator(precomp)
-        #     self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
-        #                                           jpg_output_path, layout_output_path, houp.cam_node,
-        #                                           houp.abc_range[1] * hou.fps())
-        #     self.mantra_window.resize(800, 600)
-        #     self.mantra_window.move(1000, 250)
-        #     self.mantra_window.show()
+        houp = HouPepper()
+        for precomp in self.render_model.pepperlist:
+            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+                = self.path_seperator(precomp)
+            houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
+                                         f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
+        for precomp in self.render_model.pepperlist:
+            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+                = self.path_seperator(precomp)
+            self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
+                                                  jpg_output_path, layout_output_path, houp.cam_node,
+                                                  houp.abc_range[1] * hou.fps())
+            self.mantra_window.resize(800, 600)
+            self.mantra_window.move(1000, 250)
+            self.mantra_window.show()
             # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
             # f.resize(800, 600)
             # f.move(1000, 250)
             # f.show()
 
-        # pepper.precomp_list 의 갯수가 0 이면 return !
-        if len(self.render_model.pepperlist) == 0:
-            return
-
         self.save_preset_json()
-
         self.main_menu.update()
 
         self.pepper.precomp_list.clear()
