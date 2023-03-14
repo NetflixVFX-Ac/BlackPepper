@@ -19,6 +19,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
         self.user_path = ''
 
         self.output_path = output_path
+        self.total_frame = total_frame
 
         self.padding_frame = None
         self.stop_sig = False
@@ -201,6 +202,7 @@ class MantraMainWindow(QtWidgets.QMainWindow):
 
     def reset_setting(self):
         self.padding_frame = None
+        if self.total_frame == self.padding_frame:
+            self.output_path = None
         self.save_frame_setting()
 
-##
