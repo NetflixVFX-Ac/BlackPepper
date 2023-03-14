@@ -41,7 +41,7 @@ class PepperWindow(QMainWindow):
         self.temp_rev = None
         self.cam_rev = None
         self.mantra_window = None
-        self.main_filemenu = None
+        # self.main_filemenu = None
         self.main_user = None
         self.main_menu_bar = None
         self.render_process = None
@@ -116,6 +116,7 @@ class PepperWindow(QMainWindow):
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
         self.main_window.save_btn.clicked.connect(self.render_preset_json)
         self.main_window.template_rev_cbox.currentTextChanged.connect(self.renew_template_info)
+
         # add listview to ui
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
@@ -126,8 +127,6 @@ class PepperWindow(QMainWindow):
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
         # set main menubar
         self.set_login_menubar()
-
-        # self.set_main_menubar()
 
         # set auto login
         self.set_auto_login()
@@ -431,6 +430,8 @@ class PepperWindow(QMainWindow):
         self.main_menu_bar.setNativeMenuBar(False)
         # set Menu
         self.main_filemenu = self.main_menu_bar.addMenu('File')
+        # 동적으로 메뉴를 채워주는 부분
+        self.main_filemenu.aboutToShow.connect(self.set_main_open_recent)
         # set main window preset
         self.set_main_open_recent()
         # 구분자 추가
@@ -481,6 +482,7 @@ class PepperWindow(QMainWindow):
             메뉴바 'Menu' 에 'Recent Presets는'메뉴에 path json file 을 불러오고 최신 5개의 json render_model.pepperlist
             5번 인덱스가 제일 최신 json dict 정보이다.
         """
+        self.main_filemenu.clear()
         self.preset_json_path = 'render_check_list.json'
 
         if not os.path.exists(self.preset_json_path):
@@ -586,7 +588,7 @@ class PepperWindow(QMainWindow):
 
         self.render_preset_json()
 
-        self.pepper.precomp_list.clear()
+        # self.pepper.precomp_list.clear()
         self.render_list_data.clear()
 
         self.render_model.layoutChanged.emit()
