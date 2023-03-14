@@ -10,7 +10,6 @@ from PySide2.QtWidgets import QMainWindow
 from PySide2.QtWidgets import QAction, QApplication
 from BlackPepper.ui.model import PepperModel, PepperDnDModel
 from BlackPepper.ui.view import PepperView, PepperDnDView
-from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import QAction, QApplication, QMenu, QMenuBar
 from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
@@ -126,11 +125,11 @@ class PepperWindow(QMainWindow):
         self.login_window.statusBar().showMessage('kitsu 로그인 하세요!  houdini 확장자 선택하세요!')
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
         # set main menubar
-        self.set_login_menubar()
+        self.create_login_menubar()
 
         # set auto login
         self.set_auto_login()
-        self.set_main_menubar()
+        self.create_main_menubar()
 
     def set_auto_login(self):
         log_path = self.login_log.user_path
@@ -404,8 +403,8 @@ class PepperWindow(QMainWindow):
         self.render_model.pepperlist.clear()
         self.render_model.layoutChanged.emit()
 
-    def set_login_menubar(self):
-        """로그인 창의 메뉴바를 셋팅하는 함수이다.
+    def create_login_menubar(self):
+        """로그인 창에 메뉴바를 만들고 셋팅하는 함수이다.
 
             메뉴바에 'Menu'를 만들고 'Menu'안에 'Exit'를 만들었고 'Ctrl+Q' 단축키 또는 'Exit' 클릭시 창의 X 와 같은 기능으로
          어플리케이션이 종료 된다.
@@ -418,8 +417,8 @@ class PepperWindow(QMainWindow):
         exit_action.triggered.connect(QApplication.instance().quit)
         login_menu.addAction(exit_action)
 
-    def set_main_menubar(self):
-        """메인 창의 메뉴바를 셋팅하는 함수이다.
+    def create_main_menubar(self):
+        """메인 윈도우에 메뉴바를 만들고 셋팅하 함수이다.
 
             함수에는 메뉴바에 preset 을 셋팅하는 함수를 포함 하고있다.
         'Menu' 와 'Help' 메뉴바를 만들고 'Menu' 에는 먼저 set_main_window_preset() 함수의 'Recent Presets' 와
@@ -428,56 +427,48 @@ class PepperWindow(QMainWindow):
         """
         self.main_menu_bar = self.main_window.menuBar()
         self.main_menu_bar.setNativeMenuBar(False)
-        # set Menu
-        self.main_filemenu = self.main_menu_bar.addMenu('File')
+        # create 'File' menu
+        self.main_filemenu = self.main_menu_bar.addMenu('&File')
         # 동적으로 메뉴를 채워주는 부분
         self.main_filemenu.aboutToShow.connect(self.set_main_open_recent)
-        # set main window preset
+        # 'File' menu add 'Open Recent Rreset' & 'Exit'
         self.set_main_open_recent()
-        # 구분자 추가
-        self.main_filemenu.addSeparator()
-        # addMenu 'Exit'
-        exit_action = QAction('Exit', self.main_window)
-        exit_action.setShortcut('Ctrl+Q')
-        exit_action.setStatusTip('Exit application')
-        exit_action.triggered.connect(QApplication.instance().quit)
-        self.main_filemenu.addAction(exit_action)
-        # addMenu Help
-        main_helpmenu = self.main_menu_bar.addMenu('Help')
+        # create Help menu
+        main_helpmenu = self.main_menu_bar.addMenu('&Help')
         # set kitsu
         kisu_action = QAction('Kitsu', self.main_window)
         kisu_action.setShortcut('F1')
         kisu_action.setStatusTip('Kitsu site open')
         kisu_action.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
         main_helpmenu.addAction(kisu_action)
-        # set sidefx
+        # help add sidefx
         sidefx_action = QAction('Side Fx', self.main_window)
         sidefx_action.setShortcut('F2')
         sidefx_action.setStatusTip('Side Fx site open')
         sidefx_action.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
         main_helpmenu.addAction(sidefx_action)
-        # set scanline vfx
+        # help add scanline vfx
         scanline_action = QAction('Scanline VFX', self.main_window)
         scanline_action.setShortcut('F3')
         scanline_action.setStatusTip('Scanline VFX site open')
         scanline_action.triggered.connect(lambda: webbrowser.open('https://www.scanlinevfx.com/'))
         main_helpmenu.addAction(scanline_action)
-        # addMenu 'User'
-        self.main_user = self.main_menu_bar.addMenu('User')
+        # create menu 'User'
+        self.main_user = self.main_menu_bar.addMenu('&User')
         host_info = QAction(f'host : {self.login_log.host}', self.main_window)
         self.main_user.addAction(host_info)
         id_info = QAction(f'id : {self.login_log.user_id}', self.main_window)
         self.main_user.addAction(id_info)
         self.main_user.addSeparator()
-        # set 'Logout'
-        logout_action = QAction('Logout', self.main_window)
+        # 'User' add 'Logout'
+        logout_action = QAction('&Logout', self.main_window)
         logout_action.setShortcut('Ctrl+L')
         logout_action.setStatusTip('Logout application')
         logout_action.triggered.connect(self.user_logout)
         self.main_user.addAction(logout_action)
 
     def set_main_open_recent(self):
-        """메인창의 메뉴바에 Recent precet 메뉴를 만들어주 함수이다.
+        """메인창의 file 메뉴 'Open Recent Presets' 의 sub 메뉴들을 만들어주는 함수이다.
 
             메뉴바 'Menu' 에 'Recent Presets는'메뉴에 path json file 을 불러오고 최신 5개의 json render_model.pepperlist
             5번 인덱스가 제일 최신 json dict 정보이다.
@@ -489,7 +480,7 @@ class PepperWindow(QMainWindow):
             self.presave_preset_json()
         pass
 
-        self.recent_menu = QMenu('Open Recent Presets', self.main_window)
+        self.recent_menu = QMenu('&Open Recent Presets', self.main_window)
 
         with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
@@ -505,9 +496,17 @@ class PepperWindow(QMainWindow):
                 self.recent_menu.addAction(file_action)
 
         self.main_filemenu.addMenu(self.recent_menu)
+        # 구분자 추가
+        self.main_filemenu.addSeparator()
+        # add 'Exit'
+        exit_action = QAction('&Exit', self.main_window)
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.setStatusTip('Exit application')
+        exit_action.triggered.connect(QApplication.instance().quit)
+        self.main_filemenu.addAction(exit_action)
 
     def handle_file(self, file_path):
-        """메뉴바의 recent preset
+        """메인창의 file 메뉴 'Open Recent Presets' 의 원하는 Preset 을 선택시 실행되는 함수이다.
         """
         # TODO: 파일 내용 처리하기
         # self.load_preset_set()
