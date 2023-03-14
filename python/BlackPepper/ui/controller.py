@@ -142,6 +142,13 @@ class PepperWindow(QMainWindow):
         self.create_main_menubar()
 
     def set_auto_login(self):
+        """
+        사용자가 로그인을 할 때 로그인 창에 id, password를 적고 houdini 확장자를 선택한다. \n
+        그 때 .config에 저장된 json파일의 'auto'에 host 연결정보, id연결정보,id, password, host, houdini 확장자를 기록한다. \n
+        만약 기존에 json파일이 없으면 창에서 id, password를 저장하고 만약 정보가 있으면 id, password, houdini 확장자를 받아와서
+        로그인 버튼을 누른다.
+        """
+        # get login window to initial login information
         log_path = self.login_log.user_path
         self.login_log.host = "http://192.168.3.116/api"
         log_id = self.login_window.input_id.text()
@@ -149,6 +156,8 @@ class PepperWindow(QMainWindow):
         log_sfw = self.login_window.hipbox.currentText()[1:]
         log_value = self.login_log.load_setting()
         log_dict = self.login_log.user_dict
+
+        # get to json key 'auto' check
         if os.path.exists(log_path) and (not log_dict['auto'] or log_id != log_value['user_id']
                                          or log_pw != log_value['user_pw'] or log_sfw != log_value['user_ext']):
             self.login_log.user_id = log_id
@@ -179,11 +188,14 @@ class PepperWindow(QMainWindow):
         로그인 성공 시 입력받은 Houdini license 종류가 pepper의 self.software에 set 된다.
         이후 self.main_window가 바로 실행되어 pepper의 메인 UI가 디스플레이 된다.
         """
+
+        # set initial login information
         self.login_log.host = "http://192.168.3.116/api"
         self.login_log.user_id = self.login_window.input_id.text()
         self.login_log.user_pw = self.login_window.input_pw.text()
         self.login_log.user_ext = self.login_window.hipbox.currentText()[1:]
 
+        # if connect login, get login information and close login window, open main window
         if self.login_log.connect_login():
             self.pepper.software = self.login_log.user_ext
             self.login_log.auto_login = True
@@ -192,12 +204,19 @@ class PepperWindow(QMainWindow):
             self.open_main_window()
 
     def user_logout(self):
+        """
+        로그인 된 사용자가 로그아웃 버튼을 누르면 모든 창이 clear가 된다. \n
+        그 후 id, password, host, houdini 확장자, host 연결상태, id 연결상태를 모두 초기화하고 로그인 창이 새로 뜬다.
+        """
+
+        # if connect login, log out, all window clear and close main window, open login window
         if self.login_log.connect_login():
             self.login_log.log_out()
 
-            # self.pepper.precomp_list.clear()
+            # render data list clear
             self.render_list_data.clear()
 
+            # render, template, shot, project list clear
             self.render_model.layoutChanged.emit()
             self.template_model.layoutChanged.emit()
             self.shot_model.layoutChanged.emit()
@@ -211,6 +230,7 @@ class PepperWindow(QMainWindow):
             self.templates_selection.clear()
             self.shots_selection.clear()
 
+            # main window close and login window show
             self.main_window.close()
             self.login_window.show()
 
