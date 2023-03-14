@@ -41,7 +41,7 @@ class PepperWindow(QMainWindow):
         self.temp_rev = None
         self.cam_rev = None
         self.mantra_window = None
-        self.main_menu = None
+        self.main_filemenu = None
         self.main_user = None
         self.main_menu_bar = None
         self.render_process = None
@@ -430,17 +430,17 @@ class PepperWindow(QMainWindow):
         self.main_menu_bar = self.main_window.menuBar()
         self.main_menu_bar.setNativeMenuBar(False)
         # set Menu
-        self.main_menu = self.main_menu_bar.addMenu('Menu')
+        self.main_filemenu = self.main_menu_bar.addMenu('File')
         # set main window preset
         self.set_main_open_recent()
         # 구분자 추가
-        self.main_menu.addSeparator()
+        self.main_filemenu.addSeparator()
         # addMenu 'Exit'
         exit_action = QAction('Exit', self.main_window)
         exit_action.setShortcut('Ctrl+Q')
         exit_action.setStatusTip('Exit application')
         exit_action.triggered.connect(QApplication.instance().quit)
-        self.main_menu.addAction(exit_action)
+        self.main_filemenu.addAction(exit_action)
         # addMenu Help
         main_helpmenu = self.main_menu_bar.addMenu('Help')
         # set kitsu
@@ -487,7 +487,7 @@ class PepperWindow(QMainWindow):
             self.presave_preset_json()
         pass
 
-        self.recent_menu = QMenu('Recent Presets', self.main_window)
+        self.recent_menu = QMenu('Open Recent Presets', self.main_window)
 
         with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
@@ -502,16 +502,10 @@ class PepperWindow(QMainWindow):
                 file_action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
                 self.recent_menu.addAction(file_action)
 
-        self.main_menu.addMenu(self.recent_menu)
+        self.main_filemenu.addMenu(self.recent_menu)
 
-    def handle_file(self, file_path):  # 수정예정
-        """
-
-        Args:
-            file_path:
-
-        Returns:
-
+    def handle_file(self, file_path):
+        """메뉴바의 recent preset
         """
         # TODO: 파일 내용 처리하기
         # self.load_preset_set()
