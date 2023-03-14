@@ -66,7 +66,6 @@ class PepperWindow(QMainWindow):
         self.shots_listview = PepperView(self)
         self.renderlists_listview = PepperDnDView(self)
         self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         # setModel
         self.projects_listview.setModel(self.project_model)
         self.projects_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
@@ -112,8 +111,6 @@ class PepperWindow(QMainWindow):
         self.check_window = self.login_ui_loader.load(check_ui)
         self.check_window.setWindowTitle('Render Check List')
         self.check_window.move(1000, 300)
-        # self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        # self.check_window.connect(self.renew_template_info)
         self.check_window.checklist.setModel(self.render_list_model)
         # Render check list button
         self.check_window.yesyes_btn.clicked.connect(self.render_yes)
@@ -317,6 +314,7 @@ class PepperWindow(QMainWindow):
     def renew_template_info(self):
         revision = self.main_window.template_rev_cbox.currentText()
         name, time, rev = self.pepper.get_working_file_data('simulation', revision, 'asset')
+
         date = time[:10]
         clock = time[11:]
         self.main_window.template_info_label.setText(f"{name}\n{date}\n{clock}")
@@ -623,6 +621,7 @@ class PepperWindow(QMainWindow):
 
     def render_execute(self):
         houp = HouPepper()
+
         for precomp in self.render_model.pepperlist:
             temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
                 = self.path_seperator(precomp)
