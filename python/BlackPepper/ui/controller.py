@@ -600,7 +600,7 @@ class PepperWindow(QMainWindow):
                 json.dump(data_to_save, f, ensure_ascii=False)
 
     def render_file_check(self):
-        # self.render_list_model.pepperlist.clear()
+        self.render_list_model.pepperlist.clear()
         for render_file in self.render_model.pepperlist:
             self.render_list_model.pepperlist.append(f"\n{render_file['name']} : \n "
                                                      f"{render_file['temp_working_path']}\n "
