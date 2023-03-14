@@ -52,6 +52,7 @@ class PepperWindow(QMainWindow):
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
         self.render_model = PepperDnDModel()
+        self.render_list_model = PepperDnDModel()
         # listview instance
         self.projects_listview = PepperView(self)
         self.templates_listview = PepperView(self)
@@ -97,6 +98,21 @@ class PepperWindow(QMainWindow):
         self.main_window = self.main_ui_loader.load(main_ui)
         self.main_window.setWindowTitle('Black Pepper')
         self.main_window.move(700, 250)
+        # check Ui loader
+        ui_path = os.path.dirname(os.path.realpath(__file__))
+        check_ui = QtCore.QFile(os.path.join(ui_path, 'mvc_YN_3.ui'))
+        check_ui.open(QtCore.QFile.ReadOnly)
+        self.check_ui_loader = QUiLoader()
+        self.check_window = self.login_ui_loader.load(check_ui)
+        self.check_window.setWindowTitle('Render Check List')
+        self.check_window.move(1000, 300)
+        self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        # self.check_window.connect(self.renew_template_info)
+        self.check_window.checklist.setModel(self.render_list_model)
+        # Render check list button
+        self.check_window.yesyes_btn.clicked.connect(self.render_yes)
+        self.check_window.nono_btn.clicked.connect(self.render_no)
+
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
@@ -106,10 +122,11 @@ class PepperWindow(QMainWindow):
         self.templates_listview.clicked.connect(self.template_selected)
         self.shots_listview.clicked.connect(self.shot_selected)
         self.main_window.reset_btn.clicked.connect(self.clear_list)
-        self.main_window.render_btn.clicked.connect(self.render_execute)
+        self.main_window.render_btn.clicked.connect(self.render_file_check)
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
         self.main_window.logout_btn.clicked.connect(self.user_logout)
+
         self.main_window.temp_rev_cbox.currentTextChanged.connect(self.renew_template_info)
         # add listview to ui
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
@@ -584,6 +601,39 @@ class PepperWindow(QMainWindow):
         video_output_path = precomp['video_output_path']
         return temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path
 
+    def check_button(self):
+        houp = HouPepper()
+        for precomp in self.pepper.precomp_list:
+            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+                = self.path_seperator(precomp)
+            houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
+                                         f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
+        for precomp in self.pepper.precomp_list:
+            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
+                = self.path_seperator(precomp)
+            self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
+                                                  jpg_output_path, layout_output_path, houp.cam_node,
+                                                  houp.abc_range[1] * hou.fps())
+            self.mantra_window.resize(800, 600)
+            self.mantra_window.move(1000, 250)
+            self.mantra_window.show()
+
+    def render_file_check(self):
+
+        self.render_list_model.pepperlist.clear()
+        for render in self.pepper.precomp_list:
+            self.render_list_model.pepperlist.append(render['name'])
+        self.render_list_model.layoutChanged.emit()
+        self.check_window.show()
+        # self.check_window.yesyes_btn.clicked.connect(self.render_yes)
+        # self.check_window.nono_btn.clicked.connect(self.render_no)
+
+    def render_yes(self):
+        self.check_window.close()
+        self.render_execute()
+
+    def render_no(self):
+        self.check_window.close()
 
 def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
