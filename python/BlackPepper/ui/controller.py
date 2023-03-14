@@ -483,20 +483,24 @@ class PepperWindow(QMainWindow):
         """
         self.preset_json_path = 'render_check_list.json'
 
+        if not os.path.exists(self.preset_json_path):
+            self.presave_preset_json()
+        pass
+
         self.recent_menu = QMenu('Recent Presets', self.main_window)
 
         with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
 
-        if not os.path.exists(self.preset_json_path):
-            self.presave_preset_json()
-            return
-        else:
-            for json_files in self.render_list_data['recent']:
-                for file_path in json_files:
-                    file_action = QAction(os.path.basename(file_path), self)
-                    file_action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
-                    self.recent_menu.addAction(file_action)
+        # if not os.path.exists(self.preset_json_path):
+        #     self.presave_preset_json()
+        #     return
+        # else:
+        for json_files in self.render_list_data['recent']:
+            for file_path in json_files:
+                file_action = QAction(os.path.basename(file_path), self)
+                file_action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+                self.recent_menu.addAction(file_action)
 
         self.main_menu.addMenu(self.recent_menu)
 
@@ -555,7 +559,10 @@ class PepperWindow(QMainWindow):
 
         """
 
-        self.render_list_data = {}
+        self.render_list_data = {
+            "recent": []
+
+        }
         data_to_save = self.render_list_data  # 'recent' key 값의 value로 저장
 
         with open(self.preset_json_path, "w") as f:
