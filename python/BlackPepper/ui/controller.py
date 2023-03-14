@@ -2,7 +2,8 @@ import sys
 import os
 import json
 import webbrowser
-from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
+from BlackPepper.process.render_process_bar import RenderMainWindow
+# from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow, QAction, QApplication, QMenu
@@ -647,10 +648,10 @@ class PepperWindow(QMainWindow):
 
         # print('cmd_list :', cmd_list)
         # print('total_frame_list :', total_frame_list)
-        # self.render_process = RenderMainWindow(cmd_list, total_frame_list)
-        # self.render_process.resize(800, 600)
-        # self.render_process.move(1000, 250)
-        # self.render_process.show()
+        self.render_process = RenderMainWindow(cmd_list, total_frame_list)
+        self.render_process.resize(800, 600)
+        self.render_process.move(1000, 250)
+        self.render_process.show()
 
 
         # self.pepper.precomp_list.clear()
