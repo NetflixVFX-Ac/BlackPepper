@@ -588,10 +588,6 @@ class Houpub:
         working_files = gazu.files.get_all_working_files_for_entity(self.entity)
         revision_list = [working_file['revision'] for working_file in working_files
                          if gazu.task.get_task(working_file['task_id'])['entity_type']['name'] == task_name]
-        for working_file in working_files:
-            task_dict = gazu.task.get_task(working_file['task_id'])
-            if task_dict['entity_type']['name'] == task_name:
-                revision_list.append(working_file['revision'])
         return revision_list
 
     def get_every_revision_for_output_file(self, output_type_name, task_type_name):

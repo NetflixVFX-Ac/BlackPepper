@@ -59,13 +59,13 @@ class PepperWindow(QMainWindow):
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
         self.render_model = PepperDnDModel()
+        self.render_list_model = PepperModel()
         # listview instance
         self.projects_listview = PepperView(self)
         self.templates_listview = PepperView(self)
         self.shots_listview = PepperView(self)
         self.renderlists_listview = PepperDnDView(self)
         self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        # self.renderlists_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         # setModel
         self.projects_listview.setModel(self.project_model)
         self.projects_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
@@ -104,6 +104,17 @@ class PepperWindow(QMainWindow):
         self.main_window = self.main_ui_loader.load(main_ui)
         self.main_window.setWindowTitle('BlackPepper 0.1')
         self.main_window.move(700, 250)
+        # check Ui loader
+        check_ui = QtCore.QFile(os.path.join(script_path, 'mvc_YN_3.ui'))
+        check_ui.open(QtCore.QFile.ReadOnly)
+        self.check_ui_loader = QUiLoader()
+        self.check_window = self.login_ui_loader.load(check_ui)
+        self.check_window.setWindowTitle('Render Check List')
+        self.check_window.move(1000, 300)
+        self.check_window.checklist.setModel(self.render_list_model)
+        # Render check list button
+        self.check_window.yesyes_btn.clicked.connect(self.render_yes)
+        self.check_window.nono_btn.clicked.connect(self.render_no)
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
@@ -113,7 +124,7 @@ class PepperWindow(QMainWindow):
         self.templates_listview.clicked.connect(self.template_selected)
         self.shots_listview.clicked.connect(self.shot_selected)
         self.main_window.reset_btn.clicked.connect(self.clear_list)
-        self.main_window.render_btn.clicked.connect(self.render_execute)
+        self.main_window.render_btn.clicked.connect(self.render_file_check)
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
         self.main_window.save_btn.clicked.connect(self.save_user_renderlists)
@@ -282,7 +293,6 @@ class PepperWindow(QMainWindow):
         self.pepper.entity = 'asset'
         rev_list = self.pepper.get_every_revision_for_working_file('fx_template')
         self.renew_template_cbox(rev_list)
-
         self.renew_template_info()
         # set template info label
         # name, time, rev = self.pepper.get_working_file_data('simulation', 'asset')
@@ -300,13 +310,6 @@ class PepperWindow(QMainWindow):
         self.renderlists_selection.clear()
         self.main_window.statusBar().showMessage('shots 를 선택하세요 ! 다중선택가능 ! ')
 
-    def renew_template_info(self):
-        revision = self.main_window.template_rev_cbox.currentText()
-        name, time, rev = self.pepper.get_working_file_data('simulation', revision, 'asset')
-        date = time[:10]
-        clock = time[11:]
-        self.main_window.template_info_label.setText(f"{name}\n{date}\n{clock}")
-
     def shot_selected(self, event):
         """Shots 를 선택 시 선택한 shot 의 정보(dict)를 self.all_shots = [] 에 담는 함수 이다.\n
         추가로 하단 Shot info 에 created Artist,Time,Revision 정보를 보여 준다.
@@ -323,6 +326,13 @@ class PepperWindow(QMainWindow):
         self.renew_shot_cbox(rev_list)
         self.renew_shot_info()
         self.renderlists_selection.clear()
+
+    def renew_template_info(self):
+        revision = self.main_window.template_rev_cbox.currentText()
+        name, time, rev = self.pepper.get_working_file_data('simulation', revision, 'asset')
+        date = time[:10]
+        clock = time[11:]
+        self.main_window.template_info_label.setText(f"{name}\n{date}\n{clock}")
 
     def renew_shot_info(self):
         revision = self.main_window.shot_rev_cbox.currentText()
@@ -486,16 +496,12 @@ class PepperWindow(QMainWindow):
 
         for json_files in self.render_list_data['recent']:
             for file_path in json_files:
-                print(111, json_files)
-                file_action = QAction(file_path, self)
-                file_action.triggered.connect(self.handle_file)
+                file_action = self.append_renderlist_to_menubar(file_path)
                 self.recent_menu.addAction(file_action)
 
         for json_files in self.render_list_data['saved']:
             for file_path in json_files:
-                print(222, json_files)
-                file_action = QAction(file_path, self)
-                file_action.triggered.connect(self.handle_file)
+                file_action = self.append_renderlist_to_menubar(file_path)
                 self.saved_menu.addAction(file_action)
 
         self.main_filemenu.addMenu(self.recent_menu)
@@ -508,23 +514,26 @@ class PepperWindow(QMainWindow):
         exit_action.triggered.connect(QApplication.instance().quit)
         self.main_filemenu.addAction(exit_action)
 
-    def append_renderlist_to_menubar(self, data_type):
-        for json_files in self.render_list_data[data_type]:
-            for file_path in json_files:
-                file_action = QAction(os.path.basename(file_path), self)
-                file_action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
-                self.saved_menu.addAction(file_action)
+    def append_renderlist_to_menubar(self, render_list):
+        file_action = QAction(render_list, self)
+        file_action.triggered.connect(lambda: self.handle_file(file_action.text()))
+        return file_action
 
-    def handle_file(self, file_path):
+    def handle_file(self, text):
         """메인창의 file 메뉴 'Open Recent Presets' 의 원하는 Preset 을 선택시 실행되는 함수이다.
 
             json 을 load 하고 정보들을 main window 에 set 한다.
         """
-        # self.open_json()
-        # for json_files in self.render_list_data['recent']:
-        #     for renderlist in json_files:
-        self.render_list_data = self.render_model.pepperlist
-        self.append_render_list()
+        if text.startswith("saved"):
+            list_type = 'saved'
+        elif text.startswith("recent"):
+            list_type = 'recent'
+        else:
+            return
+        render_lists = self.render_list_data.get(list_type)
+        for render_list in render_lists:
+            self.render_model.pepperlist = render_list.get(text)
+        self.renew_render_list()
 
     def save_recent_renderlists(self):
         """save preset json path 의 json 을 불러오고 recent key 값에 정보를 저장하는 함수이다.
@@ -542,7 +551,7 @@ class PepperWindow(QMainWindow):
         if len(recent_data) >= 5:
             recent_data.pop(0)  # 가장 오래된 데이터 삭제
         recent_data.append({
-            f'recent_{now.date()}_time_{now.hour}:{now.minute}': self.render_model.pepperlist
+            f'recent_{now.date()}_time_{now.hour}:{now.minute}:{now.second}': self.render_model.pepperlist
         })
         # 'recent' key 값의 value로 저장
         self.render_list_data['recent'] = recent_data
@@ -564,7 +573,7 @@ class PepperWindow(QMainWindow):
         if len(saved_data) >= 10:
             saved_data.pop(0)  # 가장 오래된 데이터 삭제
         saved_data.append({
-            f'saved_{now.date()}_time_{now.hour}:{now.minute}': self.render_model.pepperlist
+            f'saved_{now.date()}_time_{now.hour}:{now.minute}:{now.second}': self.render_model.pepperlist
         })
         # 'recent' key 값의 value로 저장
         self.render_list_data['saved'] = saved_data
@@ -591,8 +600,30 @@ class PepperWindow(QMainWindow):
             with open(self.preset_json_path, "w") as f:
                 json.dump(data_to_save, f, ensure_ascii=False)
 
+    def render_file_check(self):
+        self.render_list_model.pepperlist.clear()
+        for render_file in self.render_model.pepperlist:
+            self.render_list_model.pepperlist.append(f"\n{render_file['name']} : \n "
+                                                     f"{render_file['temp_working_path']}\n "
+                                                     f"{render_file['layout_output_path']}\n "
+                                                     f"{render_file['fx_working_path']}\n "
+                                                     f"{render_file['jpg_output_path']}\n "
+                                                     f"{render_file['video_output_path']}\n")
+        self.render_list_model.layoutChanged.emit()
+        self.check_window.show()
+        # self.check_window.yesyes_btn.clicked.connect(self.render_yes)
+        # self.check_window.nono_btn.clicked.connect(self.render_no)
+
+    def render_yes(self):
+        self.check_window.close()
+        self.render_execute()
+
+    def render_no(self):
+        self.check_window.close()
+
     def render_execute(self):
         houp = HouPepper()
+
         for precomp in self.render_model.pepperlist:
             temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
                 = self.path_seperator(precomp)

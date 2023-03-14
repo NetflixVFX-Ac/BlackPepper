@@ -32,12 +32,10 @@ class PepperDnDModel(QtCore.QAbstractListModel):
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
-            text = self.pepperlist[index.row()].get('name')
-            return text
-
-    def fulldata(self, index, role):
-        if role == Qt.DisplayRole:
-            text = self.pepperlist[index.row()]
+            if isinstance(self.pepperlist[index.row()], str):
+                text = self.pepperlist[index.row()]
+            else:
+                text = self.pepperlist[index.row()].get('name')
             return text
 
     def setData(self, start, index, role):
