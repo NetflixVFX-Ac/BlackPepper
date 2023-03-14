@@ -31,6 +31,7 @@ class PepperWindow(QMainWindow):
         super().__init__()
         self.preset_json_path = ''
         self.recent_menu = None
+        self.saved_menu = None
         self.pepper = Houpub()
         self.login_log = Auto_log()
         self.projects_selection = None
@@ -40,17 +41,20 @@ class PepperWindow(QMainWindow):
         self.temp_rev = None
         self.cam_rev = None
         self.mantra_window = None
-        # self.main_filemenu = None
+        self.main_filemenu = None
         self.main_user = None
         self.main_menu_bar = None
         self.render_process = None
-        self.render_list_data = None
 
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
         self.render_list_data = []
+        self.saved_list_data = []
         self.filename = []
+
+        self.preset_json_path = 'render_check_list.json'
+
         # model instance
         self.project_model = PepperModel()
         self.template_model = PepperModel()
@@ -99,7 +103,7 @@ class PepperWindow(QMainWindow):
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
-        self.main_window.setWindowTitle('Black Pepper')
+        self.main_window.setWindowTitle('BlackPepper 0.1')
         self.main_window.move(700, 250)
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
@@ -113,7 +117,7 @@ class PepperWindow(QMainWindow):
         self.main_window.render_btn.clicked.connect(self.render_execute)
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
-        self.main_window.save_btn.clicked.connect(self.render_preset_json)
+        self.main_window.save_btn.clicked.connect(self.save_user_renderlists)
         self.main_window.template_rev_cbox.currentTextChanged.connect(self.renew_template_info)
 
         # add listview to ui
@@ -185,7 +189,7 @@ class PepperWindow(QMainWindow):
         if self.login_log.connect_login():
             self.login_log.log_out()
 
-            self.pepper.precomp_list.clear()
+            # self.pepper.precomp_list.clear()
             self.render_list_data.clear()
 
             self.render_model.layoutChanged.emit()
@@ -389,6 +393,8 @@ class PepperWindow(QMainWindow):
         그리고 pepper 의 precomp_list를 render_moderl.pepperlist 에 append 한다.
         추가로 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
         """
+        if not self.renderlists_selection.selectedRows():
+            return
         idx = self.renderlists_selection.selectedRows()[0]
         for precomp in self.render_model.pepperlist:
             if precomp['name'] == idx.data():
@@ -431,20 +437,25 @@ class PepperWindow(QMainWindow):
         self.main_filemenu = self.main_menu_bar.addMenu('&File')
         # 동적으로 메뉴를 채워주는 부분
         self.main_filemenu.aboutToShow.connect(self.set_main_open_recent)
-        # 'File' menu add 'Open Recent Rreset' & 'Exit'
-        self.set_main_open_recent()
+        self.main_filemenu.aboutToShow.connect(self.set_main_open_saved)
         # create Help menu
         main_helpmenu = self.main_menu_bar.addMenu('&Help')
+        # 'File' menu add 'Open Recent preset' & 'Exit'
+        self.set_main_open_recent()
+        # self.set_main_open_saved()
+
+        # self.main_filemenu.addAction()
+        # main_helpmenu = self.main_menu_bar.addMenu('Help')
         # set kitsu
         kisu_action = QAction('Kitsu', self.main_window)
         kisu_action.setShortcut('F1')
         kisu_action.setStatusTip('Kitsu site open')
         kisu_action.triggered.connect(lambda: webbrowser.open('http://192.168.3.116/'))
         main_helpmenu.addAction(kisu_action)
-        # help add sidefx
-        sidefx_action = QAction('Side Fx', self.main_window)
+        # set sidefx
+        sidefx_action = QAction('SideFX', self.main_window)
         sidefx_action.setShortcut('F2')
-        sidefx_action.setStatusTip('Side Fx site open')
+        sidefx_action.setStatusTip('SideFX site open')
         sidefx_action.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
         main_helpmenu.addAction(sidefx_action)
         # help add scanline vfx
@@ -474,13 +485,12 @@ class PepperWindow(QMainWindow):
             5번 인덱스가 제일 최신 json dict 정보이다.
         """
         self.main_filemenu.clear()
-        self.preset_json_path = 'render_check_list.json'
 
         if not os.path.exists(self.preset_json_path):
-            self.presave_preset_json()
+            self.create_json()
         pass
 
-        self.recent_menu = QMenu('&Open Recent Presets', self.main_window)
+        self.recent_menu = QMenu('Open recent renderlists', self.main_window)
 
         with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
@@ -496,14 +506,51 @@ class PepperWindow(QMainWindow):
                 self.recent_menu.addAction(file_action)
 
         self.main_filemenu.addMenu(self.recent_menu)
-        # 구분자 추가
-        self.main_filemenu.addSeparator()
+
+        if not os.path.exists(self.preset_json_path):
+            self.create_json()
+        pass
+
+        self.saved_menu = QMenu('Open saved renderlists', self.main_window)
+
+        with open(self.preset_json_path, 'r') as f:
+            self.saved_list_data = json.load(f)
+
+        for json_files in self.saved_list_data['saved']:
+            for file_path in json_files:
+                file_action = QAction(os.path.basename(file_path), self)
+                file_action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+                self.recent_menu.addAction(file_action)
+        self.main_filemenu.addMenu(self.saved_menu)
+
         # add 'Exit'
         exit_action = QAction('&Exit', self.main_window)
         exit_action.setShortcut('Ctrl+Q')
         exit_action.setStatusTip('Exit application')
         exit_action.triggered.connect(QApplication.instance().quit)
         self.main_filemenu.addAction(exit_action)
+
+    def set_main_open_saved(self):
+        """메인창의 메뉴바에 Recent precet 메뉴를 만들어주 함수이다.
+
+            메뉴바 'Menu' 에 'Recent Presets는'메뉴에 path json file 을 불러오고 최신 5개의 json render_model.pepperlist
+            5번 인덱스가 제일 최신 json dict 정보이다.
+        """
+        if not os.path.exists(self.preset_json_path):
+            self.create_json()
+        pass
+
+        self.saved_menu = QMenu('Open saved renderlists', self.main_window)
+
+        with open(self.preset_json_path, 'r') as f:
+            self.saved_list_data = json.load(f)
+
+        for json_files in self.saved_list_data['saved']:
+            for file_path in json_files:
+                file_action = QAction(os.path.basename(file_path), self)
+                file_action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+                self.recent_menu.addAction(file_action)
+        self.main_filemenu.addMenu(self.saved_menu)
 
     def handle_file(self, file_path):
         """메인창의 file 메뉴 'Open Recent Presets' 의 원하는 Preset 을 선택시 실행되는 함수이다.
@@ -512,7 +559,7 @@ class PepperWindow(QMainWindow):
         # self.load_preset_set()
         pass
 
-    def render_preset_json(self):
+    def save_recent_renderlists(self):
         """save preset json path 의 json 을 불러오고 recent key 값에 정보를 저장하는 함수이다.
 
             path 에 json 파일이 없으면 json 을 만들어주는 함수를 사용하여 json 을 만들어주고 json을 load 하여 'recent' key에
@@ -520,9 +567,8 @@ class PepperWindow(QMainWindow):
         """
         if len(self.render_model.pepperlist) == 0:
             return
-        self.preset_json_path = 'render_check_list.json'
         if not os.path.exists(self.preset_json_path):
-            self.presave_preset_json()
+            self.create_json()
         with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
         recent_data = self.render_list_data.get('recent', [])
@@ -539,11 +585,38 @@ class PepperWindow(QMainWindow):
         with open(self.preset_json_path, "w") as f:
             json.dump(data_to_save, f, ensure_ascii=False)
 
-    def presave_preset_json(self):
+    def save_user_renderlists(self):
+        """save preset json path 의 json 을 불러오고 recent key 값에 정보를 저장하는 함수이다.
+
+            path 에 json 파일이 없으면 json 을 만들어주는 함수를 사용하여 json 을 만들어주고 json을 load 하여 'recent' key에
+            render_moderl.pepperlist(렌다할 render files들) dict 들을 날짜,시간별로 리스트로 json을 저장한다.
+        """
+        if len(self.render_model.pepperlist) == 0:
+            return
+        if not os.path.exists(self.preset_json_path):
+            self.create_json()
+        with open(self.preset_json_path, 'r') as f:
+            self.render_list_data = json.load(f)
+        saved_data = self.render_list_data.get('saved', [])
+        now = datetime.now()
+        # 최대 인덱스 5까지 새로운 value가 추가되도록 수정
+        if len(saved_data) >= 10:
+            saved_data.pop(0)  # 가장 오래된 데이터 삭제
+        saved_data.append({
+            f'saved_{now.date()}_time_{now.hour}:{now.minute}': self.render_model.pepperlist
+        })
+        # 'recent' key 값의 value로 저장
+        self.render_list_data['saved'] = saved_data
+        data_to_save = self.render_list_data
+        with open(self.preset_json_path, "w") as f:
+            json.dump(data_to_save, f, ensure_ascii=False)
+
+    def create_json(self):
         """preset이 저장되어있는 json파일이 없으면 json 파일을 만들어주는 함수이다.
         """
         self.render_list_data = {
-            "recent": []
+            "recent": [],
+            "saved": []
         }
         data_to_save = self.render_list_data
 
@@ -585,7 +658,7 @@ class PepperWindow(QMainWindow):
         # self.render_process.move(1000, 250)
         # self.render_process.show()
 
-        self.render_preset_json()
+        self.save_recent_renderlists()
 
         # self.pepper.precomp_list.clear()
         self.render_list_data.clear()
