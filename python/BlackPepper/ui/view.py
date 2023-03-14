@@ -37,6 +37,8 @@ class PepperDnDView(QtWidgets.QListView):
         destination_index = self.indexAt(event.pos())
         dix_row = destination_index.row()
         model = destination_index.model()
+        if model is None:
+            return
         updated_list = model.pepperlist
         temp_list = []
         for idx in rev_selections:

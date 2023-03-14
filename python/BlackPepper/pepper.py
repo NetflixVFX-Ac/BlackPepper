@@ -588,10 +588,6 @@ class Houpub:
         working_files = gazu.files.get_all_working_files_for_entity(self.entity)
         revision_list = [working_file['revision'] for working_file in working_files
                          if gazu.task.get_task(working_file['task_id'])['entity_type']['name'] == task_name]
-        for working_file in working_files:
-            task_dict = gazu.task.get_task(working_file['task_id'])
-            if task_dict['entity_type']['name'] == task_name:
-                revision_list.append(working_file['revision'])
         return revision_list
 
     def get_every_revision_for_output_file(self, output_type_name, task_type_name):
@@ -754,15 +750,13 @@ class Houpub:
                 Returns:
                     JaehyukLee, Date-Time, 1
                 """
-        the_working_file = None
+        global the_working_file
         self.entity = entity_type
         _, task = self.get_task(task_type_name)
         working_files = gazu.files.get_all_working_files_for_entity(self.entity)
         for check_file in working_files:
             if str(check_file['revision']) == revision:
                 the_working_file = check_file
-        if the_working_file is None:
-            return
         created_time = the_working_file['created_at']
         rev = the_working_file['revision']
         person_id = the_working_file['person_id']
@@ -783,7 +777,7 @@ class Houpub:
         Returns:
             JaehyukLee, Date-Time, 1
         """
-        the_output_file = None
+        global the_output_file
         self.entity = entity_type
         task_type, _ = self.get_task(task_type_name)
         output_type = gazu.files.get_output_type_by_name(output_type_name)
@@ -792,8 +786,6 @@ class Houpub:
             if str(check_file['revision']) == revision:
                 the_output_file = check_file
                 break
-        if the_output_file is None:
-            return
         rev = the_output_file['revision']
         created_time = the_output_file['created_at']
         person_id = the_output_file['person_id']
