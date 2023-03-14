@@ -1,18 +1,13 @@
 import sys
 import os
-import glob
 import json
 import webbrowser
 from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QMainWindow
-from PySide2.QtWidgets import QAction, QApplication
+from PySide2.QtWidgets import QMainWindow, QAction, QApplication, QMenu
 from BlackPepper.ui.model import PepperModel, PepperDnDModel
 from BlackPepper.ui.view import PepperView, PepperDnDView
-from PySide2.QtWidgets import QAction, QApplication, QMenu, QMenuBar
-from BlackPepper.ui.model import PepperModel
-from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
 from BlackPepper.process.houpepper import HouPepper
 from BlackPepper.ui.auto_login import Auto_log
@@ -113,8 +108,8 @@ class PepperWindow(QMainWindow):
         self.check_window.move(1000, 300)
         self.check_window.checklist.setModel(self.render_list_model)
         # Render check list button
-        self.check_window.yesyes_btn.clicked.connect(self.render_yes)
-        self.check_window.nono_btn.clicked.connect(self.render_no)
+        self.check_window.close_btn.clicked.connect(self.close_fullpath)
+        self.check_window.render_btn.clicked.connect(self.render_execute)
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
@@ -124,10 +119,11 @@ class PepperWindow(QMainWindow):
         self.templates_listview.clicked.connect(self.template_selected)
         self.shots_listview.clicked.connect(self.shot_selected)
         self.main_window.reset_btn.clicked.connect(self.clear_list)
-        self.main_window.render_btn.clicked.connect(self.render_file_check)
+        self.main_window.render_btn.clicked.connect(self.render_execute)
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
         self.main_window.save_btn.clicked.connect(self.save_user_renderlists)
+        self.main_window.path_btn.clicked.connect(self.render_file_check)
         self.main_window.template_rev_cbox.currentTextChanged.connect(self.renew_template_info)
 
         # add listview to ui
@@ -405,6 +401,7 @@ class PepperWindow(QMainWindow):
         for precomp in self.render_model.pepperlist:
             if precomp['name'] == idx.data():
                 self.render_model.pepperlist.remove(precomp)
+        self.render_model.pepperlist.clear()
         self.renew_render_list()
 
     def clear_list(self):
@@ -532,7 +529,9 @@ class PepperWindow(QMainWindow):
             return
         render_lists = self.render_list_data.get(list_type)
         for render_list in render_lists:
-            self.render_model.pepperlist = render_list.get(text)
+            the_list = render_list.get(text)
+            if the_list is not None:
+                self.render_model.pepperlist = the_list
         self.renew_render_list()
 
     def save_recent_renderlists(self):
@@ -601,7 +600,7 @@ class PepperWindow(QMainWindow):
                 json.dump(data_to_save, f, ensure_ascii=False)
 
     def render_file_check(self):
-        self.render_list_model.pepperlist.clear()
+        # self.render_list_model.pepperlist.clear()
         for render_file in self.render_model.pepperlist:
             self.render_list_model.pepperlist.append(f"\n{render_file['name']} : \n "
                                                      f"{render_file['temp_working_path']}\n "
@@ -611,19 +610,15 @@ class PepperWindow(QMainWindow):
                                                      f"{render_file['video_output_path']}\n")
         self.render_list_model.layoutChanged.emit()
         self.check_window.show()
-        # self.check_window.yesyes_btn.clicked.connect(self.render_yes)
-        # self.check_window.nono_btn.clicked.connect(self.render_no)
 
-    def render_yes(self):
-        self.check_window.close()
-        self.render_execute()
-
-    def render_no(self):
+    def close_fullpath(self):
         self.check_window.close()
 
     def render_execute(self):
         houp = HouPepper()
-
+        if not self.render_model.pepperlist:
+            return
+        self.save_recent_renderlists()
         for precomp in self.render_model.pepperlist:
             temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
                 = self.path_seperator(precomp)
@@ -657,7 +652,6 @@ class PepperWindow(QMainWindow):
         # self.render_process.move(1000, 250)
         # self.render_process.show()
 
-        self.save_recent_renderlists()
 
         # self.pepper.precomp_list.clear()
         self.render_list_data.clear()
