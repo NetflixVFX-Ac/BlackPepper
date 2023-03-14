@@ -486,14 +486,16 @@ class PepperWindow(QMainWindow):
 
         for json_files in self.render_list_data['recent']:
             for file_path in json_files:
-                file_action = QAction(os.path.basename(file_path), self)
-                file_action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+                print(111, json_files)
+                file_action = QAction(file_path, self)
+                file_action.triggered.connect(self.handle_file)
                 self.recent_menu.addAction(file_action)
 
         for json_files in self.render_list_data['saved']:
             for file_path in json_files:
-                file_action = QAction(os.path.basename(file_path), self)
-                file_action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+                print(222, json_files)
+                file_action = QAction(file_path, self)
+                file_action.triggered.connect(self.handle_file)
                 self.saved_menu.addAction(file_action)
 
         self.main_filemenu.addMenu(self.recent_menu)
@@ -515,10 +517,14 @@ class PepperWindow(QMainWindow):
 
     def handle_file(self, file_path):
         """메인창의 file 메뉴 'Open Recent Presets' 의 원하는 Preset 을 선택시 실행되는 함수이다.
+
+            json 을 load 하고 정보들을 main window 에 set 한다.
         """
-        # TODO: 파일 내용 처리하기
-        # self.load_preset_set()
-        pass
+        # self.open_json()
+        # for json_files in self.render_list_data['recent']:
+        #     for renderlist in json_files:
+        self.render_list_data = self.render_model.pepperlist
+        self.append_render_list()
 
     def save_recent_renderlists(self):
         """save preset json path 의 json 을 불러오고 recent key 값에 정보를 저장하는 함수이다.
