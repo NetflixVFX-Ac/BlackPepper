@@ -89,7 +89,7 @@ class PepperWindow(QMainWindow):
         login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
-        self.login_window.setWindowTitle('Black Pepper Login')
+        self.login_window.setWindowTitle('Black Pepper v0.01')
         self.login_window.move(1000, 300)
         self.login_window.show()
         # main Ui loader
@@ -97,7 +97,7 @@ class PepperWindow(QMainWindow):
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
-        self.main_window.setWindowTitle('BlackPepper 0.1')
+        self.main_window.setWindowTitle('Black Pepper v0.0.1')
         self.main_window.move(700, 250)
         # check Ui loader
         check_ui = QtCore.QFile(os.path.join(script_path, 'mvc_YN_3.ui'))
@@ -134,6 +134,9 @@ class PepperWindow(QMainWindow):
         # set statusbar to window
         self.login_window.statusBar().showMessage('kitsu 로그인 하세요!  houdini 확장자 선택하세요!')
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
+        self.main_window.path_btn.setStatusTip('Render files Full path window open.')
+        self.main_window.save_btn.setStatusTip("Render files (File > 'Open saved renderlists') save")
+        self.main_window.reset_btn.setStatusTip('Render files Clear')
         # set main menubar
         self.create_login_menubar()
 
