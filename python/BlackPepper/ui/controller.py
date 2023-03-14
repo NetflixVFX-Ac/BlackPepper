@@ -531,39 +531,29 @@ class PepperWindow(QMainWindow):
 
         if not os.path.exists(self.preset_json_path):
             self.presave_preset_json()
-
         with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
-
         recent_data = self.render_list_data.get('recent', [])
-
         now = datetime.now()
-
         # 최대 인덱스 5까지 새로운 value가 추가되도록 수정
         if len(recent_data) >= 5:
             recent_data.pop(0)  # 가장 오래된 데이터 삭제
-        # recent_index = len(recent_data) + 1
-        # for render in self.pepper.precomp_list:
         recent_data.append({
              f'recent_{now.date()}_time_{now.hour}:{now.minute}': self.render_model.pepperlist
         })
-
+        # 'recent' key 값의 value로 저장
         self.render_list_data['recent'] = recent_data
-        data_to_save = self.render_list_data  # 'recent' key 값의 value로 저장
-
+        data_to_save = self.render_list_data
         with open(self.preset_json_path, "w") as f:
             json.dump(data_to_save, f, ensure_ascii=False)
 
     def presave_preset_json(self):
         """preset이 저장되어있는 json파일이 없으면 json 파일을 만들어주는 함수이다.
-
         """
-
         self.render_list_data = {
             "recent": []
-
         }
-        data_to_save = self.render_list_data  # 'recent' key 값의 value로 저장
+        data_to_save = self.render_list_data
 
         with open(self.preset_json_path, "w") as f:
             json.dump(data_to_save, f, ensure_ascii=False)
