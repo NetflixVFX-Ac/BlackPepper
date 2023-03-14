@@ -15,13 +15,6 @@ class PepperModel(QtCore.QAbstractListModel):
             text = self.pepperlist[index.row()]
             return text
 
-    # def setData(self, index, value, role=None):
-    #     if role == QtCore.Qt.EditRole:
-    #         row = index.row()
-    #         self.dataChanged.emit(index, index)
-    #         return True
-    #     return False
-
     def rowCount(self, index):
         return len(self.pepperlist)
 
@@ -39,31 +32,22 @@ class PepperDnDModel(QtCore.QAbstractListModel):
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
-            text = self.pepperlist[index.row()].get('name')
-            return text
-
-    def fulldata(self, index, role):
-        if role == Qt.DisplayRole:
-            text = self.pepperlist[index.row()]
+            if isinstance(self.pepperlist[index.row()], str):
+                text = self.pepperlist[index.row()]
+            else:
+                text = self.pepperlist[index.row()].get('name')
             return text
 
     def setData(self, start, index, role):
-        # print("AA", start, index)
         if role == QtCore.Qt.EditRole:
             item = self.pepperlist.pop(start)
             self.pepperlist.insert(index, item)
             return True
         return False
 
-    # def insertRow(self, row, count, index):
-    #     self.beginInsertRows()
-    #     self.endInsertRows()
-    #
-    # def removeRow(self, row, parent=None, *args, **kwargs):
-    #     self.beginRemoveRows()
-    #     self.endRemoveRows()
-
     def rowCount(self, index):
+        if not self.pepperlist:
+            return 0
         return len(self.pepperlist)
 
     def flags(self, index):

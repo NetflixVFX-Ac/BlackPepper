@@ -11,6 +11,7 @@ class Auto_log:
     login 정보의 경우 json파일에 'auto'라는 이름의 key값으로 저장되며 해당 값에는 host, id, password, auto login이력의 정보가 적혀있다.
     해당모듈은 ui가 실행하면 작동한다.
     """
+
     def __init__(self):
         self.hklog = Logger()
         self.pr = Houpub()
@@ -200,6 +201,31 @@ class Auto_log:
         self.dir_path = os.path.join('/'.join(split_path), '.config')
         self.user_path = os.path.join(self.dir_path, 'user.json')
 
+    def access_setting(self):
+        """ home_path에 지정한 directory가 존재하지 않으면 만들어준다.
+        또한 user 정보가 기록된 json파일이 없을 경우 user와 host정보를 초기화한다.
+
+        Examples:
+            Auto_log.access_setting()
+
+        Raises:
+            OSError: Failed to create the directory.
+            OSError: Failed to create user.json file.
+
+        Returns: True
+        """
+        if not os.path.exists(self.dir_path):
+            try:
+                os.makedirs(self.dir_path)
+            except OSError:
+                raise ValueError("Failed to create the directory.")
+        try:
+            if not os.path.exists(self.user_path):
+                self.reset_setting()
+        except OSError:
+            raise ValueError("Failed to create user.json file.")
+        return True
+
     def connect_login(self):
         """kitsu에 login과 software정보를 입력한다. 로그인이 성공할 시 host의 연결과 user의 vaild를 기록한다.
         호스트, 로그인이 실패할 경우 log를 남기고 로그인 후에도 해당 정보를 log에 남긴다.
@@ -246,31 +272,6 @@ class Auto_log:
         gazu.log_out()
         self.user = None
         self.reset_setting()
-        return True
-
-    def access_setting(self):
-        """ home_path에 지정한 directory가 존재하지 않으면 만들어준다.
-        또한 user 정보가 기록된 json파일이 없을 경우 user와 host정보를 초기화한다.
-
-        Examples:
-            Auto_log.access_setting()
-
-        Raises:
-            OSError: Failed to create the directory.
-            OSError: Failed to create user.json file.
-
-        Returns: True
-        """
-        if not os.path.exists(self.dir_path):
-            try:
-                os.makedirs(self.dir_path)
-            except OSError:
-                raise ValueError("Failed to create the directory.")
-        try:
-            if not os.path.exists(self.user_path):
-                self.reset_setting()
-        except OSError:
-            raise ValueError("Failed to create user.json file.")
         return True
 
     def load_setting(self):
