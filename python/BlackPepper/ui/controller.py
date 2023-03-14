@@ -526,7 +526,7 @@ class PepperWindow(QMainWindow):
 
     def load_preset_set(self):  # 함수수정예정
         """preset이 저장되어있는 json파일을 load하는 함수이다.
-
+        """
         with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
 
