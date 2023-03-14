@@ -7,6 +7,7 @@ import _alembic_hom_extensions as abc
 import sys
 import pprint
 
+
 class HouPepper:
     """
     이 모듈은 Template으로 정한 Houdini 파일에 Alembic 파일의 카메라값을 불러와 FX working file path에 저장한다. Alembic 파일은
@@ -14,16 +15,17 @@ class HouPepper:
     Temp 내 복사한 FX working file을 이용한다. FX output file path에 시퀀스 파일을 저장하고 사용한 Temp를 지워주면서 Publish를
     진행한다.
     """
+
     def __init__(self):
         self.cam_list = []
         self.cam_path = []
 
-###############################################################################
+        ###############################################################################
 
         self.cmd_list = []
         self.total_frame_list = []
 
-###############################################################################
+        ###############################################################################
 
         self.cam_node = None
         self._abc_path = None
@@ -378,8 +380,8 @@ class HouPepper:
         ]
 
         self.ffmpeg_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
-        # self.cmd_list.append(self.ffmpeg_cmd)
-        # self.total_frame_list.append(total_frame)
+        self.cmd_list.append(self.ffmpeg_cmd)
+        self.total_frame_list.append(total_frame)
 
         cmd_list = self.cmd_list
         total_frame_list = self.total_frame_list
@@ -415,8 +417,7 @@ def main():
         aaa = pepper.make_precomp_dict(shot)
         bbb, ccc = hou_pepper.make_cmd(aaa)
 
-
-###############################################################################################
+    ###############################################################################################
 
     if not QtWidgets.QApplication.instance():
         app = QtWidgets.QApplication(sys.argv)
@@ -428,9 +429,7 @@ def main():
     r.move(1000, 250)
     r.show()
     app.exec_()
-#
-#
-# if __name__ == "__main__":
-#     main()
 
 
+if __name__ == "__main__":
+    main()

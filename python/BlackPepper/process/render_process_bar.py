@@ -61,11 +61,11 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         self.mc = self.mantra_check.search(cmd)
         self.fc = self.ffmpeg_check.search(cmd)
-        print('start total_frame :', self.total_frame)
-        print('start total_frame_list :', self.total_frame_list)
-        print('mantra :', self.mc)
-        print('ffmpeg :', self.fc)
-        print("ccccccccccmddd :", cmd)
+        # print('start total_frame :', self.total_frame)
+        # print('start total_frame_list :', self.total_frame_list)
+        # print('mantra :', self.mc)
+        # print('ffmpeg :', self.fc)
+        # print("ccccccccccmddd :", cmd)
         self.start_process(cmd)
 
     def message(self, s):
@@ -83,6 +83,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """
 
         print("start!!!!!!!")
+        print(cmd)
+        print(self.total_frame)
 
         if not self.p:
             self.p = QtCore.QProcess()
@@ -93,7 +95,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.p.readyReadStandardError.connect(self.handle_stderr)
         self.p.stateChanged.connect(self.handle_state)
         self.p.finished.connect(self.process_finished)  # Clean up once complete.
-        print('check check')
+        # print('check check')
         self.p.start(cmd)
 
     def handle_stderr(self):
@@ -142,22 +144,22 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         """
         print("fin")
-        self.message("Process finished.")
-        self.p.terminate()
+        # self.p.terminate()
         self.p.waitForFinished()
 
         if len(self.cmd_list) > 0:
             cmd = self.cmd_list.pop(0)
             self.total_frame = self.total_frame_list.pop(0)
-            print('next total_frame :', self.total_frame)
-            print('next total_frame_list :', self.total_frame_list)
-            print("ttttttttttttttmddd :", cmd)
-            print('cmd_list :', self.cmd_list)
-            print('len cmd_list :', len(self.cmd_list))
+            # print('next total_frame :', self.total_frame)
+            # print('next total_frame_list :', self.total_frame_list)
+            # print("ttttttttttttttmddd :", cmd)
+            # print('cmd_list :', self.cmd_list)
+            # print('len cmd_list :', len(self.cmd_list))
             # self.p = None
             self.start_process(cmd)
             # self.p.waitForFinished()
         else:
+            self.message("Process finished.")
             return
 
 
@@ -177,8 +179,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         progress_re = re.compile('_(\d+)\.jpg')
         m = progress_re.search(output)
-        print("m :", m)
         if m:
+            print("m :", m)
             pc_complete = m.group(1)
             if pc_complete:
                 pc = int(int(pc_complete) / total * 100)
@@ -201,8 +203,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         progress_re = re.compile("frame=   (\d+)")
         m = progress_re.search(output)
-        print("m search :", m)
         if m:
+            print("m search :", m)
             pc_complete = m.group(1)
             if pc_complete:
                 pc = int(int(pc_complete) / total * 100)
