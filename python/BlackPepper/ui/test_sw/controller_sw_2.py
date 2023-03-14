@@ -409,7 +409,7 @@ class PepperWindow(QMainWindow):
         # set Menu
         self.main_menu = self.main_menu_bar.addMenu('Menu')
         # set main window preset
-        self.set_mainwindow_preset()
+        self.set_main_open_recent()
         # 구분자 추가
         self.main_menu.addSeparator()
         # addMenu 'Exit'
@@ -453,21 +453,28 @@ class PepperWindow(QMainWindow):
         logout_action.triggered.connect(self.user_logout)
         self.main_user.addAction(logout_action)
 
-    def set_mainwindow_preset(self):
+    def set_main_open_recent(self):
         """메인창의 메뉴바에 Recent precet 메뉴를 만들어주 함수이다.
 
-            메뉴바 'Menu' 에 'Recent Presets는'메뉴에 path 에 있는 최신 5개의 json 파일들을 내림차순으로 보여준다.
+            메뉴바 'Menu' 에 'Recent Presets는'메뉴에 path json file 을 불러오고 최신 5개의 json render_model.pepperlist
+            5번 인덱스가 제일 최신 json dict 정보이다.
         """
-        recent_menu = QMenu('Recent Presets', self.main_window)
+        self.preset_json_path = 'render_check_list.json'
+        self.recent_menu = QMenu('Recent Presets', self.main_window)
 
-        directory_path = '/home/rapa/git/hook/python/BlackPepper/ui'
-        json_files = sorted(glob.glob(os.path.join(directory_path, '*.json')), key=os.path.getmtime, reverse=True)[:5]
+        with open(self.preset_json_path, 'r') as f:
+            self.render_list_data = json.load(f)
+        if not os.path.exists(self.preset_json_path):
+            self.presave_preset_json()
+            return
+        else:
+            for json_files in self.render_list_data['recent']:
+                for file_path in json_files:
+                    file_action = QAction(os.path.basename(file_path), self)
+                    file_action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
+                    self.recent_menu.addAction(file_action)
 
-        for file_path in json_files:
-            file_action = QAction(os.path.basename(file_path), self)
-            file_action.triggered.connect(lambda _, path=file_path: self.handle_file(path))
-            recent_menu.addAction(file_action)
-        self.main_menu.addMenu(recent_menu)
+        self.main_menu.addMenu(self.recent_menu)
 
     def handle_file(self, file_path):  #수정예정
         """
@@ -487,9 +494,14 @@ class PepperWindow(QMainWindow):
 
             docs 수정예정
         """
-        base_filename = 'render_check_list'
-        ext = '.json'
+        if len(self.render_model.pepperlist) == 0:
+            return
+
+        # base_filename = 'render_check_list'
+        # ext = '.json'
+
         preset_json_path = 'render_check_list.json'
+
         with open(preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
 
@@ -525,7 +537,19 @@ class PepperWindow(QMainWindow):
         for item in self.render_list_data:
             print(item['name'])
 
-    def precomp_list_len(self):  # 수정예정
+    def presave_preset_json(self):
+        """preset이 저장되어있는 json파일이 없으면 json 파일을 만들어주는 함수이다.
+
+        """
+
+        self.render_list_data = {}
+        data_to_save = self.render_list_data  # 'recent' key 값의 value로 저장
+
+        with open(self.preset_json_path, "w") as f:
+            json.dump(data_to_save, f, ensure_ascii=False)
+
+
+    def render_list_len(self):  # 수정예정
         """추가된 precom list 의 갯수를 반환하는 함수이다.
 
             pre render 할 list들의 갯수를 계산 하는 함수이다.

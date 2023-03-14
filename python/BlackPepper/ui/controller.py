@@ -482,16 +482,16 @@ class PepperWindow(QMainWindow):
             5번 인덱스가 제일 최신 json dict 정보이다.
         """
         self.preset_json_path = 'render_check_list.json'
+
         self.recent_menu = QMenu('Recent Presets', self.main_window)
 
-        # with open(self.preset_json_path, 'r') as f:
-        #     self.render_list_data = json.load(f)
+        with open(self.preset_json_path, 'r') as f:
+            self.render_list_data = json.load(f)
+
         if not os.path.exists(self.preset_json_path):
             self.presave_preset_json()
             return
         else:
-            with open(self.preset_json_path, 'r') as f:
-                self.render_list_data = json.load(f)
             for json_files in self.render_list_data['recent']:
                 for file_path in json_files:
                     file_action = QAction(os.path.basename(file_path), self)
@@ -513,12 +513,13 @@ class PepperWindow(QMainWindow):
         # self.load_preset_set()
         pass
 
-    def save_preset_json(self):
+    def render_preset_json(self):
         """save preset json path 의 json 을 불러오고 recent key 값에 정보를 저장하는 함수이다.
 
             path 에 json 파일이 없으면 json 을 만들어주는 함수를 사용하여 json 을 만들어주고 json을 load 하여 'recent' key에
             render_moderl.pepperlist(렌다할 render files들) dict 들을 날짜,시간별로 리스트로 json을 저장한다.
         """
+
         if len(self.render_model.pepperlist) == 0:
             return
 
@@ -560,44 +561,6 @@ class PepperWindow(QMainWindow):
         with open(self.preset_json_path, "w") as f:
             json.dump(data_to_save, f, ensure_ascii=False)
 
-    def load_preset_set(self):  # 함수수정예정
-        """preset이 저장되어있는 json파일을 load하는 함수이다.
-        """
-        with open(self.preset_json_path, 'r') as f:
-            self.render_list_data = json.load(f)
-
-        recent_data = self.render_list_data.get('recent', [])
-
-        now = datetime.now()
-
-        # 최대 인덱스 5까지 새로운 value가 추가되도록 수정
-        if len(recent_data) >= 5:
-            recent_data.pop(0)  # 가장 오래된 데이터 삭제
-        # recent_index = len(recent_data) + 1
-        # for render in self.pepper.precomp_list:
-        recent_data.append({
-             f'recent_{now.date()}_time_{now.hour}:{now.minute}': self.render_model.pepperlist
-        })
-
-        self.render_list_data['recent'] = recent_data
-        data_to_save = self.render_list_data  # 'recent' key 값의 value로 저장
-
-        with open(self.preset_json_path, "w") as f:
-            json.dump(data_to_save, f, ensure_ascii=False)
-
-    def render_list_len(self):  # 함수수정예정
-        """추가된 precom list 의 갯수를 반환하는 함수이다.
-
-            pre render 할 list들의 갯수를 계산 하는 함수이다.
-        """
-        # total = len(self.render_list_data)
-        self.render_model.pepperlist.clear()
-        for render in self.pepper.precomp_list:
-            self.render_model.pepperlist.append(render['name'])
-        self.render_model.layoutChanged.emit()
-        self.shots_selection.clear()
-        self.renderlists_selection.clear()
-
     def render_execute(self):
         houp = HouPepper()
         for precomp in self.render_model.pepperlist:
@@ -626,15 +589,14 @@ class PepperWindow(QMainWindow):
             # f.move(1000, 250)
             # f.show()
 
-        print('cmd_list :', cmd_list)
-        print('total_frame_list :', total_frame_list)
-        self.render_process = RenderMainWindow(cmd_list, total_frame_list)
-        self.render_process.resize(800, 600)
-        self.render_process.move(1000, 250)
-        self.render_process.show()
+        # print('cmd_list :', cmd_list)
+        # print('total_frame_list :', total_frame_list)
+        # self.render_process = RenderMainWindow(cmd_list, total_frame_list)
+        # self.render_process.resize(800, 600)
+        # self.render_process.move(1000, 250)
+        # self.render_process.show()
 
-        self.save_preset_json()
-        self.main_menu.update()
+        self.render_preset_json()
 
         self.pepper.precomp_list.clear()
         self.render_list_data.clear()
