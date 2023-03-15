@@ -27,7 +27,7 @@ class Houpub:
         유저 id는 self.identif에 저장해 logging이 가능하게 한다.
 
         Examples:
-            BlackPepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+            pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
 
         Args:
             host(str): host url
@@ -53,7 +53,7 @@ class Houpub:
         """입력한 project 이름과 동일한 이름을 가진 project의 dict를 반환한다.
 
         Examples:
-            BlackPepper.project = 'BlackPepper'
+            pepper.project = 'BlackPepper'
 
         Args:
             proj_name(str): Project name
@@ -76,7 +76,7 @@ class Houpub:
         self.project가 없을 시 작동하지 않는다.
 
         Examples:
-            BlackPepper.sequence = "SQ01"
+            pepper.sequence = "SQ01"
 
         Args:
             seq_name(str) : Sequence name
@@ -101,7 +101,7 @@ class Houpub:
         self.project와 self.sequence가 없을 시 작동하지 않는다.
 
         Examples:
-            BlackPepper.shot = '0010'
+            pepper.shot = '0010'
 
         Args:
             shot_name(str): Shot name
@@ -126,7 +126,7 @@ class Houpub:
         self.project가 없을 시 작동하지 않는다.
 
         Examples:
-            BlackPepper.asset = 'temp_fire'
+            pepper.asset = 'temp_fire'
 
         Args:
             asset_name(str): Asset name
@@ -149,7 +149,7 @@ class Houpub:
         asset 입력시 self.asset이 있어야 하고, shot 입력시 self.shot이 있어야 한다. 맞는 인자가 없을 시 작동하지 않는다.
 
         Examples:
-            BlackPepper.entity('asset') or BlackPepper.entity('shot')
+            pepper.entity('asset') or BlackPepper.entity('shot')
 
         Args:
             ent(str): 'asset' or 'shot'
@@ -177,7 +177,7 @@ class Houpub:
         """houdini의 extension 타입별로 software dict를 반환해준다
 
         Example:
-            BlackPepper.software = 'hip'
+            pepper.software = 'hip'
 
         Args:
             software_name(str): 'hip', 'hipnc', or 'hiplc'
@@ -205,7 +205,7 @@ class Houpub:
         self.project가 없을 시 작동하지 않는다.
 
         Examples:
-            BlackPepper.set_file_tree('mnt/projects', 'hook')
+            pepper.set_file_tree('mnt/projects', 'hook')
 
         Args:
             mount_point(str): Local mountpoint path
@@ -439,7 +439,7 @@ class Houpub:
         input_num이 None일시 revision_max를 반환한다.
 
         Example:
-            BlackPepper.get_revision_num(revision_max, 10)
+            pepper.get_revision_num(revision_max, 10)
 
         Args:
             revision_max(int): max revision number of working file or output file
@@ -462,7 +462,7 @@ class Houpub:
         메소드 내부에서만 사용되는 메소드다.
 
         Example:
-            BlackPepper.get_task("FX")
+            pepper.get_task("FX")
 
         Args:
             task_type_name: 'simulation', 'layout', ...
@@ -490,7 +490,7 @@ class Houpub:
         self.asset이 없을시 작동하지 않는다.
 
         Example:
-            BlackPepper.get_casting_path_for_asset()
+            pepper.get_casting_path_for_asset()
 
         Returns:
             casted_shots: [(shot_1_dict), (shot_2_dict), ...]
@@ -511,8 +511,8 @@ class Houpub:
 
         Example:
             for shot in render_shots:
-                BlackPepper.make_precomp_dict(shot)
-            return BlackPepper.precomp_dict
+                pepper.make_precomp_dict(shot)
+            return pepper.precomp_dict
 
         Args:
             casted_shot(dict): shot dict
@@ -542,8 +542,8 @@ class Houpub:
         실제 hip 파일이 오류 없이 정상적으로 생성되었을 때 이 메소드를 작동해야 한다.
 
         Example:
-            for precomp in BlackPepper.precomp_dict:
-                BlackPepper.publish_precomp_working(precomp)
+            for precomp in pepper.precomp_dict:
+                pepper.publish_precomp_working(precomp)
 
         Args:
             precomp(dict): make_precomp_dict에서 만든 dict
@@ -560,8 +560,8 @@ class Houpub:
         실제 mov 파일이 오류 없이 정상적으로 생성되었을 때 이 메소드를 작동해야 한다.
 
         Example:
-            for precomp in BlackPepper.precomp_dict:
-                BlackPepper.publish_precomp_output(precomp)
+            for precomp in pepper.precomp_dict:
+                pepper.publish_precomp_output(precomp)
 
         Args:
             precomp(dict): make_precomp_dict에서 만든 dict
@@ -618,7 +618,7 @@ class Houpub:
         """Host DB 안의 모든 project들을 반환한다.
 
         Examples:
-            BlackPepper.get_all_projects()
+            pepper.get_all_projects()
 
         Returns:
             ['BlackPepper', 'chopsticks', ...]
@@ -630,7 +630,7 @@ class Houpub:
         self.project가 없을 시 작동하지 않는다.
 
         Example:
-            BlackPepper.get_all_assets()
+            pepper.get_all_assets()
 
         Returns:
             ['temp_fire', 'temp_waterfall', ...]
@@ -646,7 +646,7 @@ class Houpub:
         self.project가 없을 시 작동하지 않는다.
 
         Example:
-            BlackPepper.get_all_sequences()
+            pepper.get_all_sequences()
 
         Returns:
             ['sq01', 'sq02', ...]
@@ -662,7 +662,7 @@ class Houpub:
         self.project와 self.sequence가 없을 시 작동하지 않는다.
 
         Example :
-            BlackPepper.get_all_shots()
+            pepper.get_all_shots()
 
         Returns:
             ['0010', '0020, ...]
@@ -679,7 +679,7 @@ class Houpub:
         self.project가 없을 시 작동하지 않는다.
 
         Examples:
-            BlackPepper.get_task_types_for_asset()
+            pepper.get_task_types_for_asset()
 
         Returns:
             ['simulation', 'FX', ...]
@@ -695,7 +695,7 @@ class Houpub:
         self.project, self.sequence, self.shot이 없을 시 작동하지 않는다.
 
         Examples:
-            BlackPepper.get_casted_assets_for_shot()
+            pepper.get_casted_assets_for_shot()
 
         Returns:
             [(asset_type_name: asset_name), (asset_type_name_2: asset_name_2), ...]

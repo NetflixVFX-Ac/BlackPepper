@@ -344,7 +344,9 @@ class PepperWindow(QMainWindow):
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
         self.pepper.entity = 'shot'
-        rev_list = self.pepper.get_every_revision_for_output_file('camera_cache', 'layout')
+        # self.pepper.publish_working_file('layout_camera')
+        # self.pepper.publish_output_file('layout_camera', 'camera_cache', 'test')
+        rev_list = self.pepper.get_every_revision_for_output_file('camera_cache', 'layout_camera')
         self.renew_shot_cbox(rev_list)
         self.renew_shot_info()
         self.renderlists_selection.clear()
@@ -358,7 +360,7 @@ class PepperWindow(QMainWindow):
 
     def renew_shot_info(self):
         revision = self.main_window.shot_rev_cbox.currentText()
-        name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', revision, 'shot')
+        name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout_camera', revision, 'shot')
         date = time[:10]
         clock = time[11:]
         self.main_window.shot_info_label.setText(f"{name}\n{date}\n{clock}")
