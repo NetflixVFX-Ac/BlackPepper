@@ -1,5 +1,7 @@
 import os.path
 import re
+
+import gazu.task
 from PySide2 import QtWidgets, QtCore
 from BlackPepper.pepper import Houpub
 
@@ -162,22 +164,20 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             if self.fc:
                 self.ffmpeg_list = self.cmd.split()
                 path = self.ffmpeg_list[4][:-8]+'0001.jpg'
-                print(path)
                 path_basename = os.path.basename(path)
-                print(path_basename)
                 path_re = re.compile('^(\w+)_(\w+)_(\d+)_')
                 path_search = path_re.search(path_basename)
                 project = path_search.group(1)
                 sequence = path_search.group(2)
                 shot = path_search.group(3)
-                print(project.upper(), sequence.upper(), shot)
                 self.pepper.project = project.upper()
                 self.pepper.sequence = sequence.upper()
                 self.pepper.shot = shot
                 self.pepper.entity = 'shot'
                 self.pepper.publish_output_file('FX', 'jpg_sequence', 'jpg publish')
                 self.pepper.publish_output_file('FX', 'movie_file', 'mov publish')
-                self.pepper.publish_preview('FX', 'Ready To Start', 'test', path)
+                thumbnail = self.pepper.publish_preview('FX', 'Ready To Start', 'test', path)
+                gazu.task.set_main_preview(thumbnail)
 
         if len(self.cmd_list) > 0:
             self.cmd = self.cmd_list.pop(0)
