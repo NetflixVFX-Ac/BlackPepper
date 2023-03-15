@@ -661,7 +661,12 @@ class PepperWindow(QMainWindow):
     def render_file_check(self):
         self.render_list_model.pepperlist.clear()
         for render_file in self.render_model.pepperlist:
-            self.render_list_model.pepperlist.append(f"\n{render_file['name']} : \n "
+            temp_rev = render_file['temp_working_path'].split('.')[0][-3:]
+            cam_rev = render_file['layout_output_path'].split('.')[0][-3:]
+            # re.compile('/v(\d\d\d)/')
+            self.render_list_model.pepperlist.append(f"\n{render_file['name']}\n "
+                                                     f"Template revision : {temp_rev}\n "
+                                                     f"Layout camera revision : {cam_rev}\n " 
                                                      f"{render_file['temp_working_path']}\n "
                                                      f"{render_file['layout_output_path']}\n "
                                                      f"{render_file['fx_working_path']}\n "

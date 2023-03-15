@@ -189,7 +189,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         """
         print("mantra total :", total)
-
+        '/v(\d\d\d)/'
         progress_re = re.compile('_(\d+)\.jpg')
         m = progress_re.search(output)
         if m:
