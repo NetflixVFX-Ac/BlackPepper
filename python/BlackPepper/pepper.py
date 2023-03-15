@@ -610,6 +610,26 @@ class Houpub:
         return revision_list
 
     # -------------------------------------------
+    # ----------- preview 관련 메소드들 -----------
+    # -------------------------------------------
+
+    def get_task_status(self, task_status_name):
+        all_status = ['Todo', 'Ready To Start', 'Work In Progress', 'Done', 'Retake']
+        if task_status_name not in all_status:
+            self.error('no_task_status')
+        task_status = gazu.task.get_task_status_by_name(task_status_name)
+        return task_status
+
+    def publish_preview(self, task_type_name, task_status_name, comment_text, preview_file_path):
+        _, task = self.get_task(task_type_name)
+        task_status = self.get_task_status(task_status_name)
+        gazu.task.add_comment(task, task_status, comment=comment_text)
+        comment = gazu.task.get_last_comment_for_task(task)
+        # gazu.task.create_preview(task, 'test')
+        gazu.task.add_preview(task, comment, preview_file_path)
+        # gazu.task.upload_preview_file(task, '/home/rapa/tornado/Plate/plate_undistort_2k.0001.png')
+
+    # -------------------------------------------
     # ----------- get all 관련 메소드들 -----------
     # -------------------------------------------
 
@@ -900,6 +920,8 @@ class Houpub:
             raise Exception("Software input must be hip, hipnc, or hiplc.")
         if code == 'no_task':
             raise Exception("There's no task in entity.")
+        if code == 'no_task_status':
+            raise Exception("There's no task status in project.")
         if code == 'no_task_in_entity':
             raise Exception("There's no task in entity")
         if code == 'no_project':
@@ -926,10 +948,16 @@ class Houpub:
             raise Exception("NO ERROR CODE")
 
 
-BlackPepper = Houpub()
-BlackPepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
-BlackPepper.software = 'hipnc'
-BlackPepper.project = 'PEPPER'
+# BlackPepper = Houpub()
+# BlackPepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+# BlackPepper.software = 'hipnc'
+# BlackPepper.project = 'Chopsticks'
+# BlackPepper.sequence = 'S1'
+# BlackPepper.shot = 'shot_01'
+# BlackPepper.entity = 'shot'
+# BlackPepper.publish_preview('FX', 'Ready To Start', '230315 1158 test',
+#                             '/home/rapa/tornado/Plate/plate_undistort_2k.0001.png')
+
 # BlackPepper.asset = 'temp_dancing_particle'
 # css = BlackPepper.get_casting_path_for_asset()
 # for cs in css:
