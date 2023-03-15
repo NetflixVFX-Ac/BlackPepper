@@ -278,7 +278,11 @@ class PepperWindow(QMainWindow):
         self.pepper.project = project_name
         self.all_assets = []
         for asset in self.pepper.get_all_assets():
-            if self.pepper.check_asset_type(asset, 'fx_template') is not None:
+            if self.pepper.check_asset_type(asset, 'fx_template') is None:
+                continue
+            self.pepper.asset = asset
+            self.pepper.entity = 'asset'
+            if self.pepper.check_task_status('Done', 'simulation') is True:
                 self.all_assets.append(asset)
         self.template_model.pepperlist.clear()
         self.shot_model.pepperlist.clear()
@@ -324,7 +328,11 @@ class PepperWindow(QMainWindow):
         self.shot_model.pepperlist.clear()
 
         for shot in self.all_shots:
-            self.shot_model.pepperlist.append(shot['sequence_name'] + '_' + shot['shot_name'])
+            self.pepper.sequence = shot['sequence_name']
+            self.pepper.shot = shot['shot_name']
+            self.pepper.entity = 'shot'
+            if self.pepper.check_task_status('Done', 'layout_camera') is True:
+                self.shot_model.pepperlist.append(shot['sequence_name'] + '_' + shot['shot_name'])
 
         # set emit, selected clear
         self.shot_model.layoutChanged.emit()

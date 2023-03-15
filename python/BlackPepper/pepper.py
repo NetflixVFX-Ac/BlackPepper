@@ -500,10 +500,6 @@ class Houpub:
         """
         self.dict_check(self.asset, 'no_asset')
         casted_shots = gazu.casting.get_asset_cast_in(self.asset)
-        # layout_task_type = gazu.task.get_task_type_by_name('Layout')
-        # fx_task_type = gazu.task.get_task_type_by_name('FX')
-        # layout_tasks = [gazu.task.get_task_by_name(shot['shot_id'], layout_task_type) for shot in casted_shots]
-        # fx_tasks = [gazu.task.get_task_by_name(shot['shot_id'], fx_task_type) for shot in casted_shots]
         return casted_shots
 
     def make_precomp_dict(self, casted_shot, temp_revision=None, cam_revision=None):
@@ -608,17 +604,15 @@ class Houpub:
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         task_type = gazu.task.get_task_type_by_name(task_type_name)
         output_files = gazu.files.all_output_files_for_entity(self.entity, output_type, task_type)
-
-        # working_file = gazu.files.get_all_working_files_for_entity(self.entity, task_type)
-        # output_files2 = gazu.files.get_last_output_files_for_entity(self.entity, output_type, task_type)
-        # print(gazu.files.all_output_types_for_entity(self.entity))
-        # print(self.entity)
-        # print(task_type)
-        # print(output_type)
-        # print(output_files)
-        # print(working_file)
         revision_list = [output_file['revision'] for output_file in output_files]
         return revision_list
+
+    def check_task_status(self, task_status_name, task_type_name):
+        status = self.get_task_status(task_status_name)
+        _, task = self.get_task(task_type_name)
+        if status['id'] == task['task_status_id']:
+            return True
+        return False
 
     # -------------------------------------------
     # ----------- preview 관련 메소드들 -----------
@@ -636,9 +630,7 @@ class Houpub:
         task_status = self.get_task_status(task_status_name)
         gazu.task.add_comment(task, task_status, comment=comment_text)
         comment = gazu.task.get_last_comment_for_task(task)
-        # gazu.task.create_preview(task, 'test')
         gazu.task.add_preview(task, comment, preview_file_path)
-        # gazu.task.upload_preview_file(task, '/home/rapa/tornado/Plate/plate_undistort_2k.0001.png')
 
     # -------------------------------------------
     # ----------- get all 관련 메소드들 -----------
