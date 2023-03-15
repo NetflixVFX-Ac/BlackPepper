@@ -53,6 +53,7 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
     else:
         print("missing sequence frame")
 
+
 def main():
     """
     Returns:

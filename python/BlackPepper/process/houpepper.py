@@ -422,22 +422,22 @@ def main():
         next_fx_path = pepper.make_next_working_path(fx_type_name)
         hou_pepper.set_fx_working_for_shot(simulation_path, layout_output_path,
                                            f'{next_fx_path}.{pepper.software.get("file_extension")}')
-        # aaa = pepper.make_precomp_dict(shot)
-        # bbb, ccc = hou_pepper.make_cmd(aaa)
+        aaa = pepper.make_precomp_dict(shot)
+        bbb, ccc = hou_pepper.make_cmd(aaa)
     #
     # ###############################################################################################
     #
     # print(bbb, ccc)
-    # if not QtWidgets.QApplication.instance():
-    #     app = QtWidgets.QApplication(sys.argv)
-    # else:
-    #     app = QtWidgets.QApplication.instance()
-    #
-    # r = RenderMainWindow(bbb, ccc)
-    # r.resize(800, 600)
-    # r.move(1000, 250)
-    # r.show()
-    # app.exec_()
+    if not QtWidgets.QApplication.instance():
+        app = QtWidgets.QApplication(sys.argv)
+    else:
+        app = QtWidgets.QApplication.instance()
+
+    r = RenderMainWindow(bbb, ccc)
+    r.resize(800, 600)
+    r.move(1000, 250)
+    r.show()
+    app.exec_()
 
 
 # if __name__ == "__main__":
