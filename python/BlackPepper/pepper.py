@@ -527,7 +527,7 @@ class Houpub:
         self.sequence = sequence_name
         self.shot = shot_name
         self.entity = 'shot'
-        layout_output_path = self.output_file_path('camera_cache', 'layout', input_num=cam_revision)
+        layout_output_path = self.output_file_path('camera_cache', 'layout_camera', input_num=cam_revision)
         fx_working_path = self.make_next_working_path('FX')
         jpg_output_path = self.make_next_output_path('jpg_sequence', 'FX')
         video_output_path = self.make_next_output_path('movie_file', 'FX')
