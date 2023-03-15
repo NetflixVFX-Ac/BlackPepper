@@ -629,7 +629,9 @@ class PepperWindow(QMainWindow):
         if not os.path.exists(self.preset_json_path):
             self.render_list_data = {
                 "recent": [],
-                "saved": []
+                "saved": [],
+                "auto": [],
+                "mantra_path": []
             }
             data_to_save = self.render_list_data
 
