@@ -107,7 +107,7 @@ class PepperWindow(QMainWindow):
         self.check_window.checklist.setModel(self.render_list_model)
         # Render check list button
         self.check_window.close_btn.clicked.connect(self.close_fullpath)
-        self.check_window.render_btn.clicked.connect(self.render_execute)
+        # self.check_window.render_btn.clicked.connect(self.render_execute)
         # set connect login Ui
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
