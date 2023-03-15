@@ -515,7 +515,7 @@ class PepperWindow(QMainWindow):
         # recent_index = len(recent_data) + 1
         # for render in self.pepper.precomp_list:
         recent_data.append({
-             f'recent_{now.date()}_time_{now.hour}:{now.minute}:{}': self.pepper.precomp_list
+             f'recent_{now.date()}_time_{now.hour}:{now.minute}:{now.second}': self.pepper.precomp_list
         })
 
         self.render_list_data['recent'] = recent_data
