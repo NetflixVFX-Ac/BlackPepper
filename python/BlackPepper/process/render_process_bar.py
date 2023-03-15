@@ -1,7 +1,7 @@
+import os.path
 import re
-import time
 from PySide2 import QtWidgets, QtCore
-
+from BlackPepper.pepper import Houpub
 
 class RenderMainWindow(QtWidgets.QMainWindow):
     """
@@ -19,10 +19,12 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             mov_output_path (str): output file path
         """
         super().__init__()
+        self.pepper = Houpub()
         self.p = None
         self.is_interrupted = False
         self.mc = None
         self.fc = None
+        self.check_fin = 0
 
         ########################################################
 
@@ -42,6 +44,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         self.mantra_check = re.compile('^python')
         self.ffmpeg_check = re.compile('^ffmpeg')
+        self.ffmpeg_list = None
         self.progress = QtWidgets.QProgressBar()
         self.progress.setStyleSheet(DEFAULT_STYLE)
         self.progress.setRange(0, 100)
@@ -159,21 +162,51 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             return
 
         print("fin")
+
         # self.p.terminate()
         if self.p:
             self.p.waitForFinished()
 
+        self.check_fin += 1
+        print("check_fin :", self.check_fin)
+        self.p.waitForFinished()
+        if self.check_fin == 1:
+            if self.fc:
+                self.ffmpeg_list = self.cmd.split()
+                path = self.ffmpeg_list[4][:-8]+'0001.jpg'
+                print(path)
+                path_basename = os.path.basename(path)
+                print(path_basename)
+                path_re = re.compile('^(\w+)_(\w+)_(\d+)_')
+                path_search = path_re.search(path_basename)
+                project = path_search.group(1)
+                sequence = path_search.group(2)
+                shot = path_search.group(3)
+                print(project.upper(), sequence.upper(), shot)
+                self.pepper.project = project.upper()
+                self.pepper.sequence = sequence.upper()
+                self.pepper.shot = shot
+                self.pepper.entity = 'shot'
+                self.pepper.publish_output_file('FX', 'jpg_sequence', 'jpg publish')
+                self.pepper.publish_output_file('FX', 'movie_file', 'mov publish')
+                self.pepper.publish_preview('FX', 'Ready To Start', 'test', path)
+
+
         if len(self.cmd_list) > 0:
             self.cmd = self.cmd_list.pop(0)
             self.total_frame = self.total_frame_list.pop(0)
+
             # print('next total_frame :', self.total_frame)
             # print('next total_frame_list :', self.total_frame_list)
             # print("ttttttttttttttmddd :", cmd)
             # print('cmd_list :', self.cmd_list)
             # print('len cmd_list :', len(self.cmd_list))
             # self.p = None
-            self.start_process()
             # self.p.waitForFinished()
+
+            self.check_fin = 0
+            self.start_process()
+
         else:
             self.cmd = None
             self.message("Process finished.")
@@ -192,7 +225,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         """
         print("mantra total :", total)
-        '/v(\d\d\d)/'
         progress_re = re.compile('_(\d+)\.jpg')
         m = progress_re.search(output)
         if m:
