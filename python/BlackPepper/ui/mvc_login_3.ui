@@ -117,7 +117,7 @@ color: rgb(180, 180, 180);
          <string notr="true">background-color:rgb(52, 52, 52);</string>
         </property>
         <property name="text">
-         <string>pipeline@rapa.org</string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -162,7 +162,7 @@ color: rgb(180, 180, 180);
          <string notr="true">background-color:rgb(52, 52, 52);</string>
         </property>
         <property name="text">
-         <string>netflixacademy</string>
+         <string/>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::PasswordEchoOnEdit</enum>
