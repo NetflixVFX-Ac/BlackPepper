@@ -104,9 +104,9 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """
         data = self.p.readAllStandardError()
         stderr = bytes(data).decode("utf8")
-        if self.ffmpeg_check:
+        if self.fc:
             progress = self.ffmpeg_simple_percent_parser(stderr, self.total_frame)
-        if self.mantra_check:
+        if self.mc:
             progress = self.mantra_simple_percent_parser(stderr, self.total_frame)
         if progress:
             self.progress.setValue(progress)
@@ -118,9 +118,9 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """
         data = self.p.readAllStandardOutput()
         stdout = bytes(data).decode("utf8")
-        if self.ffmpeg_check:
+        if self.fc:
             progress = self.ffmpeg_simple_percent_parser(stdout, self.total_frame)
-        if self.mantra_check:
+        if self.mc:
             progress = self.mantra_simple_percent_parser(stdout, self.total_frame)
         if progress:
             self.progress.setValue(progress)

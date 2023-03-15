@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from BlackPepper.pepper import Houpub
 from BlackPepper.process.render_process_bar import RenderMainWindow
@@ -5,7 +6,6 @@ from PySide2 import QtWidgets
 import hou
 import _alembic_hom_extensions as abc
 import sys
-import pprint
 
 
 class HouPepper:
@@ -379,6 +379,10 @@ class HouPepper:
             f'{precomp_list.get("video_output_path")}.mov'
         ]
 
+        self.output_dir = os.path.dirname(precomp_list.get("video_output_path"))
+        if not os.path.isdir(self.output_dir):
+            os.makedirs(self.output_dir)
+
         self.ffmpeg_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
         self.cmd_list.append(self.ffmpeg_cmd)
         self.total_frame_list.append(total_frame)
@@ -392,8 +396,8 @@ class HouPepper:
 def main():
     pepper = Houpub()
     pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
-    pepper.project = 'PEPPER'
-    pepper.asset = 'temp_fire'
+    pepper.project = 'BLACKPEPPER'
+    pepper.asset = 'temp_breaking_glass'
     pepper.entity = 'asset'
     pepper.software = 'hipnc'
     simulation_type_name = 'simulation'
@@ -401,24 +405,25 @@ def main():
     casted_shots = pepper.get_casting_path_for_asset()
     hou_pepper = HouPepper()
 
+
     for shot in casted_shots:
         pepper.sequence = shot.get('sequence_name')
         pepper.shot = shot.get('shot_name')
         pepper.entity = 'shot'
-        layout_type_name = 'layout'
+        layout_type_name = 'layout_camera'
         output_type_name = 'camera_cache'
         layout_output_path = pepper.output_file_path(output_type_name, layout_type_name)
         pepper.software = 'hipnc'
         fx_type_name = 'fx'
         next_fx_path = pepper.make_next_working_path(fx_type_name)
-
         hou_pepper.set_fx_working_for_shot(simulation_path, layout_output_path,
                                            f'{next_fx_path}.{pepper.software.get("file_extension")}')
         aaa = pepper.make_precomp_dict(shot)
         bbb, ccc = hou_pepper.make_cmd(aaa)
-
-    ###############################################################################################
-
+    #
+    # ###############################################################################################
+    #
+    # print(bbb, ccc)
     if not QtWidgets.QApplication.instance():
         app = QtWidgets.QApplication(sys.argv)
     else:
@@ -430,6 +435,6 @@ def main():
     r.show()
     app.exec_()
 
-
-if __name__ == "__main__":
-    main()
+#
+# if __name__ == "__main__":
+#     main()
