@@ -391,6 +391,7 @@ class PepperWindow(QMainWindow):
         그리고 pepper 의 precomp_list를 render_moderl.pepperlist 에 append 한다.
         추가로 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
         """
+        self.main_window.statusBar().showMessage('Render files drag & drop 로 순서 변경 가능')
         selections = self.shots_selection.selectedRows()
         if len(selections) == 0:
             return
