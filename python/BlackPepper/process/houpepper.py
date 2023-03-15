@@ -397,7 +397,7 @@ def main():
     pepper = Houpub()
     pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
     pepper.project = 'BLACKPEPPER'
-    pepper.asset = 'temp_breaking_glass'
+    pepper.asset = 'temp_fire'
     pepper.entity = 'asset'
     pepper.software = 'hipnc'
     simulation_type_name = 'simulation'
@@ -413,28 +413,32 @@ def main():
         layout_type_name = 'layout_camera'
         output_type_name = 'camera_cache'
         layout_output_path = pepper.output_file_path(output_type_name, layout_type_name)
+        next_layout = pepper.make_next_output_path(output_type_name, layout_type_name)
+        print(next_layout)
+        # a, b, c =pepper.get_output_file_data('camera_cache', 'layout_camera', 10, 'shot')
+        # print(a, b, c)
         pepper.software = 'hipnc'
         fx_type_name = 'fx'
         next_fx_path = pepper.make_next_working_path(fx_type_name)
         hou_pepper.set_fx_working_for_shot(simulation_path, layout_output_path,
                                            f'{next_fx_path}.{pepper.software.get("file_extension")}')
-        aaa = pepper.make_precomp_dict(shot)
-        bbb, ccc = hou_pepper.make_cmd(aaa)
+        # aaa = pepper.make_precomp_dict(shot)
+        # bbb, ccc = hou_pepper.make_cmd(aaa)
     #
     # ###############################################################################################
     #
     # print(bbb, ccc)
-    if not QtWidgets.QApplication.instance():
-        app = QtWidgets.QApplication(sys.argv)
-    else:
-        app = QtWidgets.QApplication.instance()
+    # if not QtWidgets.QApplication.instance():
+    #     app = QtWidgets.QApplication(sys.argv)
+    # else:
+    #     app = QtWidgets.QApplication.instance()
+    #
+    # r = RenderMainWindow(bbb, ccc)
+    # r.resize(800, 600)
+    # r.move(1000, 250)
+    # r.show()
+    # app.exec_()
 
-    r = RenderMainWindow(bbb, ccc)
-    r.resize(800, 600)
-    r.move(1000, 250)
-    r.show()
-    app.exec_()
 
-#
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
