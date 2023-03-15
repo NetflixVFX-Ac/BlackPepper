@@ -4,7 +4,8 @@ from PySide2 import QtWidgets, QtCore
 import os
 import glob
 import subprocess
-
+import os
+import random
 
 def find_mov():
     dir_path = '/home/rapa'
@@ -16,8 +17,6 @@ def find_mov():
                 file_path = '"' + file_path + '"'
                 print(file_path)
 
-
-find_mov()
 
 
 def thumnail_machine():
@@ -39,6 +38,23 @@ def thumnail_machine():
     result = subprocess.run(cmd, shell=True, check=True)
 
 
-thumnail_machine()
 
-def upload_thumnail_to_kitsu():
+def select_jpg():
+    folder_path = "/home/rapa"
+
+    # 폴더 내에 있는 파일 중 JPG 파일만 리스트로 가져옵니다.
+    file_list = [f for f in os.listdir(folder_path) if f.endswith(".jpg")]
+
+    if len(file_list) == 0:
+        print(f"No JPG files found in {folder_path}")
+        exit(1)
+
+    # 파일 리스트에서 랜덤으로 선택합니다.
+    random_file = random.choice(file_list)
+
+    # 선택된 파일의 전체 경로를 출력합니다.
+    random_file_path = os.path.join(folder_path, random_file)
+    print(random_file_path)
+
+
+select_jpg()
