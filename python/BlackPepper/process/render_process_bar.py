@@ -20,6 +20,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.p = None
         self.is_interrupted = False
+        self.mc = None
+        self.fc = None
 
 ########################################################
 
@@ -33,6 +35,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.mantra_check = re.compile('^python')
         self.ffmpeg_check = re.compile('^ffmpeg')
         self.progress = QtWidgets.QProgressBar()
+        self.progress.setStyleSheet(u"color: rgb(225, 225, 225);\n")
         self.progress.setRange(0, 100)
 
         self.text = QtWidgets.QPlainTextEdit()
@@ -41,9 +44,9 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         # self.btn_interrupt.clicked.connect(self.handle_interrupt)
 
         l = QtWidgets.QVBoxLayout()
-        l.addWidget(self.btn_interrupt)
         l.addWidget(self.progress)
         l.addWidget(self.text)
+        l.addWidget(self.btn_interrupt)
 
         w = QtWidgets.QWidget()
         w.setStyleSheet(u"background-color: rgb(45, 45, 45);\n"
@@ -59,8 +62,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         cmd = self.cmd_list.pop(0)
         self.total_frame = self.total_frame_list.pop(0)
 
-        self.mc = self.mantra_check.search(cmd)
-        self.fc = self.ffmpeg_check.search(cmd)
         # print('start total_frame :', self.total_frame)
         # print('start total_frame_list :', self.total_frame_list)
         # print('mantra :', self.mc)
@@ -85,6 +86,9 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         print("start!!!!!!!")
         print(cmd)
         print(self.total_frame)
+        self.mc = self.mantra_check.search(cmd)
+        self.fc = self.ffmpeg_check.search(cmd)
+
 
         if not self.p:
             self.p = QtCore.QProcess()
