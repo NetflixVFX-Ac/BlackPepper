@@ -237,8 +237,10 @@ class PepperWindow(QMainWindow):
             self.login_window.show()
 
     def open_main_window(self):
-        """mvc_main.ui를 디스플레이 해주는 메소드. 로그인 성공 시 실행된다. \n
-        projects, templates, shots, render_lists의 네 가지 부분으로 나뉘어 있다. \n
+        """로그인 성공 시 mvc_main.ui를 디스플레이 해주는 함수이다.
+
+            함수 실행 시 메인 윈도우에 메뉴바를 만들고 셋팅하는 함수를 먼저 실행한다. 그리고
+        projects, templates, shots, render_lists의 네 가지 부분으로 나뉘어 있으며 \n
         projects 에서는 로그인 된 유저가 assign 되어있는 project들을 projects_listview에 디스플레이 해준다.
         templates 에서는 선택된 project 안의 fx templates를 templates_listview에 디스플레이 해준다.
         shots 에서는 선택된 fx template가 casting 된 shots를 shots_listview에 디스플레이 해준다.
@@ -452,13 +454,14 @@ class PepperWindow(QMainWindow):
         login_menu.addAction(exit_action)
 
     def create_main_menubar(self):
-        """메인 윈도우에 메뉴바를 만들고 셋팅하는 함수이다.
+        """메인 윈도우에 메뉴바를 만들고 셋팅하는 함수이고  open_main_window 함수 실행시 실행된다.
 
-            함수에는 메뉴바에 preset 을 셋팅하는 함수를 포함 하고있다.
+            이 함수에는 메뉴바에 preset 을 셋팅하는 함수 set_main_menubar 를 포함 하고 있다.
         'Menu' 와 'Help' 메뉴바를 만들고 'Menu' 에는 먼저 set_main_window_preset() 함수의 'Recent Presets' 와
         'Logout','Exit' 들을 추가하고 단축키와 클릭시 컨넥트 되어있는 함수가 발생한다.
         'Help' 에는 Black Pepper 에 필요한 kitsu, SideFX등 같은 관련 사이트들 을 열고 단축키도 추가 되어있다.
         """
+        # get json path
         self.home_json_path()
         self.main_menu_bar = self.main_window.menuBar()
         self.main_menu_bar.setNativeMenuBar(False)
@@ -521,12 +524,12 @@ class PepperWindow(QMainWindow):
             메뉴바 'Menu' 에 'Recent Presets는'메뉴에 path json file 을 불러오고 최신 5개의 json render_model.pepperlist
             5번 인덱스가 제일 최신 json dict 정보이다.
         """
+        # 동적메뉴로 채워주기위해 clear 를 한다.
         self.main_filemenu.clear()
         self.create_json()
-
+        # set recent,saved menu
         self.recent_menu = QMenu('Open recent renderlists', self.main_window)
         self.saved_menu = QMenu('Open saved renderlists', self.main_window)
-
         with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
 
@@ -574,8 +577,9 @@ class PepperWindow(QMainWindow):
         self.renew_render_list()
 
     def save_recent_renderlists(self):
-        """save preset json path 의 json 을 불러오고 recent key 값에 정보를 저장하는 함수이다.
+        """save preset json path 의 json 을 불러오고 'recent' key 값에 정보를 저장하는 함수이다.
 
+            'Render files' 에 추가된 것이 없으면 return 한다.
             path 에 json 파일이 없으면 json 을 만들어주는 함수를 사용하여 json 을 만들어주고 json을 load 하여 'recent' key에
             render_moderl.pepperlist(렌다할 render files들) dict 들을 날짜,시간별로 리스트로 json을 저장한다.
         """
@@ -596,7 +600,7 @@ class PepperWindow(QMainWindow):
         self.save_json(self.render_list_data)
 
     def save_user_renderlists(self):
-        """save preset json path 의 json 을 불러오고 recent key 값에 정보를 저장하는 함수이다.
+        """save preset json path 의 json 을 불러오고 'saved' key 값에 정보를 저장하는 함수이다.
 
             path 에 json 파일이 없으면 json 을 만들어주는 함수를 사용하여 json 을 만들어주고 json을 load 하여 'recent' key에
             render_moderl.pepperlist(렌다할 render files들) dict 들을 날짜,시간별로 리스트로 json을 저장한다.
@@ -632,7 +636,7 @@ class PepperWindow(QMainWindow):
             json.dump(data, f, ensure_ascii=False)
 
     def create_json(self):
-        """preset이 저장되어있는 json파일이 없으면 json 파일을 만들어주는 함수이다.
+        """json path 경로를 함수롤 통해 가져오고 json에 'recent' or 'seaved' 가 없으면 key 값을 추가하고 path에 저장하는 함수이다.
         """
         self.home_json_path()
         with open(self.preset_json_path, 'r') as json_file:
