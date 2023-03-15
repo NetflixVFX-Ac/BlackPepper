@@ -592,8 +592,8 @@ class PepperWindow(QMainWindow):
         now = datetime.now()
         # 최대 인덱스 5까지 새로운 value가 추가되도록 수정
         if len(recent_data) >= 5:
-            recent_data.pop(0)  # 가장 오래된 데이터 삭제
-        recent_data.append({
+            recent_data.pop(5)  # 가장 오래된 데이터 삭제
+        recent_data.insert(0, {
             f'recent_{now.date()}_time_{now.hour}:{now.minute}:{now.second}': self.render_model.pepperlist
         })
         # 'recent' key 값의 value로 저장
@@ -614,8 +614,8 @@ class PepperWindow(QMainWindow):
         now = datetime.now()
         # 최대 인덱스 5까지 새로운 value가 추가되도록 수정
         if len(saved_data) >= 10:
-            saved_data.pop(0)  # 가장 오래된 데이터 삭제
-        saved_data.append({
+            saved_data.pop(5)  # 가장 오래된 데이터 삭제
+        saved_data.insert(0, {
             f'saved_{now.date()}_time_{now.hour}:{now.minute}:{now.second}': self.render_model.pepperlist
         })
         # 'recent' key 값의 value로 저장
