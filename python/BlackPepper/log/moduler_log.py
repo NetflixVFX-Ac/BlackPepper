@@ -5,7 +5,7 @@ import os
 class Logger:
     """
     이 모듈은 BlackPepper를 사용해서 발생할 수 있는 문제나 사용자의 접속, 퍼플리싱에 대한 정보를 기록하는 역할을 한다.
-    모든 정보는 .config의 log파일료 저장된다.
+    모든 정보는 .config의 log파일로 저장된다.
     """
 
     def __init__(self):

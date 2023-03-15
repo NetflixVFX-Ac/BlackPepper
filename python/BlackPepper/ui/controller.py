@@ -2,7 +2,8 @@ import sys
 import os
 import json
 import webbrowser
-from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
+from BlackPepper.process.render_process_bar import RenderMainWindow
+# from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow, QAction, QApplication, QMenu
@@ -43,11 +44,9 @@ class PepperWindow(QMainWindow):
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
-        self.render_list_data = []
+        self.render_list_data = {}
         self.saved_list_data = []
         self.filename = []
-
-        self.preset_json_path = 'render_check_list.json'
 
         # model instance
         self.project_model = PepperModel()
@@ -89,7 +88,7 @@ class PepperWindow(QMainWindow):
         login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
-        self.login_window.setWindowTitle('Black Pepper Login')
+        self.login_window.setWindowTitle('Black Pepper v0.01')
         self.login_window.move(1000, 300)
         self.login_window.show()
         # main Ui loader
@@ -97,7 +96,7 @@ class PepperWindow(QMainWindow):
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
-        self.main_window.setWindowTitle('BlackPepper 0.1')
+        self.main_window.setWindowTitle('Black Pepper v0.0.1')
         self.main_window.move(700, 250)
         # check Ui loader
         check_ui = QtCore.QFile(os.path.join(script_path, 'mvc_YN_3.ui'))
@@ -134,14 +133,24 @@ class PepperWindow(QMainWindow):
         # set statusbar to window
         self.login_window.statusBar().showMessage('kitsu 로그인 하세요!  houdini 확장자 선택하세요!')
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
+        self.main_window.path_btn.setStatusTip('Render files Full path window open.')
+        self.main_window.save_btn.setStatusTip("Render files (File > 'Open saved renderlists') save")
+        self.main_window.reset_btn.setStatusTip('Render files Clear')
         # set main menubar
         self.create_login_menubar()
-
         # set auto login
         self.set_auto_login()
-        self.create_main_menubar()
+        # set json path
+        self.preset_json_path = ''
 
     def set_auto_login(self):
+        """
+        사용자가 로그인을 할 때 로그인 창에 id, password를 적고 houdini 확장자를 선택한다. \n
+        그 때 .config에 저장된 json파일의 'auto'에 host 연결정보, id연결정보,id, password, host, houdini 확장자를 기록한다. \n
+        만약 기존에 json파일이 없으면 창에서 id, password를 저장하고 만약 정보가 있으면 id, password, houdini 확장자를 받아와서
+        로그인 버튼을 누른다.
+        """
+        # get login window to initial login information
         log_path = self.login_log.user_path
         self.login_log.host = "http://192.168.3.116/api"
         log_id = self.login_window.input_id.text()
@@ -149,16 +158,19 @@ class PepperWindow(QMainWindow):
         log_sfw = self.login_window.hipbox.currentText()[1:]
         log_value = self.login_log.load_setting()
         log_dict = self.login_log.user_dict
-        if os.path.exists(log_path) and (not log_dict['auto'] or log_id != log_value['user_id']
-                                         or log_pw != log_value['user_pw'] or log_sfw != log_value['user_ext']):
-            self.login_log.user_id = log_id
-            self.login_log.user_pw = log_pw
-            self.login_log.user_ext = log_sfw
-            self.login_log.valid_host = True
-            self.login_log.valid_user = True
-            self.login_log.auto_login = True
-            self.login_log.save_setting()
-            return
+
+        # get to json key 'auto' check
+        if os.path.exists(log_path) and not log_dict['auto']:
+            for auto_loop in log_dict['auto']:
+                if log_id != auto_loop['user_id'] or log_pw != auto_loop['user_pw'] or log_sfw != auto_loop['user_ext']:
+                    self.login_log.user_id = log_id
+                    self.login_log.user_pw = log_pw
+                    self.login_log.user_ext = log_sfw
+                    self.login_log.valid_host = True
+                    self.login_log.valid_user = True
+                    self.login_log.auto_login = True
+                    self.login_log.save_setting()
+                    return
         if log_value['valid_host'] and log_value['valid_user']:
             self.login_log.host = log_value['host']
             self.login_log.user_id = log_value['user_id']
@@ -179,11 +191,14 @@ class PepperWindow(QMainWindow):
         로그인 성공 시 입력받은 Houdini license 종류가 pepper의 self.software에 set 된다.
         이후 self.main_window가 바로 실행되어 pepper의 메인 UI가 디스플레이 된다.
         """
+
+        # set initial login information
         self.login_log.host = "http://192.168.3.116/api"
         self.login_log.user_id = self.login_window.input_id.text()
         self.login_log.user_pw = self.login_window.input_pw.text()
         self.login_log.user_ext = self.login_window.hipbox.currentText()[1:]
 
+        # if connect login, get login information and close login window, open main window
         if self.login_log.connect_login():
             self.pepper.software = self.login_log.user_ext
             self.login_log.auto_login = True
@@ -192,12 +207,19 @@ class PepperWindow(QMainWindow):
             self.open_main_window()
 
     def user_logout(self):
+        """
+        로그인 된 사용자가 로그아웃 버튼을 누르면 모든 창이 clear가 된다. \n
+        그 후 id, password, host, houdini 확장자, host 연결상태, id 연결상태를 모두 초기화하고 로그인 창이 새로 뜬다.
+        """
+
+        # if connect login, log out, all window clear and close main window, open login window
         if self.login_log.connect_login():
             self.login_log.log_out()
 
-            # self.pepper.precomp_list.clear()
+            # render data list clear
             self.render_list_data.clear()
 
+            # render, template, shot, project list clear
             self.render_model.layoutChanged.emit()
             self.template_model.layoutChanged.emit()
             self.shot_model.layoutChanged.emit()
@@ -211,6 +233,7 @@ class PepperWindow(QMainWindow):
             self.templates_selection.clear()
             self.shots_selection.clear()
 
+            # main window close and login window show
             self.main_window.close()
             self.login_window.show()
 
@@ -224,6 +247,7 @@ class PepperWindow(QMainWindow):
         renderlists는 pepper.precomp_list에 담긴 shot 들의 name의 value 값만 보여주는 것이고,
         render 버튼 클릭 시 pepper.precomp_list 속 dict를 Houdini로 전달한다.
         """
+        self.create_main_menubar()
         # get my project
         self.my_projects = self.pepper.get_my_projects()
         for my_project in self.my_projects:
@@ -318,7 +342,9 @@ class PepperWindow(QMainWindow):
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
         self.pepper.entity = 'shot'
-        rev_list = self.pepper.get_every_revision_for_output_file('camera_cache', 'layout')
+        # self.pepper.publish_working_file('layout_camera')
+        # self.pepper.publish_output_file('layout_camera', 'camera_cache', 'test')
+        rev_list = self.pepper.get_every_revision_for_output_file('camera_cache', 'layout_camera')
         self.renew_shot_cbox(rev_list)
         self.renew_shot_info()
         self.renderlists_selection.clear()
@@ -332,7 +358,7 @@ class PepperWindow(QMainWindow):
 
     def renew_shot_info(self):
         revision = self.main_window.shot_rev_cbox.currentText()
-        name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout', revision, 'shot')
+        name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout_camera', revision, 'shot')
         date = time[:10]
         clock = time[11:]
         self.main_window.shot_info_label.setText(f"{name}\n{date}\n{clock}")
@@ -427,13 +453,14 @@ class PepperWindow(QMainWindow):
         login_menu.addAction(exit_action)
 
     def create_main_menubar(self):
-        """메인 윈도우에 메뉴바를 만들고 셋팅하 함수이다.
+        """메인 윈도우에 메뉴바를 만들고 셋팅하는 함수이다.
 
             함수에는 메뉴바에 preset 을 셋팅하는 함수를 포함 하고있다.
         'Menu' 와 'Help' 메뉴바를 만들고 'Menu' 에는 먼저 set_main_window_preset() 함수의 'Recent Presets' 와
         'Logout','Exit' 들을 추가하고 단축키와 클릭시 컨넥트 되어있는 함수가 발생한다.
         'Help' 에는 Black Pepper 에 필요한 kitsu, SideFX등 같은 관련 사이트들 을 열고 단축키도 추가 되어있다.
         """
+        self.home_json_path()
         self.main_menu_bar = self.main_window.menuBar()
         self.main_menu_bar.setNativeMenuBar(False)
         # create 'File' menu
@@ -456,12 +483,25 @@ class PepperWindow(QMainWindow):
         sidefx_action.setStatusTip('SideFX site open')
         sidefx_action.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
         main_helpmenu.addAction(sidefx_action)
+        main_helpmenu.addSeparator()
         # help add scanline vfx
         scanline_action = QAction('Scanline VFX', self.main_window)
-        scanline_action.setShortcut('F3')
+        scanline_action.setShortcut('F5')
         scanline_action.setStatusTip('Scanline VFX site open')
         scanline_action.triggered.connect(lambda: webbrowser.open('https://www.scanlinevfx.com/'))
         main_helpmenu.addAction(scanline_action)
+        # help add scanline vfx
+        va_action = QAction('VA studio', self.main_window)
+        va_action.setShortcut('F6')
+        va_action.setStatusTip('VA studio site open')
+        va_action.triggered.connect(lambda: webbrowser.open('https://www.vastudio.co.kr/'))
+        main_helpmenu.addAction(va_action)
+        # help add scanline vfx
+        west_action = QAction('West world', self.main_window)
+        west_action.setShortcut('F7')
+        west_action.setStatusTip('West world site open')
+        west_action.triggered.connect(lambda: webbrowser.open('https://www.westworld.co.kr/'))
+        main_helpmenu.addAction(west_action)
         # create menu 'User'
         self.main_user = self.main_menu_bar.addMenu('&User')
         host_info = QAction(f'host : {self.login_log.host}', self.main_window)
@@ -503,7 +543,7 @@ class PepperWindow(QMainWindow):
 
         self.main_filemenu.addMenu(self.recent_menu)
         self.main_filemenu.addMenu(self.saved_menu)
-
+        self.main_filemenu.addSeparator()
         # add 'Exit'
         exit_action = QAction('&Exit', self.main_window)
         exit_action.setShortcut('Ctrl+Q')
@@ -578,6 +618,12 @@ class PepperWindow(QMainWindow):
         self.render_list_data['saved'] = saved_data
         self.save_json(self.render_list_data)
 
+    def home_json_path(self):
+        now_path = os.path.realpath(__file__)
+        split_path = now_path.split('/')[:-2]
+        dir_path = os.path.join('/'.join(split_path), '.config')
+        self.preset_json_path = os.path.join(dir_path, 'user.json')
+
     def open_json(self):
         with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
@@ -589,18 +635,19 @@ class PepperWindow(QMainWindow):
     def create_json(self):
         """preset이 저장되어있는 json파일이 없으면 json 파일을 만들어주는 함수이다.
         """
-        if not os.path.exists(self.preset_json_path):
-            self.render_list_data = {
-                "recent": [],
-                "saved": []
-            }
+        self.home_json_path()
+        with open(self.preset_json_path, 'r') as json_file:
+            self.render_list_data = json.load(json_file)
+            if 'recent' not in self.render_list_data:
+                self.render_list_data['recent'] = []
+            if 'saved' not in self.render_list_data:
+                self.render_list_data['saved'] = []
             data_to_save = self.render_list_data
-
             with open(self.preset_json_path, "w") as f:
                 json.dump(data_to_save, f, ensure_ascii=False)
 
     def render_file_check(self):
-        # self.render_list_model.pepperlist.clear()
+        self.render_list_model.pepperlist.clear()
         for render_file in self.render_model.pepperlist:
             self.render_list_model.pepperlist.append(f"\n{render_file['name']} : \n "
                                                      f"{render_file['temp_working_path']}\n "
@@ -640,18 +687,17 @@ class PepperWindow(QMainWindow):
         #     self.mantra_window.resize(800, 600)
         #     self.mantra_window.move(1000, 250)
         #     self.mantra_window.show()
-            # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
-            # f.resize(800, 600)
-            # f.move(1000, 250)
-            # f.show()
+        # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
+        # f.resize(800, 600)
+        # f.move(1000, 250)
+        # f.show()
 
         # print('cmd_list :', cmd_list)
         # print('total_frame_list :', total_frame_list)
-        # self.render_process = RenderMainWindow(cmd_list, total_frame_list)
-        # self.render_process.resize(800, 600)
-        # self.render_process.move(1000, 250)
-        # self.render_process.show()
-
+        self.render_process = RenderMainWindow(cmd_list, total_frame_list)
+        self.render_process.resize(800, 600)
+        self.render_process.move(1000, 250)
+        self.render_process.show()
 
         # self.pepper.precomp_list.clear()
         self.render_list_data.clear()
