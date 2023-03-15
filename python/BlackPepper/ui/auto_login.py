@@ -323,6 +323,7 @@ class Auto_log:
         self.host = ''
         self.user_id = ''
         self.user_pw = ''
+        self.user_ext = ''
         self.valid_host = False
         self.valid_user = False
         self.auto_login = False
