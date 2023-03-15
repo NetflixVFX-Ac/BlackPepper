@@ -83,19 +83,21 @@ def set_file_tree():
     #     ddd = gazu.files.get_last_entity_output_revision(shot, bbb, aaa)
     #     print(ccc, ddd)
 
-# def publish_output():
-#     pepper = Houpub()
-#     pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
-#     pepper.project = 'BLACKPEPPER'
-#     aaa = gazu.shot.all_shots_for_project(pepper.project)
-#     # print(aaa)
-#     for shot in aaa:
-#         print(shot)
+def publish_output():
+    pepper = Houpub()
+    pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+    pepper.software = 'hipnc'
+    pepper.project = 'BLACKPEPPER'
+    # aaa = gazu.shot.all_shots_for_project(pepper.project)
+    # # print(aaa)
+    # for shot in aaa:
+    #     print(shot)
 
-    # pepper.sequence = 'SQ01'
-    # pepper.entity = 'shot'
+    pepper.sequence = 'SQ01'
+    pepper.shot = '0020'
+    pepper.entity = 'shot'
     # pepper.publish_output_file('FX', 'Movie_file', "first_output")
-    # print(pepper.make_next_output_path('FX', 'Movie_file'))
+    print(pepper.make_next_output_path('layout_camera', 'camera_cache'))
 
 def casting_create(self, nb):
     asset_castings = gazu.casting.get_shot_casting(self.shot)
@@ -104,8 +106,8 @@ def casting_create(self, nb):
     gazu.casting.update_shot_casting(self.project, self.shot, casting=asset_castings)
 
 def main():
-    set_file_tree()
-    # publish_output()
+    # set_file_tree()
+    publish_output()
     # pass
 
 
