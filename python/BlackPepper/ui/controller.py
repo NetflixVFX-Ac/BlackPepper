@@ -19,16 +19,24 @@ from datetime import datetime
 class PepperWindow(QMainWindow):
     def __init__(self):
         """이 모듈은 pepper를 통해 얻어 온 kitsu 상의 template asset과 casting 된 shot들의 정보들을 UI를 통해 보여준다.
-        UI 모듈은 controller, model, view로 분리되어 있고, mvc_login, mvc_main의 .ui 파일이 UI 데이터를 가지고 있다. \n
-        메인 UI의 4개 model은 PepperModel에서 가져오며, ListView는 PepperView에서 가져온다.
-        여러 개의 shot들을 한번에 선택해 조정할 수 있도록 shots와 rendelistes의 view는 ExtendedSelection으로 설정했다. \n
-        PepperWindow 실행 시 self.login_ui가 우선 실행된다.
+
+            UI 모듈은 controller, model, view로 분리되어 있고, mvc_login, mvc_main의 .ui 파일이 UI 데이터를 가지고 있다.
+        메인 UI의 model은 PepperModel에서 가져오며, ListView는 PepperView에서 가져온다.
+        여러 개의 shot들을 한번에 선택해 조정할 수 있도록 shots view는 ExtendedSelection 으로 설정하여 멀티 선택가능하다.
+        PepperWindow 실행 시 login 창을 먼저 띄워주며 최초 로그인 시 그 이후 자동 로그인 된다.
+        로그인한 사용자에 부여된 프로젝트들이 먼저 뜨고 프로젝트를 선택시 status 가 done 된 templates 이 뜨며 선택시
+        해당 templates 에 케시팅 된 Shots 들을 보여준다. Shots 들은 멀티선택이 가능하며 Render files list에 추가하여 RENDER 버튼을
+        클릭하면 'File' 메뉴바의 'Open Recent Renderlists' 데이터들을 저장하고 불러올 수 있으며, render_process 창을 보여준다.
+        Render files 에 추가된 list 들을 Full path 버튼을 누르면 Render check list 창으로 path 들을 보여주며, Save list 시
+        'File' 메뉴바의 'Open Saved Renderlists' 에 데이터를 저장하고 불러올 수 있다.
+        status bar 를 통해 간단한 상태 정보를 알수 있으며, templates 와 Shots 의 Revision 값을 하단의 클릭시 나오는 해당 info 에서
+        'Revision' 콤보 박스으로 모든 Revision 을 확인하고 또,Revision을 변경하여 추가할 수 있다.
         """
         super().__init__()
         self.pepper = Houpub()
         self.login_log = Auto_log()
-        self.recent_menu = None
-        self.saved_menu = None
+        # self.recent_menu = None
+        # self.saved_menu = None
         self.projects_selection = None
         self.templates_selection = None
         self.shots_selection = None
@@ -37,8 +45,8 @@ class PepperWindow(QMainWindow):
         self.cam_rev = None
         self.mantra_window = None
         self.main_filemenu = None
-        self.main_user = None
-        self.main_menu_bar = None
+        # self.main_user = None
+        # self.main_menu_bar = None
         self.render_process = None
 
         self.my_projects = []
@@ -472,14 +480,14 @@ class PepperWindow(QMainWindow):
         """
         # get json path
         self.home_json_path()
-        self.main_menu_bar = self.main_window.menuBar()
-        self.main_menu_bar.setNativeMenuBar(False)
+        main_menu_bar = self.main_window.menuBar()
+        main_menu_bar.setNativeMenuBar(False)
         # create 'File' menu
-        self.main_filemenu = self.main_menu_bar.addMenu('&File')
+        self.main_filemenu = main_menu_bar.addMenu('&File')
         # 동적으로 메뉴를 채워주는 부분
         self.main_filemenu.aboutToShow.connect(self.set_main_menubar)
         # create Help menu
-        main_helpmenu = self.main_menu_bar.addMenu('&Help')
+        main_helpmenu = main_menu_bar.addMenu('&Help')
         # 'File' menu add 'Open Recent preset' & 'Exit'
         self.set_main_menubar()
         # set kitsu
@@ -514,18 +522,18 @@ class PepperWindow(QMainWindow):
         west_action.triggered.connect(lambda: webbrowser.open('https://www.westworld.co.kr/'))
         main_helpmenu.addAction(west_action)
         # create menu 'User'
-        self.main_user = self.main_menu_bar.addMenu('&User')
+        main_user = main_menu_bar.addMenu('&User')
         host_info = QAction(f'host : {self.login_log.host}', self.main_window)
-        self.main_user.addAction(host_info)
+        main_user.addAction(host_info)
         id_info = QAction(f'id : {self.login_log.user_id}', self.main_window)
-        self.main_user.addAction(id_info)
-        self.main_user.addSeparator()
+        main_user.addAction(id_info)
+        main_user.addSeparator()
         # 'User' add 'Logout'
         logout_action = QAction('&Logout', self.main_window)
         logout_action.setShortcut('Ctrl+L')
         logout_action.setStatusTip('Logout application')
         logout_action.triggered.connect(self.user_logout)
-        self.main_user.addAction(logout_action)
+        main_user.addAction(logout_action)
 
     def set_main_menubar(self):
         """메인창의 file 메뉴 'Open Recent Presets' 의 sub 메뉴들을 만들어주는 함수이다.
@@ -537,23 +545,23 @@ class PepperWindow(QMainWindow):
         self.main_filemenu.clear()
         self.create_json()
         # set recent,saved menu
-        self.recent_menu = QMenu('Open recent renderlists', self.main_window)
-        self.saved_menu = QMenu('Open saved renderlists', self.main_window)
+        recent_menu = QMenu('Open recent renderlists', self.main_window)
+        saved_menu = QMenu('Open saved renderlists', self.main_window)
         with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
 
         for json_files in self.render_list_data['recent']:
             for file_path in json_files:
                 file_action = self.append_renderlist_to_menubar(file_path)
-                self.recent_menu.addAction(file_action)
+                recent_menu.addAction(file_action)
 
         for json_files in self.render_list_data['saved']:
             for file_path in json_files:
                 file_action = self.append_renderlist_to_menubar(file_path)
-                self.saved_menu.addAction(file_action)
+                saved_menu.addAction(file_action)
 
-        self.main_filemenu.addMenu(self.recent_menu)
-        self.main_filemenu.addMenu(self.saved_menu)
+        self.main_filemenu.addMenu(recent_menu)
+        self.main_filemenu.addMenu(saved_menu)
         self.main_filemenu.addSeparator()
         # add 'Exit'
         exit_action = QAction('&Exit', self.main_window)
