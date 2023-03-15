@@ -158,16 +158,17 @@ class PepperWindow(QMainWindow):
         log_dict = self.login_log.user_dict
 
         # get to json key 'auto' check
-        if os.path.exists(log_path) and (not log_dict['auto'] or log_id != log_value['user_id']
-                                         or log_pw != log_value['user_pw'] or log_sfw != log_value['user_ext']):
-            self.login_log.user_id = log_id
-            self.login_log.user_pw = log_pw
-            self.login_log.user_ext = log_sfw
-            self.login_log.valid_host = True
-            self.login_log.valid_user = True
-            self.login_log.auto_login = True
-            self.login_log.save_setting()
-            return
+        if os.path.exists(log_path) and not log_dict['auto']:
+            for auto_loop in log_dict['auto']:
+                if log_id != auto_loop['user_id'] or log_pw != auto_loop['user_pw'] or log_sfw != auto_loop['user_ext']:
+                    self.login_log.user_id = log_id
+                    self.login_log.user_pw = log_pw
+                    self.login_log.user_ext = log_sfw
+                    self.login_log.valid_host = True
+                    self.login_log.valid_user = True
+                    self.login_log.auto_login = True
+                    self.login_log.save_setting()
+                    return
         if log_value['valid_host'] and log_value['valid_user']:
             self.login_log.host = log_value['host']
             self.login_log.user_id = log_value['user_id']
@@ -660,10 +661,10 @@ class PepperWindow(QMainWindow):
         #     self.mantra_window.resize(800, 600)
         #     self.mantra_window.move(1000, 250)
         #     self.mantra_window.show()
-            # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
-            # f.resize(800, 600)
-            # f.move(1000, 250)
-            # f.show()
+        # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
+        # f.resize(800, 600)
+        # f.move(1000, 250)
+        # f.show()
 
         # print('cmd_list :', cmd_list)
         # print('total_frame_list :', total_frame_list)
@@ -671,7 +672,6 @@ class PepperWindow(QMainWindow):
         # self.render_process.resize(800, 600)
         # self.render_process.move(1000, 250)
         # self.render_process.show()
-
 
         # self.pepper.precomp_list.clear()
         self.render_list_data.clear()
