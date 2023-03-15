@@ -106,6 +106,10 @@ def casting_create(self, nb):
     asset_castings.append(new_casting)
     gazu.casting.update_shot_casting(self.project, self.shot, casting=asset_castings)
 
+def preview_test():
+    pepper = Houpub()
+    pepper.get_task()
+
 
 def main():
     # set_file_tree()

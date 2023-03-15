@@ -690,33 +690,11 @@ class PepperWindow(QMainWindow):
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
             cmd_list, total_frame_list = houp.make_cmd(precomp)
 
-        # for precomp in self.render_model.pepperlist:
-        #     temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-        #         = self.path_seperator(precomp)
-        #     houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
-        #                                  f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
-        # for precomp in self.render_model.pepperlist:
-        #     temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-        #         = self.path_seperator(precomp)
-        #     self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
-        #                                           jpg_output_path, layout_output_path, houp.cam_node,
-        #                                           houp.abc_range[1] * hou.fps())
-        #     self.mantra_window.resize(800, 600)
-        #     self.mantra_window.move(1000, 250)
-        #     self.mantra_window.show()
-        # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
-        # f.resize(800, 600)
-        # f.move(1000, 250)
-        # f.show()
-
-        # print('cmd_list :', cmd_list)
-        # print('total_frame_list :', total_frame_list)
         self.render_process = RenderMainWindow(cmd_list, total_frame_list)
         self.render_process.resize(800, 600)
         self.render_process.move(1000, 250)
         self.render_process.show()
 
-        # self.pepper.precomp_list.clear()
         self.render_list_data.clear()
 
         self.render_model.layoutChanged.emit()
