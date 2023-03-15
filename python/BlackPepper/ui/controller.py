@@ -137,14 +137,10 @@ class PepperWindow(QMainWindow):
         self.main_window.reset_btn.setStatusTip('Render files Clear')
         # set main menubar
         self.create_login_menubar()
-
         # set auto login
         self.set_auto_login()
-
+        # set json path
         self.preset_json_path = ''
-        self.home_json_path()
-
-        self.create_main_menubar()
 
     def set_auto_login(self):
         """
@@ -250,6 +246,7 @@ class PepperWindow(QMainWindow):
         renderlists는 pepper.precomp_list에 담긴 shot 들의 name의 value 값만 보여주는 것이고,
         render 버튼 클릭 시 pepper.precomp_list 속 dict를 Houdini로 전달한다.
         """
+        self.create_main_menubar()
         # get my project
         self.my_projects = self.pepper.get_my_projects()
         for my_project in self.my_projects:
@@ -455,13 +452,14 @@ class PepperWindow(QMainWindow):
         login_menu.addAction(exit_action)
 
     def create_main_menubar(self):
-        """메인 윈도우에 메뉴바를 만들고 셋팅하 함수이다.
+        """메인 윈도우에 메뉴바를 만들고 셋팅하는 함수이다.
 
             함수에는 메뉴바에 preset 을 셋팅하는 함수를 포함 하고있다.
         'Menu' 와 'Help' 메뉴바를 만들고 'Menu' 에는 먼저 set_main_window_preset() 함수의 'Recent Presets' 와
         'Logout','Exit' 들을 추가하고 단축키와 클릭시 컨넥트 되어있는 함수가 발생한다.
         'Help' 에는 Black Pepper 에 필요한 kitsu, SideFX등 같은 관련 사이트들 을 열고 단축키도 추가 되어있다.
         """
+        self.home_json_path()
         self.main_menu_bar = self.main_window.menuBar()
         self.main_menu_bar.setNativeMenuBar(False)
         # create 'File' menu
@@ -636,6 +634,7 @@ class PepperWindow(QMainWindow):
     def create_json(self):
         """preset이 저장되어있는 json파일이 없으면 json 파일을 만들어주는 함수이다.
         """
+        self.home_json_path()
         with open(self.preset_json_path, 'r') as json_file:
             self.render_list_data = json.load(json_file)
             if 'recent' not in self.render_list_data:
