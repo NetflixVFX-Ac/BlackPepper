@@ -31,11 +31,20 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
 
 ########################################################
+        DEFAULT_STYLE = """
+        QProgressBar{
+            border: 2px solid grey;
+            border-radius: 5px;
+            text-align: center;
+            font: 10pt\"Courier New\";
+            color: rgb(225, 225, 225)
+        }
+        """
 
         self.mantra_check = re.compile('^python')
         self.ffmpeg_check = re.compile('^ffmpeg')
         self.progress = QtWidgets.QProgressBar()
-        self.progress.setStyleSheet(u"color: rgb(225, 225, 225);\n")
+        self.progress.setStyleSheet(DEFAULT_STYLE)
         self.progress.setRange(0, 100)
 
         self.text = QtWidgets.QPlainTextEdit()
@@ -54,7 +63,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                         "font: 10pt\"Courier New\";\n"
                         "color: rgb(180, 180, 180);\n")
         w.setLayout(l)
-
+        self.setWindowTitle('Black Pepper Progress')
         self.setCentralWidget(w)
 
         if len(self.cmd_list) == 0:
