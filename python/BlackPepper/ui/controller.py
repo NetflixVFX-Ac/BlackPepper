@@ -429,7 +429,6 @@ class PepperWindow(QMainWindow):
         for precomp in self.render_model.pepperlist:
             if precomp['name'] == idx.data():
                 self.render_model.pepperlist.remove(precomp)
-        self.render_model.pepperlist.clear()
         self.renew_render_list()
 
     def clear_list(self):
