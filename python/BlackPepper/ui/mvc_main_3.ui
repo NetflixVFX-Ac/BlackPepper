@@ -67,6 +67,7 @@ color: rgb(180, 180, 180);
              <font>
               <family>Courier New</family>
               <pointsize>10</pointsize>
+              <weight>50</weight>
               <italic>false</italic>
               <bold>false</bold>
              </font>
@@ -175,6 +176,7 @@ Time :</string>
              <font>
               <family>Courier New</family>
               <pointsize>10</pointsize>
+              <weight>50</weight>
               <italic>false</italic>
               <bold>false</bold>
              </font>
@@ -217,6 +219,7 @@ Time :</string>
              <font>
               <family>Courier New</family>
               <pointsize>10</pointsize>
+              <weight>50</weight>
               <italic>false</italic>
               <bold>false</bold>
              </font>
@@ -261,6 +264,7 @@ Time :</string>
                  <font>
                   <family>Courier New</family>
                   <pointsize>10</pointsize>
+                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -308,6 +312,7 @@ color: rgb(45, 45, 45);</string>
                <font>
                 <family>Courier New</family>
                 <pointsize>10</pointsize>
+                <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>
                </font>
@@ -395,9 +400,13 @@ color: rgb(45, 45, 45);</string>
                <font>
                 <family>Courier New</family>
                 <pointsize>10</pointsize>
+                <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>
                </font>
+              </property>
+              <property name="statusTip">
+               <string/>
               </property>
               <property name="text">
                <string/>

@@ -89,7 +89,7 @@ class PepperWindow(QMainWindow):
         login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
-        self.login_window.setWindowTitle('Black Pepper Login')
+        self.login_window.setWindowTitle('Black Pepper v0.01')
         self.login_window.move(1000, 300)
         self.login_window.show()
         # main Ui loader
@@ -97,7 +97,7 @@ class PepperWindow(QMainWindow):
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
-        self.main_window.setWindowTitle('BlackPepper 0.1')
+        self.main_window.setWindowTitle('Black Pepper v0.0.1')
         self.main_window.move(700, 250)
         # check Ui loader
         check_ui = QtCore.QFile(os.path.join(script_path, 'mvc_YN_3.ui'))
@@ -134,6 +134,9 @@ class PepperWindow(QMainWindow):
         # set statusbar to window
         self.login_window.statusBar().showMessage('kitsu 로그인 하세요!  houdini 확장자 선택하세요!')
         self.main_window.statusBar().showMessage('project 를 선택하세요 !')
+        self.main_window.path_btn.setStatusTip('Render files Full path window open.')
+        self.main_window.save_btn.setStatusTip("Render files (File > 'Open saved renderlists') save")
+        self.main_window.reset_btn.setStatusTip('Render files Clear')
         # set main menubar
         self.create_login_menubar()
 
@@ -477,12 +480,25 @@ class PepperWindow(QMainWindow):
         sidefx_action.setStatusTip('SideFX site open')
         sidefx_action.triggered.connect(lambda: webbrowser.open('https://www.sidefx.com/'))
         main_helpmenu.addAction(sidefx_action)
+        main_helpmenu.addSeparator()
         # help add scanline vfx
         scanline_action = QAction('Scanline VFX', self.main_window)
-        scanline_action.setShortcut('F3')
+        scanline_action.setShortcut('F5')
         scanline_action.setStatusTip('Scanline VFX site open')
         scanline_action.triggered.connect(lambda: webbrowser.open('https://www.scanlinevfx.com/'))
         main_helpmenu.addAction(scanline_action)
+        # help add scanline vfx
+        va_action = QAction('VA studio', self.main_window)
+        va_action.setShortcut('F6')
+        va_action.setStatusTip('VA studio site open')
+        va_action.triggered.connect(lambda: webbrowser.open('https://www.vastudio.co.kr/'))
+        main_helpmenu.addAction(va_action)
+        # help add scanline vfx
+        west_action = QAction('West world', self.main_window)
+        west_action.setShortcut('F7')
+        west_action.setStatusTip('West world site open')
+        west_action.triggered.connect(lambda: webbrowser.open('https://www.westworld.co.kr/'))
+        main_helpmenu.addAction(west_action)
         # create menu 'User'
         self.main_user = self.main_menu_bar.addMenu('&User')
         host_info = QAction(f'host : {self.login_log.host}', self.main_window)
@@ -524,7 +540,7 @@ class PepperWindow(QMainWindow):
 
         self.main_filemenu.addMenu(self.recent_menu)
         self.main_filemenu.addMenu(self.saved_menu)
-
+        self.main_filemenu.addSeparator()
         # add 'Exit'
         exit_action = QAction('&Exit', self.main_window)
         exit_action.setShortcut('Ctrl+Q')
