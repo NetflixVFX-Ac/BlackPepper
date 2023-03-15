@@ -586,6 +586,8 @@ class Houpub:
             [9, 8, 7, 6, 5, 4, 3, 2, 1]
         """
         working_files = gazu.files.get_all_working_files_for_entity(self.entity)
+        # print(self.entity)
+        # print(working_files)
         revision_list = [working_file['revision'] for working_file in working_files
                          if gazu.task.get_task(working_file['task_id'])['entity_type']['name'] == task_name]
         return revision_list
@@ -606,6 +608,15 @@ class Houpub:
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         task_type = gazu.task.get_task_type_by_name(task_type_name)
         output_files = gazu.files.all_output_files_for_entity(self.entity, output_type, task_type)
+
+        # working_file = gazu.files.get_all_working_files_for_entity(self.entity, task_type)
+        # output_files2 = gazu.files.get_last_output_files_for_entity(self.entity, output_type, task_type)
+        # print(gazu.files.all_output_types_for_entity(self.entity))
+        # print(self.entity)
+        # print(task_type)
+        # print(output_type)
+        # print(output_files)
+        # print(working_file)
         revision_list = [output_file['revision'] for output_file in output_files]
         return revision_list
 
@@ -806,11 +817,17 @@ class Houpub:
             if str(check_file['revision']) == revision:
                 the_output_file = check_file
                 break
-        rev = the_output_file['revision']
-        created_time = the_output_file['created_at']
-        person_id = the_output_file['person_id']
-        person = gazu.person.get_person(person_id)
-        return person['first_name'] + person['last_name'], created_time, rev
+        if not output_files:
+            rev = ''
+            person = ''
+            created_time = ''
+        else:
+            rev = the_output_file['revision']
+            created_time = the_output_file['created_at']
+            person_id = the_output_file['person_id']
+            person_dict = gazu.person.get_person(person_id)
+            person = person_dict['first_name'] + person_dict['last_name']
+        return person, created_time, rev
 
     # --------------------------------------------
     # ----------error handling 관련 메소드----------
