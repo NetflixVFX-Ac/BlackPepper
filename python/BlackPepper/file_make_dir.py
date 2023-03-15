@@ -88,16 +88,16 @@ def publish_output():
     pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
     pepper.software = 'hipnc'
     pepper.project = 'BLACKPEPPER'
-    # aaa = gazu.shot.all_shots_for_project(pepper.project)
-    # # print(aaa)
-    # for shot in aaa:
-    #     print(shot)
+    aaa = gazu.shot.all_shots_for_project(pepper.project)
+    # print(aaa)
+    for shot in aaa:
+        print(shot)
 
     pepper.sequence = 'SQ01'
-    pepper.shot = '0020'
+    pepper.shot = '0010'
     pepper.entity = 'shot'
     # pepper.publish_output_file('FX', 'Movie_file', "first_output")
-    print(pepper.make_next_output_path('layout_camera', 'camera_cache'))
+    print(pepper.make_next_output_path('camera_cache', 'layout_camera'))
 
 def casting_create(self, nb):
     asset_castings = gazu.casting.get_shot_casting(self.shot)
