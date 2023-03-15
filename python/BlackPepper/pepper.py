@@ -965,6 +965,14 @@ class Houpub:
             raise Exception("NO ERROR CODE")
 
 
+# p = Houpub()
+# p.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+# p.project = 'project1'
+# p.software = 'hip'
+# p.sequence = 'Seq1'
+# p.shot = 'sh1'
+# p.entity = 'shot'
+# p.publish_working_file('Camera')
 # BlackPepper = Houpub()
 # BlackPepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
 # BlackPepper.software = 'hipnc'
