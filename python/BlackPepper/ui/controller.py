@@ -43,11 +43,9 @@ class PepperWindow(QMainWindow):
         self.my_projects = []
         self.all_assets = []
         self.all_shots = []
-        self.render_list_data = []
+        self.render_list_data = {}
         self.saved_list_data = []
         self.filename = []
-
-        self.preset_json_path = 'render_check_list.json'
 
         # model instance
         self.project_model = PepperModel()
@@ -142,6 +140,10 @@ class PepperWindow(QMainWindow):
 
         # set auto login
         self.set_auto_login()
+
+        self.preset_json_path = ''
+        self.home_json_path()
+
         self.create_main_menubar()
 
     def set_auto_login(self):
@@ -615,6 +617,12 @@ class PepperWindow(QMainWindow):
         self.render_list_data['saved'] = saved_data
         self.save_json(self.render_list_data)
 
+    def home_json_path(self):
+        now_path = os.path.realpath(__file__)
+        split_path = now_path.split('/')[:-2]
+        dir_path = os.path.join('/'.join(split_path), '.config')
+        self.preset_json_path = os.path.join(dir_path, 'user.json')
+
     def open_json(self):
         with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
@@ -626,15 +634,13 @@ class PepperWindow(QMainWindow):
     def create_json(self):
         """preset이 저장되어있는 json파일이 없으면 json 파일을 만들어주는 함수이다.
         """
-        if not os.path.exists(self.preset_json_path):
-            self.render_list_data = {
-                "recent": [],
-                "saved": [],
-                "auto": [],
-                "mantra_path": []
-            }
+        with open(self.preset_json_path, 'r') as json_file:
+            self.render_list_data = json.load(json_file)
+            if 'recent' not in self.render_list_data:
+                self.render_list_data['recent'] = []
+            if 'saved' not in self.render_list_data:
+                self.render_list_data['saved'] = []
             data_to_save = self.render_list_data
-
             with open(self.preset_json_path, "w") as f:
                 json.dump(data_to_save, f, ensure_ascii=False)
 
