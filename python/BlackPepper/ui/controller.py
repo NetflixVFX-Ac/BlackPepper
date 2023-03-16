@@ -37,6 +37,7 @@ class PepperWindow(QMainWindow):
         super().__init__(parent=None)
         self.pepper = Houpub()
         self.login_log = Auto_log()
+        self.save_log = Logger()
         self.projects_selection = None
         self.templates_selection = None
         self.shots_selection = None
@@ -176,6 +177,7 @@ class PepperWindow(QMainWindow):
             self.login_log.user_ext = log_value['user_ext']
             self.pepper.login(self.login_log.host, self.login_log.user_id, self.login_log.user_pw)
             self.pepper.software = self.login_log.user_ext
+            self.login_log.connect_login()
             self.login_window.close()
             self.open_main_window()
         else:
