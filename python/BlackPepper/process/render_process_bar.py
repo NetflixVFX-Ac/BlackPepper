@@ -25,13 +25,9 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.mc = None
         self.fc = None
         self.check_fin = 0
-
-        ########################################################
-
         self.cmd_list = cmd_list
         self.total_frame_list = total_frame_list
 
-        ########################################################
         DEFAULT_STYLE = """
         QProgressBar{
             border: 2px solid grey;
@@ -88,9 +84,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         """
 
-        print("start!!!!!!!")
-        print(self.cmd)
-        print(self.total_frame)
         self.mc = self.mantra_check.search(self.cmd)
         self.fc = self.ffmpeg_check.search(self.cmd)
 
@@ -101,8 +94,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.p.readyReadStandardOutput.connect(self.handle_stdout)
         self.p.readyReadStandardError.connect(self.handle_stderr)
         self.p.stateChanged.connect(self.handle_state)
-        self.p.finished.connect(self.process_finished)  # Clean up once complete.
-        # print('check check')
+        self.p.finished.connect(self.process_finished)
         self.p.start(self.cmd)
 
     def handle_stderr(self):
@@ -151,17 +143,13 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         """
         if self.is_interrupted:
-            print('interrupt!!!!!')
             self.is_interrupted = False
             return
-
-        print("fin")
 
         if self.p:
             self.p.waitForFinished()
 
         self.check_fin += 1
-        print("check_fin :", self.check_fin)
         self.p.waitForFinished()
         if self.check_fin == 1:
             if self.fc:
@@ -204,11 +192,9 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         Returns: pc(progress percent)
 
         """
-        print("mantra total :", total)
         progress_re = re.compile('_(\d+)\.jpg')
         m = progress_re.search(output)
         if m:
-            print("m :", m)
             pc_complete = m.group(1)
             if pc_complete:
                 pc = int(int(pc_complete) / total * 100)
@@ -237,12 +223,10 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         Returns: pc(progress percent)
 
         """
-        print("ffmpeg total :", total)
 
         progress_re = re.compile("frame=   (\d+)")
         m = progress_re.search(output)
         if m:
-            print("m search :", m)
             pc_complete = m.group(1)
             if pc_complete:
                 pc = int(int(pc_complete) / total * 100)
