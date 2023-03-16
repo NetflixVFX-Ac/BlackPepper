@@ -77,6 +77,7 @@
 ***
 ## FileTree
 <pre>
+.
 ├── blackpepper
 │   ├── assets
 │   │   └── fx_template
@@ -126,6 +127,41 @@
 │           │   ├── fx
 │           │   │   ├── output
 │           │   │   │   ├── jpg_sequence
+│           │   │   │   │   ├── v001
+│           │   │   │   │   ├── v002
+│           │   │   │   │   │   └── blackpepper_sq01_0020_v002_####.jpg
+│           │   │   │   │   ├── v003
+│           │   │   │   │   │   └── blackpepper_sq01_0020_v003_####.jpg
+│           │   │   │   │   ├── v004
+│           │   │   │   │   │   └── blackpepper_sq01_0020_v004_####.jpg
+│           │   │   │   │   ├── v005
+│           │   │   │   │   │   └── blackpepper_sq01_0020_v005_####.jpg
+│           │   │   │   │   ├── v006
+│           │   │   │   │   │   └── blackpepper_sq01_0020_v006_####.jpg
+│           │   │   │   │   └── v007
+│           │   │   │   │       └── blackpepper_sq01_0020_v007_####.jpg
+│           │   │   │   └── movie_file
+│           │   │   │       ├── v001
+│           │   │   │       ├── v002
+│           │   │   │       │   └── blackpepper_sq01_0020_movie_file_v002.mov
+│           │   │   │       ├── v003
+│           │   │   │       │   └── blackpepper_sq01_0020_movie_file_v003.mov
+│           │   │   │       ├── v004
+│           │   │   │       │   └── blackpepper_sq01_0020_movie_file_v004.mov
+│           │   │   │       ├── v005
+│           │   │   │       │   └── blackpepper_sq01_0020_movie_file_v005.mov
+│           │   │   │       └── v006
+│           │   │   │           └── blackpepper_sq01_0020_movie_file_v006.mov
+│           │   │   └── working
+│           │   │       ├── v001
+│           │   │       └── v002
+│           │   │           └── blackpepper_sq01_0020_fx_002.hipnc
+│           │   └── layout_camera
+│           │       └── output
+│           │           └── camera_cache
+│           │               └── v001
+│           │                   └── blackpepper_sq01_0020_camera_cache_v001.abc
+
 .           .   .   .   .
 .           .   .   .   .
 .           .   .   .   .
