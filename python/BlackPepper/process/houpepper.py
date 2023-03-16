@@ -349,6 +349,17 @@ class HouPepper:
         self.cam_path.clear()
 
     def make_cmd(self, precomp_list):
+        """터미널에서 실행할 command를 list에 넣어준다. Houdini Mantra를 사용하여 렌더링하기 위해 mantra_render.py를 실행한다.
+        mantra_render.py에는 4개의 argument를 받도록 설정하였다. mantra command가 list에 들어가고
+
+
+
+        Args:
+            precomp_list:
+
+        Returns:
+
+        """
         total_frame = self.abc_range[1] * hou.fps()
 
         self.mantra_command = [
