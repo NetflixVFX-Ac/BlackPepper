@@ -646,8 +646,6 @@ class Houpub:
             [9, 8, 7, 6, 5, 4, 3, 2, 1]
         """
         working_files = gazu.files.get_all_working_files_for_entity(self.entity)
-        # print(self.entity)
-        # print(working_files)
         revision_list = [working_file['revision'] for working_file in working_files
                          if gazu.task.get_task(working_file['task_id'])['entity_type']['name'] == task_name]
         return revision_list
@@ -867,7 +865,7 @@ class Houpub:
         Returns:
             JaehyukLee, Date-Time, 1
         """
-        the_working_file = {}
+        global the_working_file
         self.entity = entity_type
         _, task = self.get_task(task_type_name)
         working_files = gazu.files.get_all_working_files_for_entity(self.entity)
@@ -902,7 +900,7 @@ class Houpub:
         Returns:
             JaehyukLee, Date-Time, 1
         """
-        the_output_file = {}
+        global the_output_file
         self.entity = entity_type
         task_type, _ = self.get_task(task_type_name)
         output_type = gazu.files.get_output_type_by_name(output_type_name)
@@ -922,6 +920,19 @@ class Houpub:
             person_dict = gazu.person.get_person(person_id)
             person = person_dict['first_name'] + person_dict['last_name']
         return person, created_time, rev
+
+    def read_json_file(self):
+        now_path = os.path.realpath(__file__)
+        split_path = now_path.split('/')[:-1]
+        dir_path = os.path.join('/'.join(split_path), '.config')
+        user_path = os.path.join(dir_path, 'user.json')
+        with open(user_path, 'r') as json_file:
+            user_dict = json.load(json_file)
+        for i in user_dict['auto']:
+            if self.identif is None:
+                self.identif = i['user_id']
+            else:
+                pass
 
     # --------------------------------------------
     # ----------error handling 관련 메소드----------
@@ -1055,16 +1066,3 @@ class Houpub:
             raise Exception(f"There's no output type named '{code[14:]}'")
         else:
             raise Exception("NO ERROR CODE")
-
-    def read_json_file(self):
-        now_path = os.path.realpath(__file__)
-        split_path = now_path.split('/')[:-1]
-        dir_path = os.path.join('/'.join(split_path), '.config')
-        user_path = os.path.join(dir_path, 'user.json')
-        with open(user_path, 'r') as json_file:
-            user_dict = json.load(json_file)
-            for i in user_dict['auto']:
-                if self.identif is None:
-                    self.identif = i['user_id']
-                else:
-                    pass
