@@ -196,22 +196,6 @@ color: rgb(180, 180, 180);
              </widget>
             </item>
             <item>
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
              <widget class="QPushButton" name="reset_btn">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -251,7 +235,7 @@ color: rgb(180, 180, 180);
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>../icon/clear-18.png</normaloff>../icon/clear-18.png</iconset>
+                <normaloff>../icon/clear-19.png</normaloff>../icon/clear-19.png</iconset>
               </property>
               <property name="iconSize">
                <size>
