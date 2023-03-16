@@ -1,20 +1,18 @@
 import os.path
 import re
-
 import gazu.task
 from PySide2 import QtWidgets, QtCore
 from BlackPepper.pepper import Houpub
 
 class RenderMainWindow(QtWidgets.QMainWindow):
     """
-    FFmpeg으로 Sequence file을 mov로 컨버팅하는 UI이다. 터미널에 명령하고 출력되는 정보를 Text Widget에 보여준다.
-    정규표현을 활용하여 터미널에 출력되는 정보에서 컨버팅 중인 프레임을 파악하고 전체 프레임과 비교하여 Progress Widget으로
-    진행사항을 유저에게 시각적으로 알려준다.
+    Houdini Mantra를 활용하여 sequence file로 render하고 FFmpeg으로 Sequence file을 mov로 컨버팅하는 UI이다. \n
+    터미널에 명령하고 출력되는 정보를 Text Widget에 보여준다. 정규표현을 활용하여 터미널에 출력되는 정보에서 컨버팅 중인 프레임을 파악하고 \n
+    전체 프레임과 비교하여 Progress Widget으로 진행사항을 유저에게 시각적으로 알려준다.
     """
 
     def __init__(self, cmd_list, total_frame_list):
         """Sequence file이 있는 경로와 mov파일이 저장될 경로, fps를 지정한다. 해당 인자들은 터미널에 명령내릴 command에 입력된다.
-
 
         Args:
             jpg_output_path (str): Sequence file path
@@ -74,12 +72,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             return
         self.cmd = self.cmd_list.pop(0)
         self.total_frame = self.total_frame_list.pop(0)
-
-        # print('start total_frame :', self.total_frame)
-        # print('start total_frame_list :', self.total_frame_list)
-        # print('mantra :', self.mc)
-        # print('ffmpeg :', self.fc)
-        # print("ccccccccccmddd :", cmd)
         self.start_process()
 
     def message(self, s):
@@ -165,7 +157,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         print("fin")
 
-        # self.p.terminate()
         if self.p:
             self.p.waitForFinished()
 
@@ -191,37 +182,26 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                 thumbnail = self.pepper.publish_preview('FX', 'Ready To Start', 'test', path)
                 gazu.task.set_main_preview(thumbnail)
 
-
         if len(self.cmd_list) > 0:
             self.cmd = self.cmd_list.pop(0)
             self.total_frame = self.total_frame_list.pop(0)
-
-            # print('next total_frame :', self.total_frame)
-            # print('next total_frame_list :', self.total_frame_list)
-            # print("ttttttttttttttmddd :", cmd)
-            # print('cmd_list :', self.cmd_list)
-            # print('len cmd_list :', len(self.cmd_list))
-            # self.p = None
-            # self.p.waitForFinished()
-
             self.check_fin = 0
             self.start_process()
-
         else:
             self.cmd = None
             self.message("Process finished.")
             return
 
     def mantra_simple_percent_parser(self, output, total):
-        """
-
-
+        """Houdini Mantra가 실행될 때, Progress bar에 넣을 값을 구하는 메소드, 백분율로 계산한다. \n
+        컨버팅이 끝난 frame은 Text Widget에 표시되고, 정규표현식을 사용하여 Text Widget에서 해당 frame을 파악한다. \n
+        Alembic file Camera에서 가져온 frame range Out count를 분모로 하고 정규표현으로 찾은 현재 frame을 분자로 하여 계산한다.\n
 
         Args:
-            output:
-            total:
+            output (str): Text in Text Widget
+            total (int): Total frame
 
-        Returns:
+        Returns: pc(progress percent)
 
         """
         print("mantra total :", total)
@@ -245,9 +225,9 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             self.start_process()
 
     def ffmpeg_simple_percent_parser(self, output, total):
-        """Progress bar에 넣을 정보를 백분율로 계산한다. \n
+        """FFmpeg이 실행될 때, Progress bar에 넣을 값을 구하는 메소드, 백분율로 계산한다. \n
         컨버팅이 끝난 frame은 Text Widget에 표시되고, 정규표현식을 사용하여 Text Widget에서 해당 frame을 파악한다. \n
-        tree 함수를 사용하여 구한 전체 frame을 분모로 설정하고 컨버팅이 끝난 frame을 분자로 설정하여 백분율을 계싼한다. \n
+        Alembic file Camera에서 가져온 frame range Out count를 분모로 하고 정규표현으로 찾은 현재 frame을 분자로 하여 계산한다.\n
         Text Widget에 성공적으로 컨버팅이 끝난 정보가 출력될 때, 100 %를 출력해준다.
 
         Args:
