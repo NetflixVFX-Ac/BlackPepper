@@ -4,11 +4,11 @@ import os
 import json
 
 class Houpub:
-    """pepper 모듈은 'Gazu'(Kitsu API 용 python 클라이언트)를 사용하여 원하는 path를 추출하는 Mapping API 이다.
+    """pepper 모듈은 Gazu (Kitsu API 용 python 클라이언트)를 사용하여 원하는 path를 추출하는 Mapping API 이다.
 
-    * 'kitsu'는 VFX 스튜디오 제작관리 web application 이고
-    * 'Gazu' 는 Kitsu API용 Python 클라이언트 이다.
-    * 'Gazu'를 사용하면  Kiust'에서 쉽게 데이터를 가져올 수 있다.
+    * kitsu는 VFX 스튜디오 제작관리 web application 이고
+    * Gazu 는 Kitsu API용 Python 클라이언트 이다.
+    * Gazu를 사용하면  Kiust'에서 쉽게 데이터를 가져올 수 있다.
     이 모듈은 kitsu에 올라간 정보를 gazu를 통해서 path를 추출한다.그 정보는 local에 저장된 houdini template에 working file path로
     지정한 경로에서 cam, asset 파일을 기존 working hip파일에 적용한다. 부가적으로 shots마다 cating된 template를 확인 할 수 있다.
      예를 들어, test_01.hip의 working file template에 cam, asset을 적용해서 새로운 jpg, hip, mov를 outputfile로 만든다.
