@@ -671,15 +671,6 @@ class PepperWindow(QMainWindow):
         render 버튼 클릭시 실행되며, 이전까지 선택한 설정들을 초기화 해준다.
         """
         houp = HouPepper()
-        save_log = Logger()
-
-        self.home_json_path()
-        log_dict = {}
-        with open(self.preset_json_path, 'r') as f:
-            log_dict = json.load(f)
-        for ident in log_dict['auto']:
-            save_log.set_logger(ident['user_id'])
-
         if not self.render_model.pepperlist:
             return
         self.save_recent_renderlists()
