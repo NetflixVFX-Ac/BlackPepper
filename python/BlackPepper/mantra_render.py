@@ -39,8 +39,8 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
         n.parm('trange').set(1)
         for i in n.parmTuple('f'):
             i.deleteAllKeyframes()
-        # n.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
-        n.parmTuple('f').set([abc_range[0] * hou.fps(), 3, 1])
+        # n.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])  # 모든 프레임을 뽑는다.
+        n.parmTuple('f').set([abc_range[0] * hou.fps(), 1, 1])  # 1 프레임만 뽑는다.
         n.parm('vm_verbose').set(1)
         n.parm("execute").pressButton()
     output_dir = os.path.dirname(output_path) + '/*.jpg'
