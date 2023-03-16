@@ -149,7 +149,7 @@ class Houpub:
         asset 입력시 self.asset이 있어야 하고, shot 입력시 self.shot이 있어야 한다. 맞는 인자가 없을 시 작동하지 않는다.
 
         Examples:
-            pepper.entity('asset') or BlackPepper.entity('shot')
+            pepper.entity('asset') or pepper.entity('shot')
 
         Args:
             ent(str): 'asset' or 'shot'
@@ -316,7 +316,7 @@ class Houpub:
         """self.entity에 해당된 task_type_name을 가진 task의 working file 중 input_num의 revision을 반환한다. \n
 
         Example:
-            BlackPepper.working_file_path("simulation") or BlackPepper.working_file_path('layout', input_num=12)
+            pepper.working_file_path("simulation") or pepper.working_file_path('layout', input_num=12)
 
         Args:
             task_type_name(str): 'simulation', 'FX', ...
@@ -532,6 +532,18 @@ class Houpub:
                    'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
                    'jpg_output_path': jpg_output_path, 'video_output_path': video_output_path}
         return precomp
+
+    @staticmethod
+    def path_seperator(precomp):
+        """self.make_precomp_dict로 생성한 dict에서 각 path들을 추출해주는 메소드. \n
+
+        """
+        temp_working_path = precomp['temp_working_path']
+        layout_output_path = precomp['layout_output_path']
+        fx_working_path = precomp['fx_working_path']
+        jpg_output_path = precomp['jpg_output_path']
+        video_output_path = precomp['video_output_path']
+        return temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path
 
     def publish_precomp_working(self, precomp):
         """self.make_precomp_dict 의 정보들로 fx의 working file을 publish 해준다. \n
@@ -782,7 +794,7 @@ class Houpub:
         """로그인한 유저가 assign되어있는 모든 project의 이름을 반환한다.
 
         Examples:
-            BlackPepper.get_my_projects()
+            pepper.get_my_projects()
 
         Returns:
             ['PEPPER', 'Redpepper', ...]
@@ -804,7 +816,7 @@ class Houpub:
         Returns:
             JaehyukLee, Date-Time, 1
         """
-        global the_working_file
+        the_working_file = {}
         self.entity = entity_type
         _, task = self.get_task(task_type_name)
         working_files = gazu.files.get_all_working_files_for_entity(self.entity)
@@ -839,7 +851,7 @@ class Houpub:
         Returns:
             JaehyukLee, Date-Time, 1
         """
-        global the_output_file
+        the_output_file = {}
         self.entity = entity_type
         task_type, _ = self.get_task(task_type_name)
         output_type = gazu.files.get_output_type_by_name(output_type_name)
@@ -886,7 +898,7 @@ class Houpub:
         메소드 내에서만 사용되는 메소드다.
 
         Example:
-            BlackPepper.args_str_check(task_type_name)
+            pepper.args_str_check(task_type_name)
 
         Args:
             args : 여러가지 인자들을 받을 수 있다
@@ -930,7 +942,7 @@ class Houpub:
             num(int): integer
 
         Examples:
-            BlackPepper.int_check(revision_num)
+            pepper.int_check(revision_num)
 
         Returns:
             num(if int)
@@ -948,7 +960,7 @@ class Houpub:
         """에러 핸들링을 위한 메소드, code에 받은 값에 따라 다른 Exception을 raise해준다.
 
         Examples:
-            BlackPepper.error('not_string')
+            pepper.error('not_string')
 
         Args:
             code(str): Error code
