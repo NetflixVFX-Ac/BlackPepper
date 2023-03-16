@@ -498,3 +498,44 @@ class TestHoupub(TestCase):
         self.pepper.publish_precomp_output(pick_precomp)
         nwp2 = self.pepper.make_next_output_path('Movie_file', 'FX')
         pprint.pp(nwp2)
+
+# -------------------------------------------------
+
+    def test_make_precomp_dict(self):
+        pass
+
+    def test_path_seperator(self):
+        pass
+
+    def test_publish_precomp_working(self):
+        pass
+
+    def test_publish_precomp_output(self):
+        pass
+
+    def test_get_every_revision_for_working_file(self):
+        pass
+
+    def test_get_every_revision_for_output_file(self):
+        pass
+
+    def test_check_status(self):
+        pass
+
+    def test_publish_preview(self):
+        pass
+
+    def test_check_asset_type(self):
+        pass
+
+    def test_get_my_projects(self):
+        pass
+
+    def test_get_working_file_data(self):
+        pass
+
+    def test_get_output_file_data(self):
+        pass
+
+    def test_read_json_file(self):
+        pass
