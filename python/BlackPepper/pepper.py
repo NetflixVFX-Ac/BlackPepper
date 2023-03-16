@@ -1,6 +1,7 @@
 import gazu
 from BlackPepper.log.moduler_log import Logger
-
+import os
+import json
 
 class Houpub:
     """
@@ -42,7 +43,6 @@ class Houpub:
         gazu.client.set_host(host)
         self.user = gazu.log_in(identify, password)
         self.identif = identify
-        self.mylog.set_logger(self.identif)
 
     @property
     def project(self):
@@ -260,6 +260,8 @@ class Houpub:
         }
         self.dict_check(self.project, 'no_project')
         gazu.files.update_project_file_tree(self.project, file_tree)
+        self.read_json_file()
+        self.mylog.set_logger(self.identif)
         self.mylog.tree_log(self.project)
 
     def publish_working_file(self, task_type_name):
@@ -281,6 +283,8 @@ class Houpub:
         self.args_str_check(task_type_name)
         _, task = self.get_task(task_type_name)
         gazu.files.new_working_file(task, software=self.software)
+        self.read_json_file()
+        self.mylog.set_logger(self.identif)
         self.mylog.publish_working_file_log(task_type_name)
 
     def publish_output_file(self, task_type_name, output_type_name, comments):
@@ -310,6 +314,8 @@ class Houpub:
         self.dict_check(task_type, f'no_task_type{output_type_name}')
         gazu.files.new_entity_output_file(self.entity, output_type, task_type, working_file=work_file,
                                           representation=output_type['short_name'], comment=comments)
+        self.read_json_file()
+        self.mylog.set_logger(self.identif)
         self.mylog.publish_output_file_log(task_type_name, output_type_name)
 
     def working_file_path(self, task_type_name, input_num=None):
@@ -993,6 +999,18 @@ class Houpub:
         else:
             raise Exception("NO ERROR CODE")
 
+    def read_json_file(self):
+        now_path = os.path.realpath(__file__)
+        split_path = now_path.split('/')[:-1]
+        dir_path = os.path.join('/'.join(split_path), '.config')
+        user_path = os.path.join(dir_path, 'user.json')
+        with open(user_path, 'r') as json_file:
+            user_dict = json.load(json_file)
+            for i in user_dict['auto']:
+                if self.identif is None:
+                    self.identif = i['user_id']
+                else:
+                    pass
 
 # p = Houpub()
 # p.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
