@@ -3,6 +3,7 @@ from BlackPepper.log.moduler_log import Logger
 import os
 import json
 
+
 class Houpub:
     """pepper 모듈은 Gazu (Kitsu API 용 python 클라이언트)를 사용하여 원하는 path를 추출하는 Mapping API 이다.
 
