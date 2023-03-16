@@ -260,7 +260,6 @@ class Houpub:
         }
         self.dict_check(self.project, 'no_project')
         gazu.files.update_project_file_tree(self.project, file_tree)
-        self.mylog.set_logger(self.identif)
         self.mylog.tree_log(self.project)
 
     def publish_working_file(self, task_type_name):
@@ -282,7 +281,6 @@ class Houpub:
         self.args_str_check(task_type_name)
         _, task = self.get_task(task_type_name)
         gazu.files.new_working_file(task, software=self.software)
-        self.mylog.set_logger(self.identif)
         self.mylog.publish_working_file_log(task_type_name)
 
     def publish_output_file(self, task_type_name, output_type_name, comments):
@@ -312,7 +310,6 @@ class Houpub:
         self.dict_check(task_type, f'no_task_type{output_type_name}')
         gazu.files.new_entity_output_file(self.entity, output_type, task_type, working_file=work_file,
                                           representation=output_type['short_name'], comment=comments)
-        self.mylog.set_logger(self.identif)
         self.mylog.publish_output_file_log(task_type_name, output_type_name)
 
     def working_file_path(self, task_type_name, input_num=None):
