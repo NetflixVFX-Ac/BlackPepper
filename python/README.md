@@ -1,3 +1,4 @@
+![pepper](./img/pepper.png)
 # What is Black Pepper
 ### Black Pepper is FX templates 에 캐스팅된 샷들을 jpg,mov render를  자동화 해주는 API 이다.
 
@@ -103,6 +104,8 @@ log save path : <root>/hook/BlackPepper/.config/hook_login.log
 * @Wongyu Lee
 * @Jaehyuk Lee
 
+***
+# Thank you for Chat JSP
 ***
 # *** License Copyright ***
 
