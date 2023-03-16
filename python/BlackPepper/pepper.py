@@ -1,10 +1,15 @@
 import gazu
 from BlackPepper.log.moduler_log import Logger
-
+import os
+import json
 
 class Houpub:
-    """
-     이 모듈은 kitsu에 올라간 정보를 gazu를 통해서 path를 추출한다. 그 정보는 local에 저장된 houdini template에 working file path로
+    """pepper 모듈은 Gazu (Kitsu API 용 python 클라이언트)를 사용하여 원하는 path를 추출하는 Mapping API 이다.
+
+    * kitsu는 VFX 스튜디오 제작관리 web application 이고
+    * Gazu 는 Kitsu API용 Python 클라이언트 이다.
+    * Gazu를 사용하면  Kiust'에서 쉽게 데이터를 가져올 수 있다.
+    이 모듈은 kitsu에 올라간 정보를 gazu를 통해서 path를 추출한다.그 정보는 local에 저장된 houdini template에 working file path로
     지정한 경로에서 cam, asset 파일을 기존 working hip파일에 적용한다. 부가적으로 shots마다 cating된 template를 확인 할 수 있다.
      예를 들어, test_01.hip의 working file template에 cam, asset을 적용해서 새로운 jpg, hip, mov를 outputfile로 만든다.
     hip파일의 경우는 test_02.hip이라는 형식으로 outputfile이자 새로운 revision의 working file을 만든다.
@@ -42,7 +47,6 @@ class Houpub:
         gazu.client.set_host(host)
         self.user = gazu.log_in(identify, password)
         self.identif = identify
-        self.mylog.set_logger(self.identif)
 
     @property
     def project(self):
@@ -287,6 +291,8 @@ class Houpub:
         }
         self.dict_check(self.project, 'no_project')
         gazu.files.update_project_file_tree(self.project, file_tree)
+        self.read_json_file()
+        self.mylog.set_logger(self.identif)
         self.mylog.tree_log(self.project)
 
     def publish_working_file(self, task_type_name):
@@ -309,6 +315,8 @@ class Houpub:
         self.args_str_check(task_type_name)
         _, task = self.get_task(task_type_name)
         gazu.files.new_working_file(task, software=self.software)
+        self.read_json_file()
+        self.mylog.set_logger(self.identif)
         self.mylog.publish_working_file_log(task_type_name)
 
     def publish_output_file(self, task_type_name, output_type_name, comments):
@@ -339,6 +347,8 @@ class Houpub:
         self.dict_check(task_type, f'no_task_type{output_type_name}')
         gazu.files.new_entity_output_file(self.entity, output_type, task_type, working_file=work_file,
                                           representation=output_type['short_name'], comment=comments)
+        self.read_json_file()
+        self.mylog.set_logger(self.identif)
         self.mylog.publish_output_file_log(task_type_name, output_type_name)
 
     def working_file_path(self, task_type_name, input_num=None):
@@ -1044,3 +1054,16 @@ class Houpub:
             raise Exception(f"There's no output type named '{code[14:]}'")
         else:
             raise Exception("NO ERROR CODE")
+
+    def read_json_file(self):
+        now_path = os.path.realpath(__file__)
+        split_path = now_path.split('/')[:-1]
+        dir_path = os.path.join('/'.join(split_path), '.config')
+        user_path = os.path.join(dir_path, 'user.json')
+        with open(user_path, 'r') as json_file:
+            user_dict = json.load(json_file)
+            for i in user_dict['auto']:
+                if self.identif is None:
+                    self.identif = i['user_id']
+                else:
+                    pass
