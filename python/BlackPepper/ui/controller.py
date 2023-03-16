@@ -215,6 +215,7 @@ class PepperWindow(QMainWindow):
             self.render_model.pepperlist.clear()
             self.template_model.pepperlist.clear()
             self.shot_model.pepperlist.clear()
+            self.project_model.pepperlist.clear()
             self.projects_selection.clear()
             self.renderlists_selection.clear()
             self.templates_selection.clear()
@@ -222,6 +223,7 @@ class PepperWindow(QMainWindow):
             self.render_model.layoutChanged.emit()
             self.template_model.layoutChanged.emit()
             self.shot_model.layoutChanged.emit()
+            self.project_model.layoutChanged.emit()
             # Close main UI and show login UI
             self.main_window.close()
             self.login_window.show()
