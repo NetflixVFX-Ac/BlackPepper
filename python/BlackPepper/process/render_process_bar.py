@@ -1,6 +1,5 @@
 import os.path
 import re
-import gazu.task
 from PySide2 import QtWidgets, QtCore
 from BlackPepper.pepper import Houpub
 
@@ -88,17 +87,19 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         if not self.p:
             self.p = QtCore.QProcess()
-            self.p.waitForFinished()
 
         self.p.readyReadStandardOutput.connect(self.handle_stdout)
         self.p.readyReadStandardError.connect(self.handle_stderr)
         self.p.stateChanged.connect(self.handle_state)
         self.p.finished.connect(self.process_finished)
         self.p.start(self.cmd)
+        print('check check')
 
     def handle_stderr(self):
         """ QProcess Error정보를 받아온다. 바이트 신호를 번역하고 백분율 계산 함수를 실행시키고 컴퓨터가 보낸 정보를 Text에 출력한다.
         """
+        if not self.p:
+            return
         data = self.p.readAllStandardError()
         stderr = bytes(data).decode("utf8")
         if self.fc:
@@ -112,6 +113,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
     def handle_stdout(self):
         """ QProcess Output정보를 받아온다. 바이트 신호를 번역한 정보를 Text에 출력한다.
         """
+        if not self.p:
+            return
         data = self.p.readAllStandardOutput()
         stdout = bytes(data).decode("utf8")
         if self.fc:
@@ -137,15 +140,17 @@ class RenderMainWindow(QtWidgets.QMainWindow):
     def process_finished(self):
         """Qprocess finish가 날 경우, 바이트 신호를 번역한 정보를 Text에 출력한다.
         """
-        if self.is_interrupted:
-            self.is_interrupted = False
-            return
+        self.message(f'finished : {self.cmd}, {self.is_interrupted}')
 
-        if self.p:
-            self.p.waitForFinished()
+        if self.is_interrupted:
+            return
+        #
+        # if self.p:
+        #     self.p.waitForFinished()
 
         self.check_fin += 1
-        self.p.waitForFinished()
+        # self.p.waitForFinished()
+
         if self.check_fin == 1:
             if self.fc:
                 self.ffmpeg_list = self.cmd.split()
@@ -160,10 +165,10 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                 self.pepper.sequence = sequence.upper()
                 self.pepper.shot = shot
                 self.pepper.entity = 'shot'
-                self.pepper.publish_output_file('FX', 'jpg_sequence', 'jpg publish')
-                self.pepper.publish_output_file('FX', 'movie_file', 'mov publish')
-                thumbnail = self.pepper.publish_preview('FX', 'Ready To Start', 'test', path)
-                gazu.task.set_main_preview(thumbnail)
+                # self.pepper.publish_output_file('FX', 'jpg_sequence', 'jpg publish')
+                # self.pepper.publish_output_file('FX', 'movie_file', 'mov publish')
+                # thumbnail = self.pepper.publish_preview('FX', 'Ready To Start', 'test', path)
+                # gazu.task.set_main_preview(thumbnail)
 
         if len(self.cmd_list) > 0:
             self.cmd = self.cmd_list.pop(0)
@@ -195,14 +200,17 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                 return pc
 
     def handle_interrupt(self):
-        if self.p:
+        if not self.is_interrupted:
             self.is_interrupted = True
             self.p.terminate()
             self.p = None
             self.btn_interrupt.setText("Restart")
+            self.message(f'interrupt at : {self.cmd}')
         else:
+            self.is_interrupted = False
             self.btn_interrupt.setText("Interrupt")
             self.start_process()
+        return
 
     def ffmpeg_simple_percent_parser(self, output, total):
         """FFmpeg이 실행될 때, Progress bar에 넣을 값을 구하는 메소드, 백분율로 계산한다. \n
