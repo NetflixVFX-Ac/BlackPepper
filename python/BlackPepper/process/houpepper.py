@@ -1,11 +1,7 @@
 import os
 import numpy as np
-from BlackPepper.pepper import Houpub
-from BlackPepper.process.render_process_bar import RenderMainWindow
-from PySide2 import QtWidgets
 import hou
 import _alembic_hom_extensions as abc
-import sys
 
 
 class HouPepper:
@@ -19,13 +15,8 @@ class HouPepper:
     def __init__(self):
         self.cam_list = []
         self.cam_path = []
-
-        ###############################################################################
-
         self.cmd_list = []
         self.total_frame_list = []
-
-        ###############################################################################
 
         self.cam_node = None
         self._abc_path = None
@@ -33,9 +24,6 @@ class HouPepper:
         self._abc_tree_path = None
         self._abc_range = None
 
-        # self.aperture = []
-        # self.aspect = []
-        # self.forcal = [] ..... self.winsizey = []
         self.hou_cam_parm_name = (
             'aperture',
             'aspect',
@@ -137,8 +125,6 @@ class HouPepper:
         if len(self.abc_path) > 0:
             self.true = self.check_abc(self.abc_path)
             if self.true:
-                # abcTreeAll :  ('ABC', 'unknown', (('cam1', 'xform', (('cam1Camera', 'camera', ()),)),))
-                # abcTreePath :  ['/', '/', '/cam1', '/cam1', '/cam1/cam1Camera', '/cam1/cam1Camera']
                 self.abc_tree_all = abc.alembicGetSceneHierarchy(self.abc_path, '')
                 self.abc_tree_path = abc.alembicGetObjectPathListForMenu(self.abc_path)
                 self.get_abc_cam_tree(self.abc_tree_all)
@@ -156,27 +142,14 @@ class HouPepper:
         node_name = abc_tree_all[0]
         node_type = abc_tree_all[1]
         node_children = abc_tree_all[2]
-        # nodename : ABC -> cam1 -> cam1Camera
-        # nodetype : unknown -> xform -> camera
-        # nodechildren : (('cam1', 'xform', (('cam1Camera', 'camera', ()),)),) -> (('cam1Camera', 'camera', ()),) -> ()
         if node_type == 'camera':
-            # node_name : cam1Camera
-            # nodechildren : ()
-            # cam_list : ['cam1Camera']
             self.cam_list.append(node_name)
-            # abcTreePath :  ['/', '/', '/cam1', '/cam1', '/cam1/cam1Camera', '/cam1/cam1Camera']
             for x in self.abc_tree_path:
-                # node_name : cam1Camera
                 if node_name in x:
-                    # camlipath : /cam1/cam1Camera
                     camlipath = x
             if camlipath not in self.cam_path:
-                # cam_path : ['/cam1/cam1Camera']
                 self.cam_path.append(camlipath)
         else:
-            # node_name : cam1
-            # node_type : xform
-            # nodechildren : (('cam1Camera', 'camera', ()),)
             for children in node_children:
                 self.get_abc_cam_tree(children)
 
@@ -202,18 +175,19 @@ class HouPepper:
         """Alembic file에 있는 카메라가 가진 frame range에 frame rate를 곱하여 real time frame 동안의 \n
         camera 정보 값을 가져와 Houdini 내 새로 생성한 카메라 정보 값에 넣어준다.
 
+        Example:
+            hou.hipFile.load(hip_path)
+            cam = '/cam1/cam1Camera'
+            set_cam_view(cam)
 
         Args:
             cam: cam node created in houdini
 
         """
-        # abc_range : (0.041666666666666664, 10.0)
-        # abc_range * hou.fps() : (1, 240)
         for f in range(int(self.abc_range[0] * hou.fps()), int(self.abc_range[1] * hou.fps()) + 1):
             camera_dict = abc.alembicGetCameraDict(self.abc_path, cam, float(f) / hou.fps())
             self.filmaspectratio.append(camera_dict['filmaspectratio'])
             if camera_dict:
-                # self.aperture = [{},]
                 for parm_name in self.hou_cam_parm_name:
                     exec("self.{}.append({})".format(parm_name, camera_dict.get(parm_name)))
 
@@ -233,8 +207,6 @@ class HouPepper:
         Returns: True
 
         """
-        # abc_range : (0.041666666666666664, 10.0)
-        # abc_range * hou.fps() : (1, 240)
         for f in range(int(self.abc_range[0] * hou.fps()), int(self.abc_range[1] * hou.fps()) + 1):
             cam_resolution = abc.alembicGetCameraResolution(self.abc_path, cam, float(f) / hou.fps())
             if cam_resolution:
@@ -256,19 +228,15 @@ class HouPepper:
         Returns (list): translate, rotate, scale
 
         """
-        # abc_range : (0.041666666666666664, 10.0)
-        # abc_range * hou.fps() : (1, 240)
         translate = []
         rotate = []
         scale = []
-        # shear = []
         for f in range(int(self.abc_range[0] * hou.fps()), int(self.abc_range[1] * hou.fps())):
             xform = abc.getWorldXform(self.abc_path, cam, float(f) / hou.fps())[0]
             xf = hou.Matrix4(xform)
             translate.append(xf.extractTranslates())
             rotate.append(xf.extractRotates())
             scale.append(xf.extractScales())
-            # shear.append(xf.extractShears())
         return translate, rotate, scale
 
     def set_cam_key(self, key, node, parm):
@@ -288,25 +256,18 @@ class HouPepper:
             parm: 't' (translate) or 'r' (rotate) or 's' (scale)
 
         """
-        # self.set_cam_key(tr, cam_node, 't')
         J = ['x', 'y', 'z', 'w']
-        # key_np : matrix - tr : [[x1, y1 ,z1],
-        #                         [x2,y2,z2] ...] tx, ty, tz rx,rt, rz
+
         key_np = np.array(key)
         s = [1, -1]
-        # frame : 0  k : [x1,y1,z1]
         for frame, k in enumerate(key_np):
             try:
                 num_key = len(k)
                 if num_key > 1:
-                    # n : 0, key_index : x1 = 9.42313...
-                    # n : 1, key_index : y1 = 3.23213...
-                    # n : 2, key_index : z1 = 2.23423...
                     for n, key_index in enumerate(k):
                         slope = np.convolve(list(map(lambda x: x[1], key_np)), s, mode='same') / (len(s) - 1)
                         if slope[frame] != 0:
                             keyframe = hou.Keyframe(key_index, hou.frameToTime(frame + 1))
-                            # tx, ty, tz - traslate / rx, ry, rz - rotate / sx, sy, sz = scale
                             node.parm('{}{}'.format(parm, J[n])).setKeyframe(keyframe)
             except:
                 slope = np.convolve(list(map(lambda x: x, key_np)), s, mode='same') / (len(s) - 1)
@@ -328,16 +289,11 @@ class HouPepper:
         """
         self.set_abc_cam_tree(abc_path)
         name = [abc.alembicGetSceneHierarchy(abc_path, i)[0] for i in self.cam_path]
-        # cam_list : ['cam1Camera']
-        # cam_path : ['/cam1/cam1Camera']
         for cam in self.cam_path:
-            # cam_node = cam1Camera
             cam_node = hou.node('/obj').createNode('cam', name[self.cam_path.index(cam)])
             self.cam_node = cam_node
             self.set_cam_view(cam)
-            # check_resolution : True
             check_resolution = self.get_cam_resolution(cam)
-            # tr, ro, sc : hou.Vector3
             tr, ro, sc = self.get_cam_xform(cam)
             self.set_cam_key(tr, cam_node, 't')
             self.set_cam_key(ro, cam_node, 'r')
@@ -418,7 +374,7 @@ class HouPepper:
             "-c:v", "libx264",  # 코덱
             "-pix_fmt", "yuv420p",  # 포맷양식
             "-y",  # 출력파일을 쓸 때 같은 이름의 파일이 있어도 확인없이 덮어씀
-            "-loglevel", "debug",  # 인코딩 과정로그를 보여줌
+            "-loglevel", "debug",
             f'{precomp_list.get("video_output_path")}.mov'
         ]
 
