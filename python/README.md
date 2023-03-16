@@ -2,8 +2,8 @@
 # What is Black Pepper
 ### Black Pepper is FX templates 에 캐스팅된 샷들을 jpg,mov render를  자동화 해주는 API 이다.
 
-* FX artist 가 template asset fx 에 casting 된 많은 샷들을 Houdini 에서 pre-comp 와 mantra 에서 jpg 로 render 하고
-* ffmfeg 을 사용하여 jps sequnce 들을 mov 로 자동화한다. 많은 샷들의 FX 룩을 보기 위한 API 이다.  
+> FX artist 가 template asset fx 에 casting 된 많은 샷들을 Houdini 에서 pre-comp 와 mantra 에서 jpg 로 render 하고
+> ffmfeg 을 사용하여 jps sequnce 들을 mov 로 자동화한다. 많은 샷들의 FX 룩을 보기 위한 API 이다.  
 
 ***
 ### kitsu & gazu ?
@@ -22,11 +22,11 @@
 ### Target User : FX artist
 ### OS : Linux
 ### requires : Python 3.9, Houdini 19.5, Gazu, ffmpeg
-
+***
 # Black Pepper Download links:
 * SSH clone URL: ssh://git@git.jetbrains.space/pipeline/main/hook.git
 * HTTPS clone URL: https://git.jetbrains.space/pipeline/main/hook.git
-
+***
 # How to use Black Pepper
 1. API 실행한다.
 2. Login 창에서 user ID 와 PW 를 입력하고 콤보박스에서 houdini 확장자를 선택한 뒤 Login 한다.
