@@ -212,25 +212,32 @@ class HouPepper:
         for f in range(int(self.abc_range[0] * hou.fps()), int(self.abc_range[1] * hou.fps()) + 1):
             camera_dict = abc.alembicGetCameraDict(self.abc_path, cam, float(f) / hou.fps())
             self.filmaspectratio.append(camera_dict['filmaspectratio'])
-            if camera_dict != None:
+            if camera_dict:
                 # self.aperture = [{},]
                 for parm_name in self.hou_cam_parm_name:
                     exec("self.{}.append({})".format(parm_name, camera_dict.get(parm_name)))
 
     def get_cam_resolution(self, cam):
         """Alembic file에 있는 카메라가 가진 frame range에 frame rate를 곱하여 real time frame 동안의 \n
-        camera 해상도 값을 가져와 Houdini 내 새로 생성한 카메라 해상도 값에 넣어준다.
+        camera 해상도 값을 가져와 Houdini 내 새로 생성한 카메라 해상도 값에 넣어준다. 해상도 값이 존재할 경우, \n
+        cam_resolution 리스트에 해상도 값을 추가하고 return 값으로 True를 갖는다.
 
+        Example:
+            hou.hipFile.load(hip_path)
+            cam = '/cam1/cam1Camera'
+            check_resolution = self.get_cam_resolution(cam)
 
         Args:
             cam: cam node created in houdini
+
+        Returns: True
 
         """
         # abc_range : (0.041666666666666664, 10.0)
         # abc_range * hou.fps() : (1, 240)
         for f in range(int(self.abc_range[0] * hou.fps()), int(self.abc_range[1] * hou.fps()) + 1):
             cam_resolution = abc.alembicGetCameraResolution(self.abc_path, cam, float(f) / hou.fps())
-            if cam_resolution != None:
+            if cam_resolution:
                 self.cam_resolution.append(cam_resolution)
                 return True
 
@@ -238,6 +245,10 @@ class HouPepper:
         """Alembic file에 있는 카메라가 가진 frame range에 frame rate를 곱하여 real time frame 동안의 \n
         Houdini 내 Matrix4 모듈을 사용하여 camera translate, rotate, scale 값을 가져온다.
 
+        Example:
+            hou.hipFile.load(hip_path)
+            cam = '/cam1/cam1Camera'
+            tr, ro, sc = self.get_cam_xform(cam)
 
         Args:
             cam: camera node created in houdini
@@ -262,7 +273,14 @@ class HouPepper:
 
     def set_cam_key(self, key, node, parm):
         """key에 저장된 x, y, z 값(traslate, rotate, scale)을 Houdini obj에 만든 camera parameter에 넣어준다. \n
-        numpy convolution 메소드를 사용하여 Key 값이 변하는 구간에서 값들을 읽어 camera parameter에 넣어준다.
+        numpy, convolution 메소드를 사용하여 camera Key 값이 변하는 구간에서 값들을 읽어 camera parameter에 넣어준다.
+
+        Example:
+            hou.hipFile.load(hip_path)
+            cam = '/cam1/cam1Camera'
+            tr, ro, sc = get_cam_xform(cam)
+            cam_node = hou.node('/obj').createNode('cam', name[cam_path.index(cam)])
+            set_cam_key(tr, cam_node, 't')
 
         Args:
             key(list): x, y, z position
@@ -297,8 +315,12 @@ class HouPepper:
                     node.parm('{}'.format(parm)).setKeyframe(keyframe)
 
     def set_cam_create(self, abc_path):
-        """Houdini obj 경로에 camera node를 만들고, Alembic file에 있는 camera의 정보 값들을 \n
-        obj 안에 만든 camera에 넣어준다. 정보는 camera의 dictionary 값, camera resolution, camera x,y,z position에 해당된다.
+        """Houdini obj에 camera를 생성하고, Alembic file에 있는 camera의 정보 값들을 \n
+        obj에 만든 camera에 넣어준다. 해당 data는 camera의 dictionary, camera resolution, camera x,y,z position 값이 된다.
+
+        Example:
+            precomp = pepper.make_precomp_dict(casted_shot)
+            set_cam_create(precomp.get('layout_output_path'))
 
         Args:
             abc_path: Alembic file path
@@ -332,9 +354,13 @@ class HouPepper:
                 self.cam_node.parm('resy').set(int(1920 / self.filmaspectratio[0]))
 
     def set_fx_working_for_shot(self, hip_path, abc_path, saved_path):
-        """Template에 casting된 shot layout output file인 Alembic의 카메라 정보를 가진 cam node를 저장하여 \n
+        """Template file obj에 shot layout output file인 Alembic의 카메라 정보를 가진 camera를 생성하여\n
         shot fx working file path에 저장한다.
 
+        Example:
+            precomp = pepper.make_precomp_dict(casted_shot)
+            houp.set_fx_working_for_shot(precomp.get('temp_working_path'), precomp.get('layout_output_path'),
+                             f'{precomp.get('fx_working_path')}.{pepper.software.get("file_extension")}')
 
         Args:
             hip_path: template asset working file path
@@ -350,14 +376,20 @@ class HouPepper:
 
     def make_cmd(self, precomp_list):
         """터미널에서 실행할 command를 list에 넣어준다. Houdini Mantra를 사용하여 렌더링하기 위해 mantra_render.py를 실행한다.
-        mantra_render.py에는 4개의 argument를 받도록 설정하였다. mantra command가 list에 들어가고
+        mantra_render.py에는 4개의 argument를 받도록 설정하였다. list에 mantra command가 들어가고 sequence file을 mov로
+        컨버팅하기 위해 FFmpeg을 사용하는 command를 list에 추가로 넣어준다. alembic file의 camera frame out count를 위해
+        mantra와 ffmpeg을 사용한 command를 리스트에 넣어줄때, 지정한 total_frame를 total_frame_list에 넣어준다.
 
-
+        Example:
+            precomp = pepper.make_precomp_dict(casted_shot)
+            houpepper.make_cmd(precomp)
 
         Args:
-            precomp_list:
+            precomp_list (dict): precomp = {'name': name, 'temp_working_path': temp_working_path,
+                    'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
+                    'jpg_output_path': jpg_output_path, 'video_output_path': video_output_path}
 
-        Returns:
+        Returns: cmd_list, total_frame_list
 
         """
         total_frame = self.abc_range[1] * hou.fps()
@@ -402,4 +434,3 @@ class HouPepper:
         total_frame_list = self.total_frame_list
 
         return cmd_list, total_frame_list
-

@@ -665,8 +665,10 @@ class PepperWindow(QMainWindow):
         self.check_window.close()
 
     def render_execute(self):
-        """
-
+        """render list에 있는 shot의 path를 읽어와 template에 Alembic file의 camera값이 들어간 fx working file을 만든다. \n
+        precomp의 dictionary value로 만든 command list와 total frame list를 활용하여 Render Progress UI를 실행한다. \n
+        Render Progress UI에서는 Houdini Mantra sequence file render, FFmpeg jpg to mov converting 순으로 진행된다. \n
+        render 버튼 클릭시 실행되며, 이전까지 선택한 설정들을 초기화 해준다.
         """
         houp = HouPepper()
         save_log = Logger()
