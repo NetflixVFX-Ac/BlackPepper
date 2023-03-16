@@ -1,12 +1,5 @@
 import os.path
 import re
-<<<<<<< HEAD
-import subprocess
-
-
-=======
->>>>>>> 42c59638fcc6de17d6ca275fe578feba2028e437
-import gazu.task
 from PySide2 import QtWidgets, QtCore
 from BlackPepper.pepper import Houpub
 
