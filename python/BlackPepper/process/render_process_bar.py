@@ -1,8 +1,7 @@
+import os.path
 import re
-import time
 from PySide2 import QtWidgets, QtCore
-
-
+from BlackPepper.pepper import Houpub
 
 class RenderMainWindow(QtWidgets.QMainWindow):
     """
@@ -10,6 +9,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
     정규표현을 활용하여 터미널에 출력되는 정보에서 컨버팅 중인 프레임을 파악하고 전체 프레임과 비교하여 Progress Widget으로
     진행사항을 유저에게 시각적으로 알려준다.
     """
+
     def __init__(self, cmd_list, total_frame_list):
         """Sequence file이 있는 경로와 mov파일이 저장될 경로, fps를 지정한다. 해당 인자들은 터미널에 명령내릴 command에 입력된다.
 
@@ -19,32 +19,45 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             mov_output_path (str): output file path
         """
         super().__init__()
+        self.pepper = Houpub()
         self.p = None
         self.is_interrupted = False
+        self.mc = None
+        self.fc = None
+        self.check_fin = 0
 
-########################################################
-
+        ########################################################
 
         self.cmd_list = cmd_list
         self.total_frame_list = total_frame_list
 
-
-########################################################
+        ########################################################
+        DEFAULT_STYLE = """
+        QProgressBar{
+            border: 2px solid grey;
+            border-radius: 5px;
+            text-align: center;
+            font: 10pt\"Courier New\";
+            color: rgb(225, 225, 225)
+        }
+        """
 
         self.mantra_check = re.compile('^python')
         self.ffmpeg_check = re.compile('^ffmpeg')
+        self.ffmpeg_list = None
         self.progress = QtWidgets.QProgressBar()
+        self.progress.setStyleSheet(DEFAULT_STYLE)
         self.progress.setRange(0, 100)
 
         self.text = QtWidgets.QPlainTextEdit()
         self.text.setReadOnly(True)
         self.btn_interrupt = QtWidgets.QPushButton("Interrupt")
-        # self.btn_interrupt.clicked.connect(self.handle_interrupt)
+        self.btn_interrupt.clicked.connect(self.handle_interrupt)
 
         l = QtWidgets.QVBoxLayout()
-        l.addWidget(self.btn_interrupt)
         l.addWidget(self.progress)
         l.addWidget(self.text)
+        l.addWidget(self.btn_interrupt)
 
         w = QtWidgets.QWidget()
         w.setStyleSheet(u"background-color: rgb(45, 45, 45);\n"
@@ -52,22 +65,20 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                         "font: 10pt\"Courier New\";\n"
                         "color: rgb(180, 180, 180);\n")
         w.setLayout(l)
-
+        self.setWindowTitle('Black Pepper Progress')
         self.setCentralWidget(w)
 
         if len(self.cmd_list) == 0:
             return
-        cmd = self.cmd_list.pop(0)
+        self.cmd = self.cmd_list.pop(0)
         self.total_frame = self.total_frame_list.pop(0)
 
-        self.mc = self.mantra_check.search(cmd)
-        self.fc = self.ffmpeg_check.search(cmd)
-        print('start total_frame :', self.total_frame)
-        print('start total_frame_list :', self.total_frame_list)
-        print('mantra :', self.mc)
-        print('ffmpeg :', self.fc)
-        print("ccccccccccmddd :", cmd)
-        self.start_process(cmd)
+        # print('start total_frame :', self.total_frame)
+        # print('start total_frame_list :', self.total_frame_list)
+        # print('mantra :', self.mc)
+        # print('ffmpeg :', self.fc)
+        # print("ccccccccccmddd :", cmd)
+        self.start_process()
 
     def message(self, s):
         """  Text Widget에 메시지를 출력한다
@@ -77,24 +88,28 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """
         self.text.appendPlainText(s)
 
-    def start_process(self, cmd):
+    def start_process(self):
         """ Qprocess를 활용하여 터미널에 명령을 내려주고 터미널 신호에 따라 출력하는 내용을 달리한다. \n
         진행 중, 오류, 변동, 마무리 단계마다 Text Widget에 상태를 Handling 한다.
 
         """
 
         print("start!!!!!!!")
+        print(self.cmd)
+        print(self.total_frame)
+        self.mc = self.mantra_check.search(self.cmd)
+        self.fc = self.ffmpeg_check.search(self.cmd)
 
         if not self.p:
             self.p = QtCore.QProcess()
-
-        self.p.waitForFinished()
+            self.p.waitForFinished()
 
         self.p.readyReadStandardOutput.connect(self.handle_stdout)
         self.p.readyReadStandardError.connect(self.handle_stderr)
         self.p.stateChanged.connect(self.handle_state)
         self.p.finished.connect(self.process_finished)  # Clean up once complete.
-        self.p.start(cmd)
+        # print('check check')
+        self.p.start(self.cmd)
 
     def handle_stderr(self):
         """ QProcess Error정보를 받아온다. 바이트 신호를 번역하고 백분율 계산 함수를 실행시키고 컴퓨터가 보낸 정보를 Text에 출력한다.
@@ -102,9 +117,9 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """
         data = self.p.readAllStandardError()
         stderr = bytes(data).decode("utf8")
-        if self.ffmpeg_check:
+        if self.fc:
             progress = self.ffmpeg_simple_percent_parser(stderr, self.total_frame)
-        if self.mantra_check:
+        if self.mc:
             progress = self.mantra_simple_percent_parser(stderr, self.total_frame)
         if progress:
             self.progress.setValue(progress)
@@ -116,9 +131,9 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """
         data = self.p.readAllStandardOutput()
         stdout = bytes(data).decode("utf8")
-        if self.ffmpeg_check:
+        if self.fc:
             progress = self.ffmpeg_simple_percent_parser(stdout, self.total_frame)
-        if self.mantra_check:
+        if self.mc:
             progress = self.mantra_simple_percent_parser(stdout, self.total_frame)
         if progress:
             self.progress.setValue(progress)
@@ -141,23 +156,61 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """Qprocess finish가 날 경우, 바이트 신호를 번역한 정보를 Text에 출력한다.
 
         """
-        print("fin")
-        self.message("Process finished.")
-        self.p.terminate()
-        self.p.waitForFinished()
-
-        if len(self.cmd_list) > 0:
-            cmd = self.cmd_list.pop(0)
-            self.total_frame = self.total_frame_list.pop(0)
-            print('next total_frame :', self.total_frame)
-            print('next total_frame_list :', self.total_frame_list)
-            print("ttttttttttttttmddd :", cmd)
-            print('cmd_list :', self.cmd_list)
-            print('len cmd_list :', len(self.cmd_list))
-            self.start_process(cmd)
-        else:
+        if self.is_interrupted:
+            print('interrupt!!!!!')
+            self.is_interrupted = False
             return
 
+        print("fin")
+
+        # self.p.terminate()
+        if self.p:
+            self.p.waitForFinished()
+
+        self.check_fin += 1
+        print("check_fin :", self.check_fin)
+        self.p.waitForFinished()
+        if self.check_fin == 1:
+            if self.fc:
+                self.ffmpeg_list = self.cmd.split()
+                path = self.ffmpeg_list[4][:-8]+'0001.jpg'
+                print(path)
+                path_basename = os.path.basename(path)
+                print(path_basename)
+                path_re = re.compile('^(\w+)_(\w+)_(\d+)_')
+                path_search = path_re.search(path_basename)
+                project = path_search.group(1)
+                sequence = path_search.group(2)
+                shot = path_search.group(3)
+                print(project.upper(), sequence.upper(), shot)
+                self.pepper.project = project.upper()
+                self.pepper.sequence = sequence.upper()
+                self.pepper.shot = shot
+                self.pepper.entity = 'shot'
+                self.pepper.publish_output_file('FX', 'jpg_sequence', 'jpg publish')
+                self.pepper.publish_output_file('FX', 'movie_file', 'mov publish')
+                self.pepper.publish_preview('FX', 'Ready To Start', 'test', path)
+
+
+        if len(self.cmd_list) > 0:
+            self.cmd = self.cmd_list.pop(0)
+            self.total_frame = self.total_frame_list.pop(0)
+
+            # print('next total_frame :', self.total_frame)
+            # print('next total_frame_list :', self.total_frame_list)
+            # print("ttttttttttttttmddd :", cmd)
+            # print('cmd_list :', self.cmd_list)
+            # print('len cmd_list :', len(self.cmd_list))
+            # self.p = None
+            # self.p.waitForFinished()
+
+            self.check_fin = 0
+            self.start_process()
+
+        else:
+            self.cmd = None
+            self.message("Process finished.")
+            return
 
     def mantra_simple_percent_parser(self, output, total):
         """
@@ -172,15 +225,24 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         """
         print("mantra total :", total)
-
         progress_re = re.compile('_(\d+)\.jpg')
         m = progress_re.search(output)
-        print("m :", m)
         if m:
+            print("m :", m)
             pc_complete = m.group(1)
             if pc_complete:
                 pc = int(int(pc_complete) / total * 100)
                 return pc
+
+    def handle_interrupt(self):
+        if self.p:
+            self.is_interrupted = True
+            self.p.terminate()
+            self.p = None
+            self.btn_interrupt.setText("Restart")
+        else:
+            self.btn_interrupt.setText("Interrupt")
+            self.start_process()
 
     def ffmpeg_simple_percent_parser(self, output, total):
         """Progress bar에 넣을 정보를 백분율로 계산한다. \n
@@ -199,8 +261,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         progress_re = re.compile("frame=   (\d+)")
         m = progress_re.search(output)
-        print("m search :", m)
         if m:
+            print("m search :", m)
             pc_complete = m.group(1)
             if pc_complete:
                 pc = int(int(pc_complete) / total * 100)
@@ -215,3 +277,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                 pc = int(int(pc_complete) / total * 100)
                 return pc  # 백분율을 통해 process bar에 보여질 값
 
+    def closeEvent(self, event):
+        if self.p is not None and self.p.state() == QtCore.QProcess.Running:
+            self.p.terminate()
+        super().closeEvent(event)

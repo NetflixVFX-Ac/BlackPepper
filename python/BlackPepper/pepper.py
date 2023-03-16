@@ -310,7 +310,7 @@ class Houpub:
         self.dict_check(task_type, f'no_task_type{output_type_name}')
         gazu.files.new_entity_output_file(self.entity, output_type, task_type, working_file=work_file,
                                           representation=output_type['short_name'], comment=comments)
-        self.mylog.publish_output_file_log(task_type_name, output_type_name)
+        # self.mylog.publish_output_file_log(task_type_name, output_type_name)
 
     def working_file_path(self, task_type_name, input_num=None):
         """self.entity에 해당된 task_type_name을 가진 task의 working file 중 input_num의 revision을 반환한다. \n
@@ -500,10 +500,6 @@ class Houpub:
         """
         self.dict_check(self.asset, 'no_asset')
         casted_shots = gazu.casting.get_asset_cast_in(self.asset)
-        # layout_task_type = gazu.task.get_task_type_by_name('Layout')
-        # fx_task_type = gazu.task.get_task_type_by_name('FX')
-        # layout_tasks = [gazu.task.get_task_by_name(shot['shot_id'], layout_task_type) for shot in casted_shots]
-        # fx_tasks = [gazu.task.get_task_by_name(shot['shot_id'], fx_task_type) for shot in casted_shots]
         return casted_shots
 
     def make_precomp_dict(self, casted_shot, temp_revision=None, cam_revision=None):
@@ -608,23 +604,39 @@ class Houpub:
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         task_type = gazu.task.get_task_type_by_name(task_type_name)
         output_files = gazu.files.all_output_files_for_entity(self.entity, output_type, task_type)
-
-        # working_file = gazu.files.get_all_working_files_for_entity(self.entity, task_type)
-        # output_files2 = gazu.files.get_last_output_files_for_entity(self.entity, output_type, task_type)
-        # print(gazu.files.all_output_types_for_entity(self.entity))
-        # print(self.entity)
-        # print(task_type)
-        # print(output_type)
-        # print(output_files)
-        # print(working_file)
         revision_list = [output_file['revision'] for output_file in output_files]
         return revision_list
 
-    # -------------------------------------------
-    # ----------- preview 관련 메소드들 -----------
-    # -------------------------------------------
+    def check_task_status(self, task_status_name, task_type_name):
+        """self.entity의 task_type_name에 해당하는 task가 task_status_name과 동일한 task status를 가지고 있는지 확인해준다.
+
+        Args:
+            task_status_name: Task status name to be checked
+            task_type_name: Task type of the task to be checked
+
+        Returns:
+            True if task status is correct, False if else
+
+        """
+        status = self.get_task_status(task_status_name)
+        _, task = self.get_task(task_type_name)
+        if status['id'] == task['task_status_id']:
+            return True
+        return False
 
     def get_task_status(self, task_status_name):
+        """task_status_name에 맞는 task status dict를 반환한다.\n
+        Todo, Ready To Start, Work In Progress, Done, Retake 중에서만 반환받을 수 있다.
+
+        Examples:
+            pepper.get_task_status('Done')
+
+        Args:
+            task_status_name: Task status name
+
+        Returns:
+            Task status dict
+        """
         all_status = ['Todo', 'Ready To Start', 'Work In Progress', 'Done', 'Retake']
         if task_status_name not in all_status:
             self.error('no_task_status')
@@ -632,13 +644,23 @@ class Houpub:
         return task_status
 
     def publish_preview(self, task_type_name, task_status_name, comment_text, preview_file_path):
+        """self.entity의 task_type에 comment를 남기며 task status를 변경해주고, preview file을 업로드한다.
+
+        Examples:
+            pepper.publish_preview('FX', 'Done', 'sq01_0010 done', /home/rapa/test.png')
+
+        Args:
+            task_type_name(str): output file을 찾을 task type의 이름
+            task_status_name(str): Destination task status
+            comment_text(str): Text for publishing comment
+            preview_file_path(str): Local path of preview file
+
+        """
         _, task = self.get_task(task_type_name)
         task_status = self.get_task_status(task_status_name)
         gazu.task.add_comment(task, task_status, comment=comment_text)
         comment = gazu.task.get_last_comment_for_task(task)
-        # gazu.task.create_preview(task, 'test')
         gazu.task.add_preview(task, comment, preview_file_path)
-        # gazu.task.upload_preview_file(task, '/home/rapa/tornado/Plate/plate_undistort_2k.0001.png')
 
     # -------------------------------------------
     # ----------- get all 관련 메소드들 -----------
@@ -769,18 +791,19 @@ class Houpub:
         return my_projects
 
     def get_working_file_data(self, task_type_name, revision, entity_type):
-        """task의 working file의 revision에 맞는 데이터를 반환해준다.
+        """해당 working file의 revision에 맞는 person, created time을 반환해준다.
 
-                Example:
-                    name, time, rev = pepper.get_working_file_data('simulation', 5, 'asset')
-                Args:
-                    task_type_name(str):
-                    revision:
-                    entity_type(str):
+        Example:
+            name, time, rev = pepper.get_working_file_data('simulation', 5, 'asset')
 
-                Returns:
-                    JaehyukLee, Date-Time, 1
-                """
+        Args:
+            task_type_name(str): Task type of working file
+            revision: Revision number of working file
+            entity_type(str): Entity type(asset or shot)
+
+        Returns:
+            JaehyukLee, Date-Time, 1
+        """
         global the_working_file
         self.entity = entity_type
         _, task = self.get_task(task_type_name)
@@ -788,22 +811,30 @@ class Houpub:
         for check_file in working_files:
             if str(check_file['revision']) == revision:
                 the_working_file = check_file
-        created_time = the_working_file['created_at']
-        rev = the_working_file['revision']
-        person_id = the_working_file['person_id']
-        person = gazu.person.get_person(person_id)
-        return person['first_name'] + person['last_name'], created_time, rev
+                break
+        if not working_files:
+            rev = ''
+            person = ''
+            created_time = ''
+        else:
+            created_time = the_working_file['created_at']
+            rev = the_working_file['revision']
+            person_id = the_working_file['person_id']
+            person_dict = gazu.person.get_person(person_id)
+            person = person_dict['first_name'] + person_dict['last_name']
+        return person, created_time, rev
 
     def get_output_file_data(self, output_type_name, task_type_name, revision, entity_type):
-        """task의 output file의 revision에 맞는 데이터를 반환해준다.
+        """해당 output file의 revision에 맞는 person, created time을 반환해준다.
 
         Example:
             name, time, rev = pepper.get_output_file_data('camera_cache', 'layout', 10, 'shot')
+
         Args:
-            output_type_name(str):
-            task_type_name(str):
-            revision:
-            entity_type(str):
+            output_type_name(str): Output type of output file
+            task_type_name(str): Task type of output file
+            revision: Revision number of output file
+            entity_type(str): Entity type(asset or shot)
 
         Returns:
             JaehyukLee, Date-Time, 1
@@ -837,7 +868,7 @@ class Houpub:
         """다른 메소드를 통해 dict값을 받아오려 할 때, 잘못된 입력으로 None이 받아지지 않았는지 체크한다.
 
         Example:
-            BlackPepper.dict_check(self.sequence, 'no_sequence')
+            pepper.dict_check(self.sequence, 'no_sequence')
 
         Returns:
             test_dict(if test_dict is not None)
@@ -873,14 +904,13 @@ class Houpub:
             return args
 
     def str_check(self, strn):
-        """strn의 타입이 str인지 체크한다.\n
-        메소드 내에서만 사용되는 메소드다.
-
-        Args:
-            strn: type이 str인지 체크하고 싶은 인자값
+        """strn의 타입이 str인지 체크한다.
 
         Examples:
-            BlackPepper.int_check(revision_num)
+            pepper.str_check(text)
+
+        Args:
+            strn(str): String to be checked
 
         Returns:
             strn(if str)
@@ -895,10 +925,9 @@ class Houpub:
 
     def int_check(self, num):
         """num의 타입이 정수인지 체크한다.\n
-        메소드 내에서만 사용되는 메소드다.
 
         Args:
-            num: type이 int인지 체크하고 싶은 인자값
+            num(int): integer
 
         Examples:
             BlackPepper.int_check(revision_num)
@@ -965,6 +994,14 @@ class Houpub:
             raise Exception("NO ERROR CODE")
 
 
+# p = Houpub()
+# p.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
+# p.project = 'project1'
+# p.software = 'hip'
+# p.sequence = 'Seq1'
+# p.shot = 'sh1'
+# p.entity = 'shot'
+# p.publish_working_file('Camera')
 # BlackPepper = Houpub()
 # BlackPepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
 # BlackPepper.software = 'hipnc'

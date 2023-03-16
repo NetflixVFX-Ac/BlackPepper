@@ -37,6 +37,7 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
         n.parm('trange').set(1)
         for i in n.parmTuple('f'):
             i.deleteAllKeyframes()
+        # n.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
         n.parmTuple('f').set([abc_range[0] * hou.fps(), 1, 1])
         n.parm('vm_verbose').set(1)
         n.parm("execute").pressButton()
@@ -48,17 +49,14 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
         if len(error_list) == 0:
             shutil.rmtree(home_path + '/temp')
         else:
-            print("render error")
+            print("jpg.mantra checkpoint exists")
     else:
         print("missing sequence frame")
 
+
 def main():
     """
-
-
-
     Returns:
-
     """
     args = sys.argv
     if len(args) != 5:

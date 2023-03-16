@@ -2,7 +2,8 @@ import sys
 import os
 import json
 import webbrowser
-from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
+from BlackPepper.process.render_process_bar import RenderMainWindow
+# from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow, QAction, QApplication, QMenu
@@ -18,16 +19,24 @@ from datetime import datetime
 class PepperWindow(QMainWindow):
     def __init__(self):
         """이 모듈은 pepper를 통해 얻어 온 kitsu 상의 template asset과 casting 된 shot들의 정보들을 UI를 통해 보여준다.
-        UI 모듈은 controller, model, view로 분리되어 있고, mvc_login, mvc_main의 .ui 파일이 UI 데이터를 가지고 있다. \n
-        메인 UI의 4개 model은 PepperModel에서 가져오며, ListView는 PepperView에서 가져온다.
-        여러 개의 shot들을 한번에 선택해 조정할 수 있도록 shots와 rendelistes의 view는 ExtendedSelection으로 설정했다. \n
-        PepperWindow 실행 시 self.login_ui가 우선 실행된다.
+
+            UI 모듈은 controller, model, view로 분리되어 있고, mvc_login, mvc_main의 .ui 파일이 UI 데이터를 가지고 있다.
+        메인 UI의 model은 PepperModel에서 가져오며, ListView는 PepperView에서 가져온다.
+        여러 개의 shot들을 한번에 선택해 조정할 수 있도록 shots view는 ExtendedSelection 으로 설정하여 멀티 선택가능하다.
+        PepperWindow 실행 시 login 창을 먼저 띄워주며 최초 로그인 시 그 이후 자동 로그인 된다.
+        로그인한 사용자에 부여된 프로젝트들이 먼저 뜨고 프로젝트를 선택시 status 가 done 된 templates 이 뜨며 선택시
+        해당 templates 에 케시팅 된 Shots 들을 보여준다. Shots 들은 멀티선택이 가능하며 Render files list에 추가하여 RENDER 버튼을
+        클릭하면 'File' 메뉴바의 'Open Recent Renderlists' 데이터들을 저장하고 불러올 수 있으며, render_process 창을 보여준다.
+        Render files 에 추가된 list 들을 Full path 버튼을 누르면 Render check list 창으로 path 들을 보여주며, Save list 시
+        'File' 메뉴바의 'Open Saved Renderlists' 에 데이터를 저장하고 불러올 수 있다.
+        status bar 를 통해 간단한 상태 정보를 알수 있으며, templates 와 Shots 의 Revision 값을 하단의 클릭시 나오는 해당 info 에서
+        'Revision' 콤보 박스으로 모든 Revision 을 확인하고 또,Revision을 변경하여 추가할 수 있다.
         """
         super().__init__()
         self.pepper = Houpub()
         self.login_log = Auto_log()
-        self.recent_menu = None
-        self.saved_menu = None
+        # self.recent_menu = None
+        # self.saved_menu = None
         self.projects_selection = None
         self.templates_selection = None
         self.shots_selection = None
@@ -36,8 +45,8 @@ class PepperWindow(QMainWindow):
         self.cam_rev = None
         self.mantra_window = None
         self.main_filemenu = None
-        self.main_user = None
-        self.main_menu_bar = None
+        # self.main_user = None
+        # self.main_menu_bar = None
         self.render_process = None
 
         self.my_projects = []
@@ -237,8 +246,10 @@ class PepperWindow(QMainWindow):
             self.login_window.show()
 
     def open_main_window(self):
-        """mvc_main.ui를 디스플레이 해주는 메소드. 로그인 성공 시 실행된다. \n
-        projects, templates, shots, render_lists의 네 가지 부분으로 나뉘어 있다. \n
+        """로그인 성공 시 mvc_main.ui를 디스플레이 해주는 함수이다.
+
+            함수 실행 시 메인 윈도우에 메뉴바를 만들고 셋팅하는 함수를 먼저 실행한다. 그리고
+        projects, templates, shots, render_lists의 네 가지 부분으로 나뉘어 있으며 \n
         projects 에서는 로그인 된 유저가 assign 되어있는 project들을 projects_listview에 디스플레이 해준다.
         templates 에서는 선택된 project 안의 fx templates를 templates_listview에 디스플레이 해준다.
         shots 에서는 선택된 fx template가 casting 된 shots를 shots_listview에 디스플레이 해준다.
@@ -275,7 +286,11 @@ class PepperWindow(QMainWindow):
         self.pepper.project = project_name
         self.all_assets = []
         for asset in self.pepper.get_all_assets():
-            if self.pepper.check_asset_type(asset, 'fx_template') is not None:
+            if self.pepper.check_asset_type(asset, 'fx_template') is None:
+                continue
+            self.pepper.asset = asset
+            self.pepper.entity = 'asset'
+            if self.pepper.check_task_status('Done', 'simulation') is True:
                 self.all_assets.append(asset)
         self.template_model.pepperlist.clear()
         self.shot_model.pepperlist.clear()
@@ -321,7 +336,11 @@ class PepperWindow(QMainWindow):
         self.shot_model.pepperlist.clear()
 
         for shot in self.all_shots:
-            self.shot_model.pepperlist.append(shot['sequence_name'] + '_' + shot['shot_name'])
+            self.pepper.sequence = shot['sequence_name']
+            self.pepper.shot = shot['shot_name']
+            self.pepper.entity = 'shot'
+            if self.pepper.check_task_status('Done', 'layout_camera') is True:
+                self.shot_model.pepperlist.append(shot['sequence_name'] + '_' + shot['shot_name'])
 
         # set emit, selected clear
         self.shot_model.layoutChanged.emit()
@@ -380,6 +399,7 @@ class PepperWindow(QMainWindow):
         그리고 pepper 의 precomp_list를 render_moderl.pepperlist 에 append 한다.
         추가로 Shots, Render files 의 selectionModel(선택된 모델) 들을 clear 해준다.
         """
+        self.main_window.statusBar().showMessage('Render files drag & drop 로 순서 변경 가능')
         selections = self.shots_selection.selectedRows()
         if len(selections) == 0:
             return
@@ -426,7 +446,6 @@ class PepperWindow(QMainWindow):
         for precomp in self.render_model.pepperlist:
             if precomp['name'] == idx.data():
                 self.render_model.pepperlist.remove(precomp)
-        self.render_model.pepperlist.clear()
         self.renew_render_list()
 
     def clear_list(self):
@@ -452,22 +471,23 @@ class PepperWindow(QMainWindow):
         login_menu.addAction(exit_action)
 
     def create_main_menubar(self):
-        """메인 윈도우에 메뉴바를 만들고 셋팅하는 함수이다.
+        """메인 윈도우에 메뉴바를 만들고 셋팅하는 함수이고  open_main_window 함수 실행시 실행된다.
 
-            함수에는 메뉴바에 preset 을 셋팅하는 함수를 포함 하고있다.
+            이 함수에는 메뉴바에 preset 을 셋팅하는 함수 set_main_menubar 를 포함 하고 있다.
         'Menu' 와 'Help' 메뉴바를 만들고 'Menu' 에는 먼저 set_main_window_preset() 함수의 'Recent Presets' 와
         'Logout','Exit' 들을 추가하고 단축키와 클릭시 컨넥트 되어있는 함수가 발생한다.
         'Help' 에는 Black Pepper 에 필요한 kitsu, SideFX등 같은 관련 사이트들 을 열고 단축키도 추가 되어있다.
         """
+        # get json path
         self.home_json_path()
-        self.main_menu_bar = self.main_window.menuBar()
-        self.main_menu_bar.setNativeMenuBar(False)
+        main_menu_bar = self.main_window.menuBar()
+        main_menu_bar.setNativeMenuBar(False)
         # create 'File' menu
-        self.main_filemenu = self.main_menu_bar.addMenu('&File')
+        self.main_filemenu = main_menu_bar.addMenu('&File')
         # 동적으로 메뉴를 채워주는 부분
         self.main_filemenu.aboutToShow.connect(self.set_main_menubar)
         # create Help menu
-        main_helpmenu = self.main_menu_bar.addMenu('&Help')
+        main_helpmenu = main_menu_bar.addMenu('&Help')
         # 'File' menu add 'Open Recent preset' & 'Exit'
         self.set_main_menubar()
         # set kitsu
@@ -502,18 +522,18 @@ class PepperWindow(QMainWindow):
         west_action.triggered.connect(lambda: webbrowser.open('https://www.westworld.co.kr/'))
         main_helpmenu.addAction(west_action)
         # create menu 'User'
-        self.main_user = self.main_menu_bar.addMenu('&User')
+        main_user = main_menu_bar.addMenu('&User')
         host_info = QAction(f'host : {self.login_log.host}', self.main_window)
-        self.main_user.addAction(host_info)
+        main_user.addAction(host_info)
         id_info = QAction(f'id : {self.login_log.user_id}', self.main_window)
-        self.main_user.addAction(id_info)
-        self.main_user.addSeparator()
+        main_user.addAction(id_info)
+        main_user.addSeparator()
         # 'User' add 'Logout'
         logout_action = QAction('&Logout', self.main_window)
         logout_action.setShortcut('Ctrl+L')
         logout_action.setStatusTip('Logout application')
         logout_action.triggered.connect(self.user_logout)
-        self.main_user.addAction(logout_action)
+        main_user.addAction(logout_action)
 
     def set_main_menubar(self):
         """메인창의 file 메뉴 'Open Recent Presets' 의 sub 메뉴들을 만들어주는 함수이다.
@@ -521,27 +541,27 @@ class PepperWindow(QMainWindow):
             메뉴바 'Menu' 에 'Recent Presets는'메뉴에 path json file 을 불러오고 최신 5개의 json render_model.pepperlist
             5번 인덱스가 제일 최신 json dict 정보이다.
         """
+        # 동적메뉴로 채워주기위해 clear 를 한다.
         self.main_filemenu.clear()
         self.create_json()
-
-        self.recent_menu = QMenu('Open recent renderlists', self.main_window)
-        self.saved_menu = QMenu('Open saved renderlists', self.main_window)
-
+        # set recent,saved menu
+        recent_menu = QMenu('Open recent renderlists', self.main_window)
+        saved_menu = QMenu('Open saved renderlists', self.main_window)
         with open(self.preset_json_path, 'r') as f:
             self.render_list_data = json.load(f)
 
         for json_files in self.render_list_data['recent']:
             for file_path in json_files:
                 file_action = self.append_renderlist_to_menubar(file_path)
-                self.recent_menu.addAction(file_action)
+                recent_menu.addAction(file_action)
 
         for json_files in self.render_list_data['saved']:
             for file_path in json_files:
                 file_action = self.append_renderlist_to_menubar(file_path)
-                self.saved_menu.addAction(file_action)
+                saved_menu.addAction(file_action)
 
-        self.main_filemenu.addMenu(self.recent_menu)
-        self.main_filemenu.addMenu(self.saved_menu)
+        self.main_filemenu.addMenu(recent_menu)
+        self.main_filemenu.addMenu(saved_menu)
         self.main_filemenu.addSeparator()
         # add 'Exit'
         exit_action = QAction('&Exit', self.main_window)
@@ -574,8 +594,9 @@ class PepperWindow(QMainWindow):
         self.renew_render_list()
 
     def save_recent_renderlists(self):
-        """save preset json path 의 json 을 불러오고 recent key 값에 정보를 저장하는 함수이다.
+        """save preset json path 의 json 을 불러오고 'recent' key 값에 정보를 저장하는 함수이다.
 
+            'Render files' 에 추가된 것이 없으면 return 한다.
             path 에 json 파일이 없으면 json 을 만들어주는 함수를 사용하여 json 을 만들어주고 json을 load 하여 'recent' key에
             render_moderl.pepperlist(렌다할 render files들) dict 들을 날짜,시간별로 리스트로 json을 저장한다.
         """
@@ -587,8 +608,8 @@ class PepperWindow(QMainWindow):
         now = datetime.now()
         # 최대 인덱스 5까지 새로운 value가 추가되도록 수정
         if len(recent_data) >= 5:
-            recent_data.pop(0)  # 가장 오래된 데이터 삭제
-        recent_data.append({
+            recent_data.pop(4)  # 가장 오래된 데이터 삭제
+        recent_data.insert(0, {
             f'recent_{now.date()}_time_{now.hour}:{now.minute}:{now.second}': self.render_model.pepperlist
         })
         # 'recent' key 값의 value로 저장
@@ -596,7 +617,7 @@ class PepperWindow(QMainWindow):
         self.save_json(self.render_list_data)
 
     def save_user_renderlists(self):
-        """save preset json path 의 json 을 불러오고 recent key 값에 정보를 저장하는 함수이다.
+        """save preset json path 의 json 을 불러오고 'saved' key 값에 정보를 저장하는 함수이다.
 
             path 에 json 파일이 없으면 json 을 만들어주는 함수를 사용하여 json 을 만들어주고 json을 load 하여 'recent' key에
             render_moderl.pepperlist(렌다할 render files들) dict 들을 날짜,시간별로 리스트로 json을 저장한다.
@@ -608,9 +629,9 @@ class PepperWindow(QMainWindow):
         saved_data = self.render_list_data.get('saved', [])
         now = datetime.now()
         # 최대 인덱스 5까지 새로운 value가 추가되도록 수정
-        if len(saved_data) >= 10:
-            saved_data.pop(0)  # 가장 오래된 데이터 삭제
-        saved_data.append({
+        if len(saved_data) >= 5:
+            saved_data.pop(4)  # 가장 오래된 데이터 삭제
+        saved_data.insert(0, {
             f'saved_{now.date()}_time_{now.hour}:{now.minute}:{now.second}': self.render_model.pepperlist
         })
         # 'recent' key 값의 value로 저장
@@ -632,7 +653,7 @@ class PepperWindow(QMainWindow):
             json.dump(data, f, ensure_ascii=False)
 
     def create_json(self):
-        """preset이 저장되어있는 json파일이 없으면 json 파일을 만들어주는 함수이다.
+        """json path 경로를 함수롤 통해 가져오고 json에 'recent' or 'seaved' 가 없으면 key 값을 추가하고 path에 저장하는 함수이다.
         """
         self.home_json_path()
         with open(self.preset_json_path, 'r') as json_file:
@@ -648,7 +669,12 @@ class PepperWindow(QMainWindow):
     def render_file_check(self):
         self.render_list_model.pepperlist.clear()
         for render_file in self.render_model.pepperlist:
-            self.render_list_model.pepperlist.append(f"\n{render_file['name']} : \n "
+            temp_rev = render_file['temp_working_path'].split('.')[0][-3:]
+            cam_rev = render_file['layout_output_path'].split('.')[0][-3:]
+            # re.compile('/v(\d\d\d)/')
+            self.render_list_model.pepperlist.append(f"\n{render_file['name']}\n "
+                                                     f"Template revision : {temp_rev}\n "
+                                                     f"Layout camera revision : {cam_rev}\n " 
                                                      f"{render_file['temp_working_path']}\n "
                                                      f"{render_file['layout_output_path']}\n "
                                                      f"{render_file['fx_working_path']}\n "
@@ -672,33 +698,11 @@ class PepperWindow(QMainWindow):
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
             cmd_list, total_frame_list = houp.make_cmd(precomp)
 
-        # for precomp in self.render_model.pepperlist:
-        #     temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-        #         = self.path_seperator(precomp)
-        #     houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
-        #                                  f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
-        # for precomp in self.render_model.pepperlist:
-        #     temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-        #         = self.path_seperator(precomp)
-        #     self.mantra_window = MantraMainWindow(f'{fx_working_path}.{self.pepper.software.get("file_extension")}',
-        #                                           jpg_output_path, layout_output_path, houp.cam_node,
-        #                                           houp.abc_range[1] * hou.fps())
-        #     self.mantra_window.resize(800, 600)
-        #     self.mantra_window.move(1000, 250)
-        #     self.mantra_window.show()
-        # f = FFmpegMainWindow(fx_next_output, mov_next_output, hou.fps())
-        # f.resize(800, 600)
-        # f.move(1000, 250)
-        # f.show()
+        self.render_process = RenderMainWindow(cmd_list, total_frame_list)
+        self.render_process.resize(800, 600)
+        self.render_process.move(1000, 250)
+        self.render_process.show()
 
-        # print('cmd_list :', cmd_list)
-        # print('total_frame_list :', total_frame_list)
-        # self.render_process = RenderMainWindow(cmd_list, total_frame_list)
-        # self.render_process.resize(800, 600)
-        # self.render_process.move(1000, 250)
-        # self.render_process.show()
-
-        # self.pepper.precomp_list.clear()
         self.render_list_data.clear()
 
         self.render_model.layoutChanged.emit()
