@@ -4,6 +4,7 @@ import gazu.task
 from PySide2 import QtWidgets, QtCore
 from BlackPepper.pepper import Houpub
 
+
 class RenderMainWindow(QtWidgets.QMainWindow):
     """
     Houdini Mantra를 활용하여 sequence file로 render하고 FFmpeg으로 Sequence file을 mov로 컨버팅하는 UI이다. \n
@@ -81,9 +82,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
     def start_process(self):
         """ Qprocess를 활용하여 터미널에 명령을 내려주고 터미널 신호에 따라 출력하는 내용을 달리한다. \n
         진행 중, 오류, 변동, 마무리 단계마다 Text Widget에 상태를 Handling 한다.
-
         """
-
         self.mc = self.mantra_check.search(self.cmd)
         self.fc = self.ffmpeg_check.search(self.cmd)
 
@@ -99,7 +98,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
     def handle_stderr(self):
         """ QProcess Error정보를 받아온다. 바이트 신호를 번역하고 백분율 계산 함수를 실행시키고 컴퓨터가 보낸 정보를 Text에 출력한다.
-
         """
         data = self.p.readAllStandardError()
         stderr = bytes(data).decode("utf8")
@@ -113,7 +111,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
     def handle_stdout(self):
         """ QProcess Output정보를 받아온다. 바이트 신호를 번역한 정보를 Text에 출력한다.
-
         """
         data = self.p.readAllStandardOutput()
         stdout = bytes(data).decode("utf8")
@@ -128,7 +125,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
     def handle_state(self, state):
         """Qprocess state에 변동이 있을 경우, 해당 변화 정보를 출력한다.
-
         """
         states = {
             QtCore.QProcess.NotRunning: 'Not running',
@@ -140,7 +136,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
     def process_finished(self):
         """Qprocess finish가 날 경우, 바이트 신호를 번역한 정보를 Text에 출력한다.
-
         """
         if self.is_interrupted:
             self.is_interrupted = False
@@ -190,7 +185,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             total (int): Total frame
 
         Returns: pc(progress percent)
-
         """
         progress_re = re.compile('_(\d+)\.jpg')
         m = progress_re.search(output)
@@ -221,9 +215,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             total (int): Total frame
 
         Returns: pc(progress percent)
-
         """
-
         progress_re = re.compile("frame=   (\d+)")
         m = progress_re.search(output)
         if m:

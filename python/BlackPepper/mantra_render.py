@@ -21,7 +21,6 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
         output_path: shot fx output file jpg_sequence path
         abc_path: shot layout_camera output file path
         cam_node: Alembic file cam node
-
     """
     abc_range = abc.alembicTimeRange(abc_path)
     cam_setting = f'/obj/{cam_node}/'

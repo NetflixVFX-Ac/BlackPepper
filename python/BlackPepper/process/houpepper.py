@@ -75,7 +75,6 @@ class HouPepper:
             abc_tree_all (tuple): node in .abc
 
         Returns: node list
-
         """
         self._abc_tree_all = abc_tree_all
 
@@ -92,7 +91,6 @@ class HouPepper:
             abc_tree_path: node path in .abc
 
         Returns: node path
-
         """
         self._abc_tree_path = abc_tree_path
 
@@ -109,7 +107,6 @@ class HouPepper:
             abc_range(list): camera in, out frame
 
         Returns: camera in, out frame
-
         """
         self._abc_range = abc_range
 
@@ -119,7 +116,6 @@ class HouPepper:
 
         Args:
             abc_path (str): Alembic file path
-
         """
         self.abc_path = abc_path
         if len(self.abc_path) > 0:
@@ -137,7 +133,6 @@ class HouPepper:
 
         Args:
             abc_tree_all: abc.alembicGetSceneHierarchy(alembic file path, '')
-
         """
         node_name = abc_tree_all[0]
         node_type = abc_tree_all[1]
@@ -161,7 +156,6 @@ class HouPepper:
             abc_path (str): path
 
         Returns: boolean
-
         """
         file_name = abc_path
         if 'abc' not in file_name[-3:]:
@@ -182,7 +176,6 @@ class HouPepper:
 
         Args:
             cam: cam node created in houdini
-
         """
         for f in range(int(self.abc_range[0] * hou.fps()), int(self.abc_range[1] * hou.fps()) + 1):
             camera_dict = abc.alembicGetCameraDict(self.abc_path, cam, float(f) / hou.fps())
@@ -205,7 +198,6 @@ class HouPepper:
             cam: cam node created in houdini
 
         Returns: True
-
         """
         for f in range(int(self.abc_range[0] * hou.fps()), int(self.abc_range[1] * hou.fps()) + 1):
             cam_resolution = abc.alembicGetCameraResolution(self.abc_path, cam, float(f) / hou.fps())
@@ -226,7 +218,6 @@ class HouPepper:
             cam: camera node created in houdini
 
         Returns (list): translate, rotate, scale
-
         """
         translate = []
         rotate = []
@@ -254,7 +245,6 @@ class HouPepper:
             key(list): x, y, z position
             node(str): camera node created in houdini
             parm: 't' (translate) or 'r' (rotate) or 's' (scale)
-
         """
         J = ['x', 'y', 'z', 'w']
 
@@ -285,7 +275,6 @@ class HouPepper:
 
         Args:
             abc_path: Alembic file path
-
         """
         self.set_abc_cam_tree(abc_path)
         name = [abc.alembicGetSceneHierarchy(abc_path, i)[0] for i in self.cam_path]
@@ -322,7 +311,6 @@ class HouPepper:
             hip_path: template asset working file path
             abc_path: shot casted asset layout output file path
             saved_path: shot casted asset fx working file path
-
         """
         hou.hipFile.load(hip_path)
         self.set_cam_create(abc_path)
@@ -346,7 +334,6 @@ class HouPepper:
                     'jpg_output_path': jpg_output_path, 'video_output_path': video_output_path}
 
         Returns: cmd_list, total_frame_list
-
         """
         total_frame = self.abc_range[1] * hou.fps()
 
