@@ -77,8 +77,6 @@
 ***
 ## FileTree
 <pre>
-Examples
-
 ├── blackpepper
 │   ├── assets
 │   │   └── fx_template
