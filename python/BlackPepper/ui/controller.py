@@ -11,9 +11,8 @@ from BlackPepper.ui.model import PepperModel, PepperDnDModel
 from BlackPepper.ui.view import PepperView, PepperDnDView
 from BlackPepper.pepper import Houpub
 from BlackPepper.process.houpepper import HouPepper
-from BlackPepper.ui.auto_login import Auto_log
+from BlackPepper.auto_login import Auto_log
 from BlackPepper.log.moduler_log import Logger
-import hou
 from datetime import datetime
 
 
@@ -134,7 +133,6 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
         # status bar message
         self.login_window.statusBar().showMessage('Select licence version of houdini to log-in')
-        self.main_window.statusBar().showMessage('Select project to find templates')
         self.main_window.path_btn.setStatusTip('Show full path of render files')
         self.main_window.save_btn.setStatusTip("Save render files list as preset")
         self.main_window.reset_btn.setStatusTip('Clear render files list')
@@ -238,6 +236,7 @@ class PepperWindow(QMainWindow):
         renderlists는 self.render_model.pepperlist에 담긴 shot들의 name의 value 값만 보여주는 것이고,
         render 버튼 클릭 시 self.render_model.pepperlist 를 Houdini로 전달한다.
         """
+        self.main_window.statusBar().showMessage('Select project to find templates')
         self.create_main_menubar()
         # get my project
         self.my_projects = self.pepper.get_my_projects()
