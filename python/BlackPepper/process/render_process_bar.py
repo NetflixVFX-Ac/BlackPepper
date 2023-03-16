@@ -1,3 +1,4 @@
+import gazu
 import os.path
 import re
 from PySide2 import QtWidgets, QtCore
@@ -165,10 +166,10 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                 self.pepper.sequence = sequence.upper()
                 self.pepper.shot = shot
                 self.pepper.entity = 'shot'
-                # self.pepper.publish_output_file('FX', 'jpg_sequence', 'jpg publish')
-                # self.pepper.publish_output_file('FX', 'movie_file', 'mov publish')
-                # thumbnail = self.pepper.publish_preview('FX', 'Ready To Start', 'test', path)
-                # gazu.task.set_main_preview(thumbnail)
+                self.pepper.publish_output_file('FX', 'jpg_sequence', 'jpg publish')
+                self.pepper.publish_output_file('FX', 'movie_file', 'mov publish')
+                thumbnail = self.pepper.publish_preview('FX', 'Ready To Start', 'test', path)
+                gazu.task.set_main_preview(thumbnail)
 
         if len(self.cmd_list) > 0:
             self.cmd = self.cmd_list.pop(0)
