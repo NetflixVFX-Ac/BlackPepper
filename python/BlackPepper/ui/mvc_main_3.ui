@@ -244,14 +244,20 @@ color: rgb(180, 180, 180);
                <string/>
               </property>
               <property name="styleSheet">
-               <string notr="true">background-color: rgb(255, 0, 0);</string>
+               <string notr="true"/>
               </property>
               <property name="text">
                <string/>
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>../../../../../문서/fa.refresh.png</normaloff>../../../../../문서/fa.refresh.png</iconset>
+                <normaloff>../icon/clear-18.png</normaloff>../icon/clear-18.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
+               </size>
               </property>
              </widget>
             </item>
