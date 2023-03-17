@@ -1,11 +1,8 @@
 from unittest import TestCase
 from BlackPepper.process.houpepper import HouPepper
 from BlackPepper.pepper import Houpub
-import os
-import numpy as np
 import hou
 import _alembic_hom_extensions as abc
-import os
 
 
 class TestHouPepper(TestCase):
@@ -87,7 +84,7 @@ class TestHouPepper(TestCase):
         abc_range = abc.alembicTimeRange(abc_path)
         self.hou_pepper.abc_path = abc_path
         self.hou_pepper.abc_range = abc_range
-        cam = '/cam1/camCamera'
+        cam = 'cam1Camera'
 
         bbb = abc.alembicGetCameraDict(abc_path, cam, 1)
         print(bbb)
