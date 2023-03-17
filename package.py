@@ -7,7 +7,7 @@ version = '0.0.1'
 authors = ['Sunjun Park', 'Sungwoo Park', 'Jinkwang Park', 'Yeolhoon Yoon', 'Wongyu Lee', 'Jaehyuk Lee']
 
 requires = [
-    'gazu', 'hou', 'ffmpeg'
+    'gazu', 'hou', 'ffmpeg', 'PySide2'
 ]
 variants = [
     ['platform-linux', 'pyhton-3.9', 'houdini 19.5'],
