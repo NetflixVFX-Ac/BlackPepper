@@ -32,15 +32,15 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
     hou.hipFile.load(temp_path)
     root = hou.node('/out')
     if root is not None:
-        n = root.createNode('ifd')
-        n.parm('camera').set(cam_setting)
-        n.parm('vm_picture').set(f'{output_path[:-17]}{output_path[-4:]}_$F4.jpg')
-        n.parm('trange').set(1)
-        for i in n.parmTuple('f'):
+        mantre_node = root.createNode('ifd')
+        mantre_node.parm('camera').set(cam_setting)
+        mantre_node.parm('vm_picture').set(f'{output_path[:-17]}{output_path[-4:]}_$F4.jpg')
+        mantre_node.parm('trange').set(1)
+        for i in mantre_node.parmTuple('f'):
             i.deleteAllKeyframes()
-        n.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
-        n.parm('vm_verbose').set(1)
-        n.parm("execute").pressButton()
+        mantre_node.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
+        mantre_node.parm('vm_verbose').set(1)
+        mantre_node.parm("execute").pressButton()
     output_dir = os.path.dirname(output_path) + '/*.jpg'
     error_dir = os.path.dirname(output_path) + '/*.jpg.mantra_checkpoint'
     file_list = glob.glob(output_dir)
