@@ -226,7 +226,7 @@ class HouPepper:
         translate = []
         rotate = []
         scale = []
-        for f in range(int(self.abc_range[0] * hou.fps()), int(self.abc_range[1] * hou.fps())):
+        for f in range(int(self.abc_range[0] * hou.fps()), int(self.abc_range[1] * hou.fps()) + 1):
             xform = abc.getWorldXform(self.abc_path, cam, float(f) / hou.fps())[0]
             xf = hou.Matrix4(xform)
             translate.append(xf.extractTranslates())
