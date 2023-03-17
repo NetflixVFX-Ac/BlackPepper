@@ -3,6 +3,7 @@ from BlackPepper.pepper import Houpub
 import gazu
 import os
 import pprint
+import random
 
 
 class TestHoupub(TestCase):
@@ -669,7 +670,28 @@ class TestHoupub(TestCase):
         self.assertFalse(self.pepper.check_task_status('Retake', asset_test_task_type_name))
 
     def test_publish_preview(self):
-        pass
+        sequence_name = 'SQ01'
+        shot_name = '0040'
+        shot_test_task_type_name = 'layout_camera'
+        path = f'/mnt/project/test/dino/dino.{random.randrange(1, 218)}.png'
+        self.pepper.project = 'PEPPER'
+        self.pepper.software = 'hip'
+        self.pepper.sequence = sequence_name
+        self.pepper.shot = shot_name
+        self.pepper.entity = 'shot'
+        task_type, task = self.pepper.get_task(shot_test_task_type_name)
+        task_id = task['id']
+        task_type_id = task_type['id']
+        all_preview = gazu.shot.all_previews_for_shot(self.pepper.entity)
+        for preview in all_preview[task_type_id]:
+            self.assertEqual(preview['task_id'], task_id)
+        old_revs = [preview['revision'] for preview in all_preview[task_type_id]]
+        self.pepper.publish_preview(shot_test_task_type_name, 'Done', f'Test publish, preview file : {path}', path)
+        all_preview = gazu.shot.all_previews_for_shot(self.pepper.entity)
+        for preview in all_preview[task_type_id]:
+            self.assertEqual(preview['task_id'], task_id)
+        new_revs = [preview['revision'] for preview in all_preview[task_type_id]]
+        self.assertNotEqual(old_revs, new_revs)
 
     def test_check_asset_type(self):
         self.pepper.project = 'PEPPER'
@@ -727,6 +749,3 @@ class TestHoupub(TestCase):
             clock = time[11:]
             for data in clock.split(':'):
                 self.assertTrue(data.isdigit())
-
-    def test_read_json_file(self):
-        pass
