@@ -96,6 +96,12 @@ json save path : <root>/hook/BlackPepper/.config/user.json
 log save path : <root>/hook/BlackPepper/.config/hook_login.log
 ```
 ***
+# REZ Package included things
+Black Pepper v0.0.1 Publish 2023.03.17 
+```python
+'gazu', 'PySide2'
+```
+***
 # Contributors
 * @Sunjun Park
 * @Sungwoo Park
