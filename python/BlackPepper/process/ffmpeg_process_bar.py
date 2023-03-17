@@ -6,13 +6,12 @@ import glob
 
 class FFmpegMainWindow(QtWidgets.QMainWindow):
     """
-    FFmpeg으로 Sequence file을 mov로 컨버팅하는 UI이다. 터미널에 명령하고 출력되는 정보를 Text Widget에 보여준다.
-    정규표현을 활용하여 터미널에 출력되는 정보에서 컨버팅 중인 프레임을 파악하고 전체 프레임과 비교하여 Progress Widget으로
+    FFmpeg으로 Sequence file을 mov로 컨버팅하는 progress를 보여주는 UI다. 터미널에 명령하고 출력되는 정보를 Text widget에 보여준다.
+    정규표현식을 활용하여 터미널에 출력되는 정보에서 컨버팅 중인 프레임을 파악하고 전체 프레임과 비교하여 Progress widget으로
     진행사항을 유저에게 시각적으로 알려준다.
     """
     def __init__(self, seq_path, output_path, framerate):
         """Sequence file이 있는 경로와 mov파일이 저장될 경로, fps를 지정한다. 해당 인자들은 터미널에 명령내릴 command에 입력된다.
-
 
         Args:
             seq_path (str): Sequence file path
@@ -54,28 +53,28 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
         self.progress = QtWidgets.QProgressBar()
         self.progress.setRange(0, 100)
 
-        l = QtWidgets.QVBoxLayout()
-        # l.setStyleSheet("background-color:rgb(52, 52, 52);")
-        l.addWidget(self.progress)
-        l.addWidget(self.text)
+        layout = QtWidgets.QVBoxLayout()
+        layout.setStyleSheet("background-color:rgb(52, 52, 52);")
+        layout.addWidget(self.progress)
+        layout.addWidget(self.text)
 
-        w = QtWidgets.QWidget()
-        w.setStyleSheet(u"background-color: rgb(45, 45, 45);\n"
-                        "selection-background-color: rgb(45, 180, 198);\n"
-                        "font: 10pt\"Courier New\";\n"
-                        "color: rgb(180, 180, 180);\n")
-        w.setLayout(l)
+        widget = QtWidgets.QWidget()
+        widget.setStyleSheet(u"background-color: rgb(45, 45, 45);\n"
+                             "selection-background-color: rgb(45, 180, 198);\n"
+                             "font: 10pt\"Courier New\";\n"
+                             "color: rgb(180, 180, 180);\n")
+        widget.setLayout(layout)
 
-        self.setCentralWidget(w)
+        self.setCentralWidget(widget)
         self.start_process()
 
-    def message(self, s):
+    def message(self, text):
         """  Text Widget에 메시지를 출력한다
 
         Args:
-            s(str): text
+            text(str): text
         """
-        self.text.appendPlainText(s)
+        self.text.appendPlainText(text)
 
     def start_process(self):
         """ Qprocess를 활용하여 터미널에 명령을 내려주고 터미널 신호에 따라 출력하는 내용을 달리한다. \n
@@ -145,7 +144,8 @@ class FFmpegMainWindow(QtWidgets.QMainWindow):
                 print("unknown:", x)
         return int(self.filecnt)
 
-    def simple_percent_parser(self, output, total):
+    @staticmethod
+    def simple_percent_parser(output, total):
         """Progress bar에 넣을 정보를 백분율로 계산한다. \n
         컨버팅이 끝난 frame은 Text Widget에 표시되고, 정규표현식을 사용하여 Text Widget에서 해당 frame을 파악한다. \n
         tree 함수를 사용하여 구한 전체 frame을 분모로 설정하고 컨버팅이 끝난 frame을 분자로 설정하여 백분율을 계싼한다. \n
