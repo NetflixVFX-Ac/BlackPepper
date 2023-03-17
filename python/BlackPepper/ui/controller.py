@@ -304,7 +304,7 @@ class PepperWindow(QMainWindow):
         self.pepper.asset = template_name
         self.pepper.entity = 'asset'
         # Reset comboBox, get template info
-        rev_list = self.pepper.get_every_revision_for_working_file('fx_template')
+        rev_list = self.pepper.get_every_revision_for_working_file('simulation')
         self.renew_template_cbox(rev_list)
         self.renew_template_info()
         # Append shot names to shot listview

@@ -561,6 +561,9 @@ class Houpub:
         Returns:
             dict for houpepper render queue
         """
+        self.dict_check(casted_shot, 'not_dict')
+        if 'shot_name' not in casted_shot or 'sequence_name' not in casted_shot:
+            self.error('not_dict')
         sequence_name = casted_shot['sequence_name']
         shot_name = casted_shot['shot_name']
         name = '_'.join([self.project['name'], self.asset['name'][5:], sequence_name, shot_name])
@@ -608,8 +611,8 @@ class Houpub:
         """
         split_name = precomp['name'].split('_')
         self.project = split_name[0]
-        self.sequence = split_name[2]
-        self.shot = split_name[3]
+        self.sequence = split_name[-2]
+        self.shot = split_name[-1]
         self.entity = 'shot'
         self.publish_working_file('FX')
 
@@ -626,26 +629,27 @@ class Houpub:
         """
         split_name = precomp['name'].split('_')
         self.project = split_name[0]
-        self.sequence = split_name[2]
-        self.shot = split_name[3]
+        self.sequence = split_name[-2]
+        self.shot = split_name[-1]
         self.entity = 'shot'
         self.publish_output_file('FX', 'Movie_file', 'test_precomp')
 
-    def get_every_revision_for_working_file(self, task_name):
+    def get_every_revision_for_working_file(self, task_type_name):
         """self.entity의 task_name에 해당하는 task의 모든 working file의 revision이 담긴 list를 반환한다.
 
         Example:
             rev_list = pepper.get_every_revision_for_working_file('fx_template')
 
         Args:
-            task_name(str): working file을 찾을 task의 이름
+            task_type_name(str): working file을 찾을 task의 이름
 
         Returns:
             [9, 8, 7, 6, 5, 4, 3, 2, 1]
         """
         working_files = gazu.files.get_all_working_files_for_entity(self.entity)
+        # Task id of working file leads to task, task_type of task have task type name
         revision_list = [working_file['revision'] for working_file in working_files
-                         if gazu.task.get_task(working_file['task_id'])['entity_type']['name'] == task_name]
+                         if gazu.task.get_task(working_file['task_id'])['task_type']['name'] == task_type_name]
         return revision_list
 
     def get_every_revision_for_output_file(self, output_type_name, task_type_name):
@@ -822,11 +826,12 @@ class Houpub:
                 for asset in gazu.casting.get_shot_casting(self.shot)]
 
     def check_asset_type(self, asset_name, asset_type_name):
-        """asset의 asset type이 asset_type_name과 일치하는지 확인해주고 일치한다면 asset을 그대로 반환해준다.
-
-
+        """asset의 asset type이 asset_type_name과 일치하는지 확인해주고 일치한다면 asset을 그대로 반환해주는 메소드. \n
+        asset_name의 asset이 없거나 asset의 asset type이 asset_type_name과 일치하지 않는다면 아무것도 반환하지 않는다.
         """
         asset = gazu.asset.get_asset_by_name(self.project, asset_name)
+        if asset is None:
+            return
         asset_type = gazu.asset.get_asset_type_from_asset(asset)
         if asset_type['name'] == asset_type_name:
             return asset_name
@@ -863,24 +868,11 @@ class Houpub:
         Returns:
             JaehyukLee, Date-Time, 1
         """
-        global the_working_file
         self.entity = entity_type
         _, task = self.get_task(task_type_name)
         working_files = gazu.files.get_all_working_files_for_entity(self.entity)
-        for check_file in working_files:
-            if str(check_file['revision']) == revision:
-                the_working_file = check_file
-                break
-        if not working_files:
-            rev = ''
-            person = ''
-            created_time = ''
-        else:
-            created_time = the_working_file['created_at']
-            rev = the_working_file['revision']
-            person_id = the_working_file['person_id']
-            person_dict = gazu.person.get_person(person_id)
-            person = person_dict['first_name'] + person_dict['last_name']
+        working_file = self.find_revision_in_list(working_files, revision)
+        person, created_time, rev = self.make_info_data(working_file)
         return person, created_time, rev
 
     def get_output_file_data(self, output_type_name, task_type_name, revision, entity_type):
@@ -898,28 +890,57 @@ class Houpub:
         Returns:
             JaehyukLee, Date-Time, 1
         """
-        global the_output_file
         self.entity = entity_type
         task_type, _ = self.get_task(task_type_name)
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         output_files = gazu.files.all_output_files_for_entity(self.entity, output_type, task_type)
-        for check_file in output_files:
-            if str(check_file['revision']) == revision:
-                the_output_file = check_file
-                break
-        if not output_files:
+        output_file = self.find_revision_in_list(output_files, revision)
+        person, created_time, rev = self.make_info_data(output_file)
+        return person, created_time, rev
+
+    @staticmethod
+    def find_revision_in_list(files, revision):
+        """Working file이나 Output file들이 들어있는 리스트에서 input된 revision과 같은 revision을 가진 dict를 반환해주는 메소드. \n
+        self.get_output_file_data 메소드 안에서만 사용된다.
+
+        Args:
+            files(list): List of working file dicts or output file dicts
+            revision: Revision number of working file the user is looking for
+
+        Returns:
+            Working file dict with the right revision number(if exists)
+        """
+        for file in files:
+            if str(file['revision']) == str(revision):
+                return file
+        return
+
+    @staticmethod
+    def make_info_data(file):
+        """Working file이나 Output file의 dict에서 person, created time, revision을 찾아 반환해주는 메소드. \n
+        Dict가 제대로 들어오지 않는다면 공백을 반환한다. self.get_output_file_data 메소드 안에서만 사용된다.
+
+        Args:
+            file(dict): Working file dict or output file dict
+
+        Returns:
+            JaehyukLee, Date-Time, 1
+        """
+        if file is None:
             rev = ''
             person = ''
             created_time = ''
         else:
-            rev = the_output_file['revision']
-            created_time = the_output_file['created_at']
-            person_id = the_output_file['person_id']
+            rev = file['revision']
+            created_time = file['created_at']
+            person_id = file['person_id']
             person_dict = gazu.person.get_person(person_id)
-            person = person_dict['first_name'] + person_dict['last_name']
+            person = person_dict['full_name']
         return person, created_time, rev
 
     def read_json_file(self):
+        """Auto login을 할 수 있는 json file의 생성 경로나 불러올 경로를 지정한다. root는 현재 .py file이 위치한 곳으로 한다.
+        """
         now_path = os.path.realpath(__file__)
         split_path = now_path.split('/')[:-1]
         dir_path = os.path.join('/'.join(split_path), '.config')
@@ -1058,6 +1079,8 @@ class Houpub:
             raise Exception("No shot or asset is assigned.")
         if code == 'entity_not_assigned':
             raise Exception("Entity is not assigned")
+        if code == 'not_dict':
+            raise Exception("Input must be dict.")
         if 'no_task_type' in code:
             raise Exception(f"There's no task type named '{code[12:]}'")
         if 'no_output_type' in code:
