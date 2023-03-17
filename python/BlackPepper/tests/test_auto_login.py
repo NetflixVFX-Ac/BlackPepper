@@ -1,5 +1,7 @@
 from unittest import TestCase
-from BlackPepper.ui.auto_login import Auto_log
+from unittest.mock import patch
+from BlackPepper.auto_login import Auto_log
+
 
 
 class TestAuto_log(TestCase):
@@ -74,3 +76,10 @@ class TestAuto_log(TestCase):
             self.assertFalse(i['valid_host'])
             self.assertFalse(i['valid_user'])
             self.assertFalse(i['auto_login'])
+
+    @patch('os.path.exists')
+    @patch('os.makedirs')
+    def test_access_setting(self, patch_makedirs, patch_exists):
+        self.auto.access_setting()
+        patch_exists.return_value = True
+        self.assertTrue(patch_makedirs.called_once())

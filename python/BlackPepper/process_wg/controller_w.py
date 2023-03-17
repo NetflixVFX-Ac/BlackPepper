@@ -6,7 +6,7 @@ from PySide2.QtWidgets import QMainWindow, QApplication, QWidget, QLabel, QVBoxL
 from BlackPepper.ui.model import PepperModel
 from BlackPepper.ui.view import PepperView
 from BlackPepper.pepper import Houpub
-from BlackPepper.houpepper import HouPepper
+from BlackPepper.process.houpepper import HouPepper
 from PySide2.QtGui import QIcon
 
 

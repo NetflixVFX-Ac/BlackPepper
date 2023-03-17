@@ -31,7 +31,7 @@ class TestHouPepper(TestCase):
                         ["camera3", "camera", []]
                     ]]
                 ]]
-            ]
+            ]]
         self.get_abc_cam_tree(abc_tree_all)
 
         self.assertListEqual(self.cam_list, ["camera1", "camera2", "camera3"])
