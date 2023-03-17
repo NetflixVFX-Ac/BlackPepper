@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 
-name = 'H O O K'
+name = 'BlackPepper'
 
 version = '0.0.1'
 
 authors = ['Sunjun Park', 'Sungwoo Park', 'Jinkwang Park', 'Yeolhoon Yoon', 'Wongyu Lee', 'Jaehyuk Lee']
 
 requires = [
-    'gazu', 'hou', 'ffmpeg', 'PySide2'
+    'gazu', 'PySide2'
 ]
 variants = [
-    ['platform-linux', 'pyhton-3.9', 'houdini 19.5'],
+    ['platform-linux', 'python-3.9', 'houdini-19.5.493'],
 ]
-
-tools = ['Black Pepper']
 
 
 def commands():
