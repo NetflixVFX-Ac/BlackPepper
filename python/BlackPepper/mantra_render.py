@@ -1,9 +1,9 @@
-import hou
-import _alembic_hom_extensions as abc
+import sys
 import os
 import shutil
 import glob
-import sys
+import hou
+import _alembic_hom_extensions as abc
 
 
 def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):

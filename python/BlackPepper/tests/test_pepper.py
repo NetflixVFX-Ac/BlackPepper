@@ -65,7 +65,6 @@ class TestHoupub(TestCase):
                          '/mnt/project/hook/pepper/shots/sq01/0010/fx/output/'
                          'jpeg/v001/pepper_sq01_0010_jpeg_v001.undi_img')
 
-
     def test_working_file_path(self):
         """
         woking file path를 출력하여 last revisioln에 해당하는 path가 제대로 출력되는지 체크한다.
@@ -80,7 +79,6 @@ class TestHoupub(TestCase):
         path = self.pepper.working_file_path(task_type_name)
         latest_revision = gazu.files.get_last_working_file_revision(task).get('revision')
         self.assertEqual(latest_revision, int(path.strip()[-7:-4]))
-
 
     def test_make_next_working_path(self):
         """
@@ -163,7 +161,6 @@ class TestHoupub(TestCase):
         self.assertTrue(type(task_type), dict)
         self.assertEqual(task_type.get('name'), 'FX')
 
-
     def test_software(self):
         """
         software 함수에서 if문이 제대로 작동하는지 체크한다.
@@ -206,7 +203,6 @@ class TestHoupub(TestCase):
         code = 'none'
         check = self.pepper.dict_check(test_dict, code)
         self.assertIs(type(check), dict)
-
 
     def test_args_str_check(self):
         """
@@ -517,3 +513,220 @@ class TestHoupub(TestCase):
         self.pepper.publish_precomp_output(result)
         nwp2 = self.pepper.make_next_output_path('Movie_file', 'FX')
         pprint.pp(nwp2)
+
+# -------------------------------------------------
+
+    def test_make_precomp_dict(self):
+        self.pepper.project = 'PEPPER'
+        self.pepper.software = 'hip'
+        asset_name = 'temp_breaking_glass'
+        self.pepper.asset = asset_name
+        casted_shots = self.pepper.get_casting_path_for_asset()
+        for casted_shot in casted_shots:
+            self.assertIn('shot_name', casted_shot)
+            self.assertIn('sequence_name', casted_shot)
+            made_dict = self.pepper.make_precomp_dict(casted_shot)
+            sequence_name = casted_shot['sequence_name']
+            shot_name = casted_shot['shot_name']
+            test_name = '_'.join([self.pepper.project['name'], self.pepper.asset['name'][5:],
+                                 sequence_name, shot_name])
+            self.pepper.asset = asset_name
+            self.pepper.entity = 'asset'
+            test_temp_working_path = self.pepper.working_file_path('simulation')
+            self.pepper.sequence = sequence_name
+            self.pepper.shot = shot_name
+            self.pepper.entity = 'shot'
+            test_layout_output_path = self.pepper.output_file_path('camera_cache', 'layout_camera')
+            test_fx_working_path = self.pepper.make_next_working_path('FX')
+            test_jpg_output_path = self.pepper.make_next_output_path('jpg_sequence', 'FX')
+            test_video_output_path = self.pepper.make_next_output_path('movie_file', 'FX')
+            self.assertEqual(made_dict['name'], test_name)
+            self.assertEqual(made_dict['temp_working_path'], test_temp_working_path)
+            self.assertEqual(made_dict['layout_output_path'], test_layout_output_path)
+            self.assertEqual(made_dict['fx_working_path'], test_fx_working_path)
+            self.assertEqual(made_dict['jpg_output_path'], test_jpg_output_path)
+            self.assertEqual(made_dict['video_output_path'], test_video_output_path)
+
+    def test_path_seperator(self):
+        self.pepper.project = 'PEPPER'
+        self.pepper.software = 'hip'
+        asset_name = 'temp_breaking_glass'
+        self.pepper.asset = asset_name
+        casted_shots = self.pepper.get_casting_path_for_asset()
+        for casted_shot in casted_shots:
+            self.assertIn('shot_name', casted_shot)
+            self.assertIn('sequence_name', casted_shot)
+            made_dict = self.pepper.make_precomp_dict(casted_shot)
+            sequence_name = casted_shot['sequence_name']
+            shot_name = casted_shot['shot_name']
+            self.pepper.asset = asset_name
+            self.pepper.entity = 'asset'
+            test_temp_working_path = self.pepper.working_file_path('simulation')
+            self.pepper.sequence = sequence_name
+            self.pepper.shot = shot_name
+            self.pepper.entity = 'shot'
+            test_layout_output_path = self.pepper.output_file_path('camera_cache', 'layout_camera')
+            test_fx_working_path = self.pepper.make_next_working_path('FX')
+            test_jpg_output_path = self.pepper.make_next_output_path('jpg_sequence', 'FX')
+            test_video_output_path = self.pepper.make_next_output_path('movie_file', 'FX')
+            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path = \
+                self.pepper.path_seperator(made_dict)
+            self.assertEqual(temp_working_path, test_temp_working_path)
+            self.assertEqual(layout_output_path, test_layout_output_path)
+            self.assertEqual(fx_working_path, test_fx_working_path)
+            self.assertEqual(jpg_output_path, test_jpg_output_path)
+            self.assertEqual(video_output_path, test_video_output_path)
+
+    def test_publish_precomp_working(self):
+        self.pepper.project = 'PEPPER'
+        self.pepper.software = 'hip'
+        asset_name = 'temp_breaking_glass'
+        self.pepper.asset = asset_name
+        casted_shots = self.pepper.get_casting_path_for_asset()
+        for casted_shot in casted_shots:
+            self.pepper.sequence = casted_shot['']
+            self.assertIn('shot_name', casted_shot)
+            self.assertIn('sequence_name', casted_shot)
+            self.pepper.working_file_path('FX')
+            made_dict = self.pepper.make_precomp_dict(casted_shot)
+
+    def test_publish_precomp_output(self):
+        self.pepper.project = 'PEPPER'
+        self.pepper.software = 'hip'
+        asset_name = 'temp_breaking_glass'
+        self.pepper.asset = asset_name
+        casted_shots = self.pepper.get_casting_path_for_asset()
+        for casted_shot in casted_shots:
+            precomp = self.pepper.make_precomp_dict(casted_shot)
+            sequence_name = casted_shot['sequence_name']
+            shot_name = casted_shot['shot_name']
+            split_name = precomp['name'].split('_')
+            self.assertEqual(split_name[0], self.pepper.project['name'])
+            self.assertEqual(split_name[-2], sequence_name)
+            self.assertEqual(split_name[-1], shot_name)
+            self.pepper.sequence = casted_shot['sequence_name']
+            self.pepper.shot = casted_shot['shot_name']
+            old_path = self.pepper.working_file_path('FX')
+            self.pepper.publish_precomp_working(precomp)
+            new_path = self.pepper.working_file_path('FX')
+            self.assertNotEqual(old_path, new_path)
+
+    def test_get_every_revision_for_working_file(self):
+        asset_name = 'temp_breaking_glass'
+        asset_test_task_type_name = 'simulation'
+        sequence_name = 'SQ01'
+        shot_name = '0020'
+        shot_test_task_type_name = 'FX'
+        self.pepper.project = 'PEPPER'
+        self.pepper.software = 'hip'
+        self.pepper.asset = asset_name
+        self.pepper.entity = 'asset'
+        rev_list = self.pepper.get_every_revision_for_working_file(asset_test_task_type_name)
+        self.assertTrue(rev_list)
+        for num in rev_list:
+            self.assertEqual(type(num), int)
+        self.pepper.sequence = sequence_name
+        self.pepper.shot = shot_name
+        self.pepper.entity = 'shot'
+        rev_list = self.pepper.get_every_revision_for_working_file(shot_test_task_type_name)
+        self.assertTrue(rev_list)
+        for num in rev_list:
+            self.assertEqual(type(num), int)
+
+    def test_get_every_revision_for_output_file(self):
+        sequence_name = 'SQ01'
+        shot_name = '0040'
+        shot_test_task_type_name = 'layout_camera'
+        shot_output_type_name = 'camera_cache'
+        self.pepper.project = 'PEPPER'
+        self.pepper.software = 'hip'
+        self.pepper.sequence = sequence_name
+        self.pepper.shot = shot_name
+        self.pepper.entity = 'shot'
+        rev_list = self.pepper.get_every_revision_for_output_file(shot_output_type_name, shot_test_task_type_name)
+        self.assertTrue(rev_list)
+        for num in rev_list:
+            self.assertEqual(type(num), int)
+
+    def test_get_task_status(self):
+        all_status = ['Todo', 'Ready To Start', 'Work In Progress', 'Done', 'Retake']
+        for status in all_status:
+            status_dict = self.pepper.get_task_status(status)
+            self.assertTrue(status_dict)
+            self.assertDictEqual(status_dict, gazu.task.get_task_status_by_name(status))
+
+    def test_check_task_status(self):
+        asset_name = 'temp_breaking_glass'
+        asset_test_task_type_name = 'simulation'
+        sequence_name = 'SQ01'
+        shot_name = '0020'
+        shot_test_task_type_name = 'FX'
+        self.pepper.project = 'PEPPER'
+        self.pepper.software = 'hip'
+        self.pepper.asset = asset_name
+        self.pepper.entity = 'asset'
+        self.assertTrue(self.pepper.check_task_status('Done', asset_test_task_type_name))
+        self.assertFalse(self.pepper.check_task_status('Retake', asset_test_task_type_name))
+
+    def test_publish_preview(self):
+        pass
+
+    def test_check_asset_type(self):
+        self.pepper.project = 'PEPPER'
+        asset_name = 'temp_breaking_glass'
+        asset_type_name = 'fx_template'
+        self.assertIsNotNone(self.pepper.check_asset_type(asset_name, asset_type_name))
+        self.assertEqual(self.pepper.check_asset_type(asset_name, asset_type_name), asset_name)
+        self.assertIsNone(self.pepper.check_asset_type(asset_name, 'testname'))
+        self.assertIsNone(self.pepper.check_asset_type('testname', asset_type_name))
+
+    def test_get_my_projects(self):
+        my_projects = self.pepper.get_my_projects()
+        self.assertTrue(my_projects)
+        for project in my_projects:
+            self.pepper.project = project
+            self.assertEqual(self.pepper.project['type'], 'Project')
+
+    def test_get_working_file_data(self):
+        asset_name = 'temp_breaking_glass'
+        asset_task_type_name = 'simulation'
+        self.pepper.project = 'PEPPER'
+        self.pepper.software = 'hip'
+        self.pepper.asset = asset_name
+        self.pepper.entity = 'asset'
+        rev_list = self.pepper.get_every_revision_for_working_file(asset_task_type_name)
+        for revision in rev_list:
+            name, time, rev = self.pepper.get_working_file_data(asset_task_type_name, revision, 'asset')
+            self.assertTrue(gazu.person.get_person_by_full_name(name))
+            self.assertEqual(rev, revision)
+            date = time[:10]
+            for data in date.split('-'):
+                self.assertTrue(data.isdigit())
+            clock = time[11:]
+            for data in clock.split(':'):
+                self.assertTrue(data.isdigit())
+
+    def test_get_output_file_data(self):
+        sequence_name = 'SQ01'
+        shot_name = '0020'
+        task_type_name = 'layout_camera'
+        output_type_name = 'camera_cache'
+        self.pepper.project = 'PEPPER'
+        self.pepper.software = 'hip'
+        self.pepper.sequence = sequence_name
+        self.pepper.shot = shot_name
+        self.pepper.entity = 'shot'
+        rev_list = self.pepper.get_every_revision_for_output_file(output_type_name, task_type_name)
+        for revision in rev_list:
+            name, time, rev = self.pepper.get_working_file_data(task_type_name, revision, 'shot')
+            self.assertTrue(gazu.person.get_person_by_full_name(name))
+            self.assertEqual(rev, revision)
+            date = time[:10]
+            for data in date.split('-'):
+                self.assertTrue(data.isdigit())
+            clock = time[11:]
+            for data in clock.split(':'):
+                self.assertTrue(data.isdigit())
+
+    def test_read_json_file(self):
+        pass
