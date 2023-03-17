@@ -1,8 +1,8 @@
-from BlackPepper.ui.controller import PepperWindow
+import BlackPepper.ui.controller as bp
 
 
 def main():
-    ui = PepperWindow()
+    bp.main()
 
 
 if __name__ == "__main__":
