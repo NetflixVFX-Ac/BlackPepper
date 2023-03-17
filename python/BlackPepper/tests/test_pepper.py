@@ -3,6 +3,7 @@ from BlackPepper.pepper import Houpub
 import gazu
 import os
 import pprint
+import random
 
 
 class TestHoupub(TestCase):
@@ -489,8 +490,6 @@ class TestHoupub(TestCase):
         self.pepper.make_precomp_dict(picked_shot)
         result = self.pepper.make_precomp_dict(picked_shot)
         self.assertEqual(result['name'], 'PEPPER_fire_SQ01_0010')
-        # print(result)
-        # print("xxxxx", result['fx_working_path'])
         """
         9. render button
         
@@ -584,11 +583,19 @@ class TestHoupub(TestCase):
         self.pepper.asset = asset_name
         casted_shots = self.pepper.get_casting_path_for_asset()
         for casted_shot in casted_shots:
-            self.pepper.sequence = casted_shot['']
-            self.assertIn('shot_name', casted_shot)
-            self.assertIn('sequence_name', casted_shot)
-            self.pepper.working_file_path('FX')
-            made_dict = self.pepper.make_precomp_dict(casted_shot)
+            precomp = self.pepper.make_precomp_dict(casted_shot)
+            sequence_name = casted_shot['sequence_name']
+            shot_name = casted_shot['shot_name']
+            split_name = precomp['name'].split('_')
+            self.assertEqual(split_name[0], self.pepper.project['name'])
+            self.assertEqual(split_name[-2], sequence_name)
+            self.assertEqual(split_name[-1], shot_name)
+            self.pepper.sequence = casted_shot['sequence_name']
+            self.pepper.shot = casted_shot['shot_name']
+            old_path = self.pepper.working_file_path('FX')
+            self.pepper.publish_precomp_working(precomp)
+            new_path = self.pepper.working_file_path('FX')
+            self.assertNotEqual(old_path, new_path)
 
     def test_publish_precomp_output(self):
         self.pepper.project = 'PEPPER'
@@ -606,9 +613,9 @@ class TestHoupub(TestCase):
             self.assertEqual(split_name[-1], shot_name)
             self.pepper.sequence = casted_shot['sequence_name']
             self.pepper.shot = casted_shot['shot_name']
-            old_path = self.pepper.working_file_path('FX')
-            self.pepper.publish_precomp_working(precomp)
-            new_path = self.pepper.working_file_path('FX')
+            old_path = self.pepper.output_file_path('Movie_file', 'FX')
+            self.pepper.publish_precomp_output(precomp)
+            new_path = self.pepper.output_file_path('Movie_file', 'FX')
             self.assertNotEqual(old_path, new_path)
 
     def test_get_every_revision_for_working_file(self):
@@ -669,7 +676,28 @@ class TestHoupub(TestCase):
         self.assertFalse(self.pepper.check_task_status('Retake', asset_test_task_type_name))
 
     def test_publish_preview(self):
-        pass
+        sequence_name = 'SQ01'
+        shot_name = '0040'
+        shot_test_task_type_name = 'layout_camera'
+        path = f'/mnt/project/test/dino/dino.{random.randrange(1, 218)}.png'
+        self.pepper.project = 'PEPPER'
+        self.pepper.software = 'hip'
+        self.pepper.sequence = sequence_name
+        self.pepper.shot = shot_name
+        self.pepper.entity = 'shot'
+        task_type, task = self.pepper.get_task(shot_test_task_type_name)
+        task_id = task['id']
+        task_type_id = task_type['id']
+        all_preview = gazu.shot.all_previews_for_shot(self.pepper.entity)
+        for preview in all_preview[task_type_id]:
+            self.assertEqual(preview['task_id'], task_id)
+        old_revs = [preview['revision'] for preview in all_preview[task_type_id]]
+        self.pepper.publish_preview(shot_test_task_type_name, 'Done', f'Test publish, preview file : {path}', path)
+        all_preview = gazu.shot.all_previews_for_shot(self.pepper.entity)
+        for preview in all_preview[task_type_id]:
+            self.assertEqual(preview['task_id'], task_id)
+        new_revs = [preview['revision'] for preview in all_preview[task_type_id]]
+        self.assertNotEqual(old_revs, new_revs)
 
     def test_check_asset_type(self):
         self.pepper.project = 'PEPPER'
@@ -727,6 +755,3 @@ class TestHoupub(TestCase):
             clock = time[11:]
             for data in clock.split(':'):
                 self.assertTrue(data.isdigit())
-
-    def test_read_json_file(self):
-        pass
