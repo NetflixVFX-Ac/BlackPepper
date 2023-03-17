@@ -29,7 +29,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.cmd_list = cmd_list
         self.total_frame_list = total_frame_list
 
-        DEFAULT_STYLE = """
+        PROGRESS_DEFAULT_STYLE = """
         QProgressBar{
             border: 2px solid grey;
             border-radius: 5px;
@@ -39,11 +39,20 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         }
         """
 
+        BACKGROUND_DEFAULT_STYLE = """
+        QWidget{
+            background-color: rgb(45, 45, 45);
+            selection-background-color: rgb(45, 180, 198);
+            font: 10pt\"Courier New\";
+            color: rgb(180, 180, 180)
+        }
+        """
+
         self.mantra_check = re.compile('^python')
         self.ffmpeg_check = re.compile('^ffmpeg')
         self.ffmpeg_list = None
         self.progress = QtWidgets.QProgressBar()
-        self.progress.setStyleSheet(DEFAULT_STYLE)
+        self.progress.setStyleSheet(PROGRESS_DEFAULT_STYLE)
         self.progress.setRange(0, 100)
 
         self.text = QtWidgets.QPlainTextEdit()
@@ -57,12 +66,9 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         l.addWidget(self.btn_interrupt)
 
         w = QtWidgets.QWidget()
-        w.setStyleSheet(u"background-color: rgb(45, 45, 45);\n"
-                        "selection-background-color: rgb(45, 180, 198);\n"
-                        "font: 10pt\"Courier New\";\n"
-                        "color: rgb(180, 180, 180);\n")
+        w.setStyleSheet(BACKGROUND_DEFAULT_STYLE)
         w.setLayout(l)
-        self.setWindowTitle('Black Pepper Progress')
+        self.setWindowTitle('Black Pepper Process')
         self.setCentralWidget(w)
 
         if len(self.cmd_list) == 0:
@@ -94,7 +100,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.p.stateChanged.connect(self.handle_state)
         self.p.finished.connect(self.process_finished)
         self.p.start(self.cmd)
-        print('check check')
 
     def handle_stderr(self):
         """ QProcess Error정보를 받아온다. 바이트 신호를 번역하고 백분율 계산 함수를 실행시키고 컴퓨터가 보낸 정보를 Text에 출력한다.
@@ -201,6 +206,9 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                 return pc
 
     def handle_interrupt(self):
+        """interrupt button 클릭 시, 실행되는 메소드다. 진행 중인 Process를 중단시키고 Restart button으로 변경한다. \n
+        변경 된 button을 다시 클릭할 경우, Process를 처음부터 다시 실행한다.
+        """
         if not self.is_interrupted:
             self.is_interrupted = True
             self.p.terminate()
@@ -243,6 +251,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                 return pc  # 백분율을 통해 process bar에 보여질 값
 
     def closeEvent(self, event):
+        """Process UI를 종료시키는 Event가 발생할 경우, 진행 중인 QProcess를 중단시킨다.
+        """
         if self.p is not None and self.p.state() == QtCore.QProcess.Running:
             self.p.terminate()
         super().closeEvent(event)
