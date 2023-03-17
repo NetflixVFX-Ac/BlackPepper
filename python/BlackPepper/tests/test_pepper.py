@@ -490,8 +490,6 @@ class TestHoupub(TestCase):
         self.pepper.make_precomp_dict(picked_shot)
         result = self.pepper.make_precomp_dict(picked_shot)
         self.assertEqual(result['name'], 'PEPPER_fire_SQ01_0010')
-        # print(result)
-        # print("xxxxx", result['fx_working_path'])
         """
         9. render button
         
@@ -585,11 +583,19 @@ class TestHoupub(TestCase):
         self.pepper.asset = asset_name
         casted_shots = self.pepper.get_casting_path_for_asset()
         for casted_shot in casted_shots:
-            self.pepper.sequence = casted_shot['']
-            self.assertIn('shot_name', casted_shot)
-            self.assertIn('sequence_name', casted_shot)
-            self.pepper.working_file_path('FX')
-            made_dict = self.pepper.make_precomp_dict(casted_shot)
+            precomp = self.pepper.make_precomp_dict(casted_shot)
+            sequence_name = casted_shot['sequence_name']
+            shot_name = casted_shot['shot_name']
+            split_name = precomp['name'].split('_')
+            self.assertEqual(split_name[0], self.pepper.project['name'])
+            self.assertEqual(split_name[-2], sequence_name)
+            self.assertEqual(split_name[-1], shot_name)
+            self.pepper.sequence = casted_shot['sequence_name']
+            self.pepper.shot = casted_shot['shot_name']
+            old_path = self.pepper.working_file_path('FX')
+            self.pepper.publish_precomp_working(precomp)
+            new_path = self.pepper.working_file_path('FX')
+            self.assertNotEqual(old_path, new_path)
 
     def test_publish_precomp_output(self):
         self.pepper.project = 'PEPPER'
@@ -607,9 +613,9 @@ class TestHoupub(TestCase):
             self.assertEqual(split_name[-1], shot_name)
             self.pepper.sequence = casted_shot['sequence_name']
             self.pepper.shot = casted_shot['shot_name']
-            old_path = self.pepper.working_file_path('FX')
-            self.pepper.publish_precomp_working(precomp)
-            new_path = self.pepper.working_file_path('FX')
+            old_path = self.pepper.output_file_path('Movie_file', 'FX')
+            self.pepper.publish_precomp_output(precomp)
+            new_path = self.pepper.output_file_path('Movie_file', 'FX')
             self.assertNotEqual(old_path, new_path)
 
     def test_get_every_revision_for_working_file(self):
