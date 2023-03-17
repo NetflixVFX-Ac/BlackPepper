@@ -1,18 +1,24 @@
 # -*- coding: utf-8 -*-
 
-name = 'Black Pepper'
+name = 'H O O K'
+
 version = '0.0.1'
-authors = ['Sunjun Park', 'Sungwoo Park', 'Jinkwang Park', 'Yeolhoon Yoon', 'Jaehyuk Lee', 'Wongyu Lee']
+
+authors = ['Sunjun Park', 'Sungwoo Park', 'Jinkwang Park', 'Yeolhoon Yoon', 'Wongyu Lee', 'Jaehyuk Lee']
+
 requires = [
-    'gazu', 'hou', 'ffmpeg', 'houdini',
+    'gazu', 'hou', 'ffmpeg'
 ]
 variants = [
-    ['platform-linux', 'Pyhton3.9', 'houdini 19.5'],
+    ['platform-linux', 'pyhton-3.9', 'houdini 19.5'],
 ]
+
+tools = ['Black Pepper']
 
 
 def commands():
-    env.PYTHONPATH.prepend("{root}/BlackPepper")
+    env.PATH.append("{root}/bin")
+    env.PYTHONPATH.prepend("{root}/python")
 
 
 format_version = 1

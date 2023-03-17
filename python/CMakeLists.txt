@@ -14,3 +14,9 @@ rez_install_files(
     ${md_files}
     DESTINATION .
 )
+
+file(GLOB_RECURSE exec_files "bin/*")
+rez_install_files(
+    ${exec_files}
+    DESTINATION .
+)
