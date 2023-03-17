@@ -498,3 +498,70 @@ class TestHoupub(TestCase):
         self.pepper.publish_precomp_output(pick_precomp)
         nwp2 = self.pepper.make_next_output_path('Movie_file', 'FX')
         pprint.pp(nwp2)
+
+# -------------------------------------------------
+
+    def test_make_precomp_dict(self):
+        self.pepper.project = 'PEPPER'
+        self.pepper.software = 'hip'
+        asset_name = 'temp_breaking_glass'
+        self.pepper.asset = asset_name
+        casted_shots = self.pepper.get_casting_path_for_asset()
+        for casted_shot in casted_shots:
+            made_dict = self.pepper.make_precomp_dict(casted_shot)
+            sequence_name = casted_shot['sequence_name']
+            shot_name = casted_shot['shot_name']
+            test_name = '_'.join([self.pepper.project['name'], self.pepper.asset['name'][5:],
+                                 sequence_name, shot_name])
+            self.pepper.asset = asset_name
+            self.pepper.entity = 'asset'
+            test_temp_working_path = self.pepper.working_file_path('simulation')
+            self.pepper.sequence = sequence_name
+            self.pepper.shot = shot_name
+            self.pepper.entity = 'shot'
+            test_layout_output_path = self.pepper.output_file_path('camera_cache', 'layout_camera')
+            test_fx_working_path = self.pepper.make_next_working_path('FX')
+            test_jpg_output_path = self.pepper.make_next_output_path('jpg_sequence', 'FX')
+            test_video_output_path = self.pepper.make_next_output_path('movie_file', 'FX')
+            self.assertEqual(made_dict['name'], test_name)
+            self.assertEqual(made_dict['temp_working_path'], test_temp_working_path)
+            self.assertEqual(made_dict['layout_output_path'], test_layout_output_path)
+            self.assertEqual(made_dict['fx_working_path'], test_fx_working_path)
+            self.assertEqual(made_dict['jpg_output_path'], test_jpg_output_path)
+            self.assertEqual(made_dict['video_output_path'], test_video_output_path)
+
+    def test_path_seperator(self):
+        pass
+
+    def test_publish_precomp_working(self):
+        pass
+
+    def test_publish_precomp_output(self):
+        pass
+
+    def test_get_every_revision_for_working_file(self):
+        pass
+
+    def test_get_every_revision_for_output_file(self):
+        pass
+
+    def test_check_status(self):
+        pass
+
+    def test_publish_preview(self):
+        pass
+
+    def test_check_asset_type(self):
+        pass
+
+    def test_get_my_projects(self):
+        pass
+
+    def test_get_working_file_data(self):
+        pass
+
+    def test_get_output_file_data(self):
+        pass
+
+    def test_read_json_file(self):
+        pass

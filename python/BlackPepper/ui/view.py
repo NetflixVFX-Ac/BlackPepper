@@ -2,6 +2,9 @@ from PySide2 import QtWidgets
 
 
 class PepperView(QtWidgets.QListView):
+    """
+
+    """
     def __init__(self, parent):
         super(PepperView, self).__init__(parent=None)
 
@@ -12,6 +15,9 @@ class PepperView(QtWidgets.QListView):
 
 
 class PepperDnDView(QtWidgets.QListView):
+    """
+
+    """
     def __init__(self, parent):
         super(PepperDnDView, self).__init__(parent=None)
         self.setDragEnabled(True)   
@@ -20,17 +26,16 @@ class PepperDnDView(QtWidgets.QListView):
         self.startIndex = None
 
     def dragEnterEvent(self, event):
+        """
+
+        """
         self.startIndex = ''
         event.accept()
 
-    # def dragMoveEvent(self, event):
-    #     super(PepperDnDView, self).dragMoveEvent(event)
-    #     if event object is object:
-    #         do not accept event
-    #     print(event)
-    #     event.accept()
-
     def dropEvent(self, event):
+        """
+
+        """
         selections = self.selectedIndexes()
         rev_selections = list(reversed(selections))
         QtWidgets.QListView.dropEvent(self, event)

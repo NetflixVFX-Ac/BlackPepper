@@ -132,7 +132,7 @@ class Logger:
             output_type_name(str):  'Movie_file', 'mpeg-4', 'jpeg', ...
         """
         if task_type_name and output_type_name:
-            self.log.debug(f"publish {task_type_name}, {output_type_name} output file, last revision up")
+            self.log.debug(f'publish {task_type_name}, {output_type_name} output file, last revision up')
         else:
             self.exists_error(task_type_name, output_type_name)
 
