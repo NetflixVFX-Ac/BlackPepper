@@ -900,20 +900,31 @@ class Houpub:
 
     @staticmethod
     def find_revision_in_list(files, revision):
-        """
+        """Working file이나 Output file들이 들어있는 리스트에서 input된 revision과 같은 revision을 가진 dict를 반환해주는 메소드. \n
+        self.get_output_file_data 메소드 안에서만 사용된다.
 
+        Args:
+            files(list): List of working file dicts or output file dicts
+            revision: Revision number of working file the user is looking for
+
+        Returns:
+            Working file dict with the right revision number(if exists)
         """
         for file in files:
-            # print('file', file['revision'], type(file['revision']))
-            # print('input', revision, type(revision))
             if str(file['revision']) == str(revision):
                 return file
         return
 
     @staticmethod
     def make_info_data(file):
-        """
+        """Working file이나 Output file의 dict에서 person, created time, revision을 찾아 반환해주는 메소드. \n
+        Dict가 제대로 들어오지 않는다면 공백을 반환한다. self.get_output_file_data 메소드 안에서만 사용된다.
 
+        Args:
+            file(dict): Working file dict or output file dict
+
+        Returns:
+            JaehyukLee, Date-Time, 1
         """
         if file is None:
             rev = ''
@@ -928,6 +939,8 @@ class Houpub:
         return person, created_time, rev
 
     def read_json_file(self):
+        """Auto login을 할 수 있는 json file의 생성 경로나 불러올 경로를 지정한다. root는 현재 .py file이 위치한 곳으로 한다.
+        """
         now_path = os.path.realpath(__file__)
         split_path = now_path.split('/')[:-1]
         dir_path = os.path.join('/'.join(split_path), '.config')
