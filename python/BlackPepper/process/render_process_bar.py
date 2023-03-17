@@ -13,11 +13,11 @@ class RenderMainWindow(QtWidgets.QMainWindow):
     """
 
     def __init__(self, cmd_list, total_frame_list):
-        """Sequence file이 있는 경로와 mov파일이 저장될 경로, fps를 지정한다. 해당 인자들은 터미널에 명령내릴 command에 입력된다.
+        """
 
         Args:
-            jpg_output_path (str): Sequence file path
-            mov_output_path (str): output file path
+            cmd_list:
+            total_frame_list:
         """
         super().__init__()
         self.pepper = Houpub()
@@ -29,7 +29,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.cmd_list = cmd_list
         self.total_frame_list = total_frame_list
 
-        DEFAULT_STYLE = """
+        default_style = """
         QProgressBar{
             border: 2px solid grey;
             border-radius: 5px;
@@ -43,7 +43,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.ffmpeg_check = re.compile('^ffmpeg')
         self.ffmpeg_list = None
         self.progress = QtWidgets.QProgressBar()
-        self.progress.setStyleSheet(DEFAULT_STYLE)
+        self.progress.setStyleSheet(default_style)
         self.progress.setRange(0, 100)
 
         self.text = QtWidgets.QPlainTextEdit()
@@ -71,16 +71,16 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.total_frame = self.total_frame_list.pop(0)
         self.start_process()
 
-    def message(self, s):
-        """  Text Widget에 메시지를 출력한다
+    def message(self, text):
+        """Text Widget에 메시지를 출력해준다.
 
         Args:
-            s(str): text
+            text(str): text
         """
-        self.text.appendPlainText(s)
+        self.text.appendPlainText(text)
 
     def start_process(self):
-        """ Qprocess를 활용하여 터미널에 명령을 내려주고 터미널 신호에 따라 출력하는 내용을 달리한다. \n
+        """Qprocess를 활용하여 터미널에 명령을 내려주고 터미널 신호에 따라 출력하는 내용을 달리한다. \n
         진행 중, 오류, 변동, 마무리 단계마다 Text Widget에 상태를 Handling 한다.
         """
         self.mc = self.mantra_check.search(self.cmd)
@@ -97,7 +97,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.p.start(self.cmd)
 
     def handle_stderr(self):
-        """ QProcess Error정보를 받아온다. 바이트 신호를 번역하고 백분율 계산 함수를 실행시키고 컴퓨터가 보낸 정보를 Text에 출력한다.
+        """QProcess Error정보를 받아온다. 바이트 신호를 번역하고 백분율 계산 함수를 실행시키고 컴퓨터가 보낸 정보를 Text에 출력한다.
         """
         data = self.p.readAllStandardError()
         stderr = bytes(data).decode("utf8")
@@ -110,7 +110,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         self.message(stderr)
 
     def handle_stdout(self):
-        """ QProcess Output정보를 받아온다. 바이트 신호를 번역한 정보를 Text에 출력한다.
+        """QProcess Output정보를 받아온다. 바이트 신호를 번역한 정보를 Text에 출력한다.
         """
         data = self.p.readAllStandardOutput()
         stdout = bytes(data).decode("utf8")
@@ -149,7 +149,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         if self.check_fin == 1:
             if self.fc:
                 self.ffmpeg_list = self.cmd.split()
-                path = self.ffmpeg_list[4][:-8]+'0001.jpg'
+                path = self.ffmpeg_list[4][:-8] + '0001.jpg'
                 path_basename = os.path.basename(path)
                 path_re = re.compile('^(\w+)_(\w+)_(\d+)_')
                 path_search = path_re.search(path_basename)
@@ -175,7 +175,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             self.message("Process finished.")
             return
 
-    def mantra_simple_percent_parser(self, output, total):
+    @staticmethod
+    def mantra_simple_percent_parser(output, total):
         """Houdini Mantra가 실행될 때, Progress bar에 넣을 값을 구하는 메소드, 백분율로 계산한다. \n
         컨버팅이 끝난 frame은 Text Widget에 표시되고, 정규표현식을 사용하여 Text Widget에서 해당 frame을 파악한다. \n
         Alembic file Camera에서 가져온 frame range Out count를 분모로 하고 정규표현으로 찾은 현재 frame을 분자로 하여 계산한다.\n
@@ -184,7 +185,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             output (str): Text in Text Widget
             total (int): Total frame
 
-        Returns: pc(progress percent)
+        Returns:
+            pc(progress percent)
         """
         progress_re = re.compile('_(\d+)\.jpg')
         m = progress_re.search(output)
@@ -195,6 +197,9 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                 return pc
 
     def handle_interrupt(self):
+        """
+
+        """
         if self.p:
             self.is_interrupted = True
             self.p.terminate()
@@ -204,7 +209,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             self.btn_interrupt.setText("Interrupt")
             self.start_process()
 
-    def ffmpeg_simple_percent_parser(self, output, total):
+    @staticmethod
+    def ffmpeg_simple_percent_parser(output, total):
         """FFmpeg이 실행될 때, Progress bar에 넣을 값을 구하는 메소드, 백분율로 계산한다. \n
         컨버팅이 끝난 frame은 Text Widget에 표시되고, 정규표현식을 사용하여 Text Widget에서 해당 frame을 파악한다. \n
         Alembic file Camera에서 가져온 frame range Out count를 분모로 하고 정규표현으로 찾은 현재 frame을 분자로 하여 계산한다.\n
@@ -214,7 +220,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             output (str): Text in Text Widget
             total (int): Total frame
 
-        Returns: pc(progress percent)
+        Returns:
+            pc(progress percent)
         """
         progress_re = re.compile("frame=   (\d+)")
         m = progress_re.search(output)

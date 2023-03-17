@@ -15,7 +15,6 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
     render가 끝나면, output 경로에 출력하고자 했던 frame out count와 비교하고 render가 진행 중이면 생성되는 \n
     checkpoint 확장자가 있는지 체크하고 문제 없을 시, 홈 경로에 생성한 temp directory를 제거한다.
 
-
     Args:
         hip_path: shot fx working file path
         output_path: shot fx output file jpg_sequence path
@@ -39,7 +38,6 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
         n.parm('trange').set(1)
         for i in n.parmTuple('f'):
             i.deleteAllKeyframes()
-        # n.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])  # 모든 프레임을 뽑는다.
         n.parmTuple('f').set([abc_range[0] * hou.fps(), 1, 1])  # 1 프레임만 뽑는다.
         n.parm('vm_verbose').set(1)
         n.parm("execute").pressButton()
