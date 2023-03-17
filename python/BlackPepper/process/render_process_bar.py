@@ -268,7 +268,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         if fin_search:
             frame_group = fin_search.group(1)
             if frame_group:
-                print(frame_group, total)
                 percentage = int(int(frame_group) / total * 100)
                 return percentage  # 백분율을 통해 process bar에 보여질 값
 
