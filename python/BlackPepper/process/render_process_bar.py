@@ -37,6 +37,26 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             font: 10pt\"Courier New\";
             color: rgb(225, 225, 225)
         }
+        
+        QProgressBar::chunk {
+            background-color: qlineargradient(spread:pad, x1:0, y1:0.511364, 
+            x2:1, y2:0.523, stop:0 rgba(153, 255, 153, 255), stop:1 rgba(000, 102, 000, 255));
+        }
+        """
+
+        self.PROGRESS_COMPLETED_STYLE = """
+        QProgressBar{
+            border: 2px solid grey;
+            border-radius: 5px;
+            text-align: center;
+            font: 10pt\"Courier New\";
+            color: rgb(225, 225, 225)
+        }
+        
+        QProgressBar::chunk {
+            background-color: qlineargradient(spread:pad, x1:0, y1:0.511364, 
+            x2:1, y2:0.523, stop:0 rgba(153, 204, 255, 255), stop:1 rgba(000, 051, 153, 255));
+        }        
         """
 
         BACKGROUND_DEFAULT_STYLE = """
@@ -114,6 +134,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             progress = self.mantra_simple_percent_parser(stderr, self.total_frame)
         if progress:
             self.progress.setValue(progress)
+            self.progress.setStyleSheet(self.PROGRESS_COMPLETED_STYLE)
         self.message(stderr)
 
     def handle_stdout(self):
