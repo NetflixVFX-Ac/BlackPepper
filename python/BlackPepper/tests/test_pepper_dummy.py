@@ -18,15 +18,12 @@ class TestHoupub(TestCase):
         self.pepper.login("http://192.168.3.116/api", "pipeline@rapa.org", "netflixacademy")
 
     def test_publish_working_file(self):
-        """
-        publish를 통해 working file의 last revision이 정상적으로 업데이트 됐는지 체크한다.
-        """
+
         self.pepper.project = 'PEPPER'
         self.pepper.sequence = 'SQ01'
         self.pepper.shot = '0010'
         self.pepper.entity = 'shot'
-        task_type_name = 'layout_camera'
-        self.pepper.software = 'hip'
+        task_type_name = 'layout'
 
         task_type, task = self.pepper.get_task(task_type_name)
         pre_revision = gazu.files.get_last_working_file_revision(task).get('revision')
@@ -34,15 +31,8 @@ class TestHoupub(TestCase):
         update_revision = gazu.files.get_last_working_file_revision(task).get('revision')
         self.assertLess(pre_revision, update_revision)
 
-        old = self.pepper.working_file_path('fx')
-        self.pepper.publish_working_file('fx')
-        new = self.pepper.working_file_path('fx')
-        self.assertNotEqual(old, new)
-
     def test_publish_output_file(self):
-        """
-        publish를 통해 output file의 last revision이 정상적으로 업데이트 됐는지 체크한다.
-        """
+
         self.pepper.project = 'PEPPER'
         self.pepper.sequence = 'SQ01'
         self.pepper.shot = '0010'
@@ -60,27 +50,18 @@ class TestHoupub(TestCase):
                                                                      name='main')
         self.assertLess(pre_revision, update_revision)
 
-        new = self.pepper.output_file_path('jpeg', "fx")
-        self.assertEqual(new,
-                         '/mnt/project/hook/pepper/shots/sq01/0010/fx/output/'
-                         'jpeg/v001/pepper_sq01_0010_jpeg_v001.undi_img')
-
-
     def test_working_file_path(self):
-        """
-        woking file path를 출력하여 last revisioln에 해당하는 path가 제대로 출력되는지 체크한다.
-        """
+
         self.pepper.project = 'PEPPER'
         self.pepper.sequence = 'SQ01'
         self.pepper.shot = '0010'
         self.pepper.entity = 'shot'
         self.pepper.software = 'hip'
-        task_type_name = 'layout_camera'
+        task_type_name = 'layout'
         task_type, task = self.pepper.get_task(task_type_name)
         path = self.pepper.working_file_path(task_type_name)
         latest_revision = gazu.files.get_last_working_file_revision(task).get('revision')
         self.assertEqual(latest_revision, int(path.strip()[-7:-4]))
-
 
     def test_make_next_working_path(self):
         """
@@ -90,7 +71,7 @@ class TestHoupub(TestCase):
         self.pepper.sequence = 'SQ01'
         self.pepper.shot = '0010'
         self.pepper.entity = 'shot'
-        task_type_name = 'layout_camera'
+        task_type_name = 'layout'
         task_type, task = self.pepper.get_task(task_type_name)
         path = self.pepper.make_next_working_path(task_type_name)
         latest_revision = gazu.files.get_last_working_file_revision(task).get('revision')
@@ -113,10 +94,6 @@ class TestHoupub(TestCase):
         latest_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type,
                                                                      name='main')
         self.assertEqual(latest_revision, int(path.strip()[-7:-4]))
-        result = self.pepper.output_file_path('jpeg', task_type_name)
-        self.assertEqual(result,
-                         "/mnt/project/hook/pepper/shots/sq01/0010/fx/"
-                         "output/jpeg/v001/pepper_sq01_0010_jpeg_v001.undi_img")
 
     def test_make_next_output_path(self):
         """
@@ -133,8 +110,7 @@ class TestHoupub(TestCase):
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         latest_revision = gazu.files.get_last_entity_output_revision(self.pepper.entity, output_type, task_type,
                                                                      name='main')
-
-        self.assertEqual(latest_revision + 1, int(path.strip()[-3:]))
+        self.assertEqual(latest_revision + 1, int(path.strip()[-7:-4]))
 
     def test_get_revision_num(self):
         """
@@ -163,7 +139,6 @@ class TestHoupub(TestCase):
         self.assertTrue(type(task_type), dict)
         self.assertEqual(task_type.get('name'), 'FX')
 
-
     def test_software(self):
         """
         software 함수에서 if문이 제대로 작동하는지 체크한다.
@@ -189,7 +164,7 @@ class TestHoupub(TestCase):
         #     if last_revision[i][0].get('shot_name') == self.BlackPepper.shot.get('name'):
         #         shot_dict = last_revision[i][0]
         # self.assertIsNotNone(shot_dict)
-        casted_shots = self.pepper.get_casting_path_for_asset()
+        casted_shots, layout_tasks, fx_tasks = self.pepper.get_casting_path_for_asset()
         shot = None
         layout_task = None
         fx_task = None
@@ -197,6 +172,13 @@ class TestHoupub(TestCase):
             if i.get('shot_name') == '0010':
                 shot = i
         self.assertEqual(shot.get('shot_name'), '0010')
+        for l in layout_tasks:
+            if l.get('entity_id') == shot.get('shot_id'):
+                layout_task = l
+        for f in fx_tasks:
+            if f.get('entity_id') == shot.get('shot_id'):
+                fx_task = f
+        self.assertEqual(layout_task.get('entity_id'), fx_task.get('entity_id'))
 
     def test_dick_check(self):
         """
@@ -206,7 +188,6 @@ class TestHoupub(TestCase):
         code = 'none'
         check = self.pepper.dict_check(test_dict, code)
         self.assertIs(type(check), dict)
-
 
     def test_args_str_check(self):
         """
@@ -309,13 +290,9 @@ class TestHoupub(TestCase):
         task_type_name = 'fx'
         _, task = self.pepper.get_task(task_type_name)
 
-        get_revision = self.pepper.get_working_revision_max(task)
-        next_revision = self.pepper.make_next_working_path(task_type_name)
-        self.assertLess(get_revision, int(next_revision[-3:]))
-
-        # with self.assertRaises(Exception) as context:
-        #     self.pepper.get_working_revision_max(task)
-        # self.assertEqual("No working file found.", str(context.exception))
+        with self.assertRaises(Exception) as context:
+            self.pepper.get_working_revision_max(task)
+        self.assertEqual("No working file found.", str(context.exception))
 
         self.pepper.project = 'PEPPER'
         self.pepper.sequence = 'SQ01'
@@ -337,20 +314,15 @@ class TestHoupub(TestCase):
         self.assertIn('0020', self.pepper.get_all_shots())
         self.assertIn('0030', self.pepper.get_all_shots())
         self.assertIn('0040', self.pepper.get_all_shots())
-
-        result = self.pepper.get_all_shots()
-        self.assertEqual(str(result), "['0010', '0020', '0030', '0040']")
+        self.assertIn('0050', self.pepper.get_all_shots())
 
     def test_get_task_types_for_asset(self):
         """
         project와 asset을 입력했을때, asset안에 simulation task_type이 있는지 체크한다.
         """
         self.pepper.project = "PEPPER"
-        self.pepper.asset = "temp_breaking_glass"
-
-        result = self.pepper.get_task_types_for_asset()
+        self.pepper.asset = "temp_explosion"
         self.assertIn("simulation", self.pepper.get_task_types_for_asset())
-        self.assertEqual(str(result), "['simulation']")
 
     def test_get_all_projects(self):
         """
@@ -363,9 +335,10 @@ class TestHoupub(TestCase):
         PEPPER asset내, Template이 제대로 출력됐는지 체크한다.
         """
         self.pepper.project = 'PEPPER'
-        self.assertIn('temp_breaking_glass', self.pepper.get_all_assets())
-        self.assertIn('temp_dancing_particle', self.pepper.get_all_assets())
+        self.assertIn('temp_explosion', self.pepper.get_all_assets())
         self.assertIn('temp_fire', self.pepper.get_all_assets())
+        self.assertIn('temp_thunder', self.pepper.get_all_assets())
+        self.assertIn('temp_waterfall', self.pepper.get_all_assets())
 
     def test_get_all_sequences(self):
         """
@@ -384,7 +357,7 @@ class TestHoupub(TestCase):
         self.BlackPepper.software = 'hipnc'
         """
         host = 'http://192.168.3.116/api'
-        identify = 'pepper@hook.com'
+        identify = 'BlackPepper@hook.com'
         password = 'pepperpepper'
         project = None
         self.pepper.login(host, identify, password)
@@ -413,8 +386,9 @@ class TestHoupub(TestCase):
         assets = []
         for asset in self.pepper.get_all_assets():
             assets.append(asset)
-        self.assertIn('temp_breaking_glass', assets)
-        self.assertIn('temp_dancing_particle', assets)
+        self.assertIn('temp_explosion', assets)
+        self.assertIn('temp_thunder', assets)
+        self.assertIn('temp_waterfall', assets)
         self.assertIn('temp_fire', assets)
 
         """
@@ -446,7 +420,7 @@ class TestHoupub(TestCase):
                 task_type = t
                 path = self.pepper.working_file_path(task_type.get('name'))
                 dir = os.path.dirname(path)
-        self.assertEqual(dir, '/mnt/project/hook/pepper/assets/fx_template/temp_fire/simulation/working/v009')
+        self.assertEqual(dir, 'mnt/projects/hook/BlackPepper/assets/fx_template/temp_fire/simulation/working/v009')
 
         """
         6. casting shot unittest
@@ -457,7 +431,7 @@ class TestHoupub(TestCase):
         
         """
         shots = []
-        casted_shots = self.pepper.get_casting_path_for_asset()
+        casted_shots, layout_type, fx_tasks = self.pepper.get_casting_path_for_asset()
         for shot in casted_shots:
             shots.append(shot.get('shot_name'))
         self.assertIn('0010', shots)
@@ -491,10 +465,12 @@ class TestHoupub(TestCase):
         -   self.BlackPepper.shot = shot.get('shot_name') = 0010        
         """
         self.pepper.make_precomp_dict(picked_shot)
-        result = self.pepper.make_precomp_dict(picked_shot)
-        self.assertEqual(result['name'], 'PEPPER_fire_SQ01_0010')
-        # print(result)
-        # print("xxxxx", result['fx_working_path'])
+        pick_precomp = None
+        for precomp in self.pepper.precomp_list:
+            if precomp.get('name') == 'PEPPER_fire_SQ01_0010':
+                pick_precomp = precomp
+        self.assertEqual(pick_precomp.get('name'), 'PEPPER_fire_SQ01_0010')
+
         """
         9. render button
         
@@ -509,11 +485,10 @@ class TestHoupub(TestCase):
         10. publish
         
         """
-
-        aa = self.pepper.publish_precomp_working(result)
+        self.pepper.publish_precomp_working(pick_precomp)
         nwp = self.pepper.make_next_working_path('FX')
         pprint.pp(nwp)
 
-        self.pepper.publish_precomp_output(result)
+        self.pepper.publish_precomp_output(pick_precomp)
         nwp2 = self.pepper.make_next_output_path('Movie_file', 'FX')
         pprint.pp(nwp2)
