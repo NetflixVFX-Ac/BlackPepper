@@ -39,7 +39,6 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
         for i in mantre_node.parmTuple('f'):
             i.deleteAllKeyframes()
         mantre_node.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
-        # mantre_node.parmTuple('f').set([abc_range[0] * hou.fps(), 5, 1])
         mantre_node.parm('vm_verbose').set(1)
         mantre_node.parm("execute").pressButton()
     output_dir = os.path.dirname(output_path) + '/*.jpg'
