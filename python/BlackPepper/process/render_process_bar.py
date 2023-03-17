@@ -134,7 +134,6 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             progress = self.mantra_simple_percent_parser(stderr, self.total_frame)
         if progress:
             self.progress.setValue(progress)
-            self.progress.setStyleSheet(self.PROGRESS_COMPLETED_STYLE)
         self.message(stderr)
 
     def handle_stdout(self):
@@ -205,6 +204,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         else:
             self.cmd = None
             self.message("Process finished.")
+            self.progress.setStyleSheet(self.PROGRESS_COMPLETED_STYLE)
             return
 
     def mantra_simple_percent_parser(self, output, total):
