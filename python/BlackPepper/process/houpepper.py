@@ -125,6 +125,7 @@ class HouPepper:
                 self.abc_tree_path = abc.alembicGetObjectPathListForMenu(self.abc_path)
                 self.get_abc_cam_tree(self.abc_tree_all)
         self.abc_range = abc.alembicTimeRange(self.abc_path)
+        # print(self.abc_tree_all)
 
     def get_abc_cam_tree(self, abc_tree_all):
         """Alembic 파일 내 Node에서 이름이 camera인 노드를 찾는다. \n
@@ -137,6 +138,7 @@ class HouPepper:
         node_name = abc_tree_all[0]
         node_type = abc_tree_all[1]
         node_children = abc_tree_all[2]
+        # print(abc_tree_all)
         if node_type == 'camera':
             self.cam_list.append(node_name)
             for x in self.abc_tree_path:
@@ -147,6 +149,7 @@ class HouPepper:
         else:
             for children in node_children:
                 self.get_abc_cam_tree(children)
+
 
     def check_abc(self, abc_path):
         """
@@ -183,6 +186,7 @@ class HouPepper:
             if camera_dict:
                 for parm_name in self.hou_cam_parm_name:
                     exec("self.{}.append({})".format(parm_name, camera_dict.get(parm_name)))
+
 
     def get_cam_resolution(self, cam):
         """Alembic file에 있는 카메라가 가진 frame range에 frame rate를 곱하여 real time frame 동안의 \n
@@ -377,3 +381,4 @@ class HouPepper:
         total_frame_list = self.total_frame_list
 
         return cmd_list, total_frame_list
+
