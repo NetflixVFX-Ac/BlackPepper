@@ -11,9 +11,8 @@ from BlackPepper.ui.model import PepperModel, PepperDnDModel
 from BlackPepper.ui.view import PepperView, PepperDnDView
 from BlackPepper.pepper import Houpub
 from BlackPepper.process.houpepper import HouPepper
-from BlackPepper.ui.auto_login import Auto_log
+from BlackPepper.auto_login import Auto_log
 from BlackPepper.log.moduler_log import Logger
-import hou
 from datetime import datetime
 
 
@@ -127,20 +126,30 @@ class PepperWindow(QMainWindow):
         # main UI clicked event
         self.check_window.close_btn.clicked.connect(self.close_fullpath)
         self.check_window.render_btn.clicked.connect(self.render_execute)
-        # listview to UI
+        # Add listview to UI
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
-        # status bar message
+        # Set status bar message
         self.login_window.statusBar().showMessage('Select licence version of houdini to log-in')
-        self.main_window.statusBar().showMessage('Select project to find templates')
         self.main_window.path_btn.setStatusTip('Show full path of render files')
         self.main_window.save_btn.setStatusTip("Save render files list as preset")
         self.main_window.reset_btn.setStatusTip('Clear render files list')
         # set main menubar
+        self.main_window.statusBar().showMessage('Select project to find templates')
+        # Set tooltips
+        self.main_window.append_btn.setToolTip('Append selected shots to renderlist')
+        self.main_window.del_btn.setToolTip('Delete selected shot from renderlist')
+        self.main_window.path_btn.setToolTip('Show full path of render files')
+        self.main_window.save_btn.setToolTip('Save render files list as preset')
+        self.main_window.reset_btn.setToolTip('Clear render files list')
+        self.main_window.render_btn.setToolTip('Press to render')
+        self.main_window.template_rev_cbox.setToolTip('Select template revision to render')
+        self.main_window.shot_rev_cbox.setToolTip('Select camera revision to render')
+        # Set main menubar
         self.create_login_menubar()
-        # set auto login
+        # Set auto login
         self.set_auto_login()
 
     def set_auto_login(self):
@@ -150,7 +159,7 @@ class PepperWindow(QMainWindow):
         만약 기존에 json파일이 없으면 창에서 id, password를 저장하고 만약 정보가 있으면 id, password, houdini 확장자를 받아와서
         로그인 버튼을 누른다.
         """
-        # initialize information from login UI
+        # Initialize information from login UI
         log_path = self.login_log.user_path
         self.login_log.host = "http://192.168.3.116/api"
         log_id = self.login_window.input_id.text()
@@ -158,7 +167,7 @@ class PepperWindow(QMainWindow):
         log_sfw = self.login_window.hipbox.currentText()[1:]
         log_value = self.login_log.load_setting()
         log_dict = self.login_log.user_dict
-        # check json file to get auto login information
+        # Check json file to get auto login information
         if os.path.exists(log_path) and not log_dict['auto']:
             for auto_loop in log_dict['auto']:
                 if log_id != auto_loop['user_id'] or log_pw != auto_loop['user_pw'] or log_sfw != auto_loop['user_ext']:
@@ -210,11 +219,12 @@ class PepperWindow(QMainWindow):
         """
         if self.login_log.connect_login():
             self.login_log.log_out()
-            # clear lists, models, and data
+            # Clear lists, models, and data
             self.render_list_data.clear()
             self.render_model.pepperlist.clear()
             self.template_model.pepperlist.clear()
             self.shot_model.pepperlist.clear()
+            self.project_model.pepperlist.clear()
             self.projects_selection.clear()
             self.renderlists_selection.clear()
             self.templates_selection.clear()
@@ -222,6 +232,7 @@ class PepperWindow(QMainWindow):
             self.render_model.layoutChanged.emit()
             self.template_model.layoutChanged.emit()
             self.shot_model.layoutChanged.emit()
+            self.project_model.layoutChanged.emit()
             # Close main UI and show login UI
             self.main_window.close()
             self.login_window.show()
@@ -236,8 +247,9 @@ class PepperWindow(QMainWindow):
         renderlists는 self.render_model.pepperlist에 담긴 shot들의 name의 value 값만 보여주는 것이고,
         render 버튼 클릭 시 self.render_model.pepperlist 를 Houdini로 전달한다.
         """
+        self.main_window.statusBar().showMessage('Select project to find templates')
         self.create_main_menubar()
-        # get my project
+        # Get my project
         self.my_projects = self.pepper.get_my_projects()
         for my_project in self.my_projects:
             self.project_model.pepperlist.append(my_project)
@@ -259,7 +271,7 @@ class PepperWindow(QMainWindow):
         project_name = self.my_projects[event.row()]
         self.pepper.project = project_name
         self.all_assets = []
-        # append templates to template listview
+        # Append templates to template listview
         for asset in self.pepper.get_all_assets():
             if self.pepper.check_asset_type(asset, 'fx_template') is None:
                 continue
@@ -271,7 +283,7 @@ class PepperWindow(QMainWindow):
         self.shot_model.pepperlist.clear()
         for asset in self.all_assets:
             self.template_model.pepperlist.append(asset)
-        # renew listview
+        # Renew listview
         self.template_model.layoutChanged.emit()
         self.shot_model.layoutChanged.emit()
         self.templates_selection.clear()
@@ -291,11 +303,11 @@ class PepperWindow(QMainWindow):
         template_name = self.all_assets[event.row()]
         self.pepper.asset = template_name
         self.pepper.entity = 'asset'
-        # reset comboBox, get template info
+        # Reset comboBox, get template info
         rev_list = self.pepper.get_every_revision_for_working_file('fx_template')
         self.renew_template_cbox(rev_list)
         self.renew_template_info()
-        # append shot names to shot listview
+        # Append shot names to shot listview
         self.all_shots = self.pepper.get_casting_path_for_asset()
         self.shot_model.pepperlist.clear()
         for shot in self.all_shots:
@@ -304,11 +316,10 @@ class PepperWindow(QMainWindow):
             self.pepper.entity = 'shot'
             if self.pepper.check_task_status('Done', 'layout_camera') is True:
                 self.shot_model.pepperlist.append(shot['sequence_name'] + '_' + shot['shot_name'])
-        # renew listview
+        # Renew listview
         self.shot_model.layoutChanged.emit()
         self.shots_selection.clear()
         self.renderlists_selection.clear()
-        self.main_window.statusBar().showMessage('shots 를 선택하세요 ! 다중선택가능 ! ')
 
     def shot_selected(self, event):
         """shots_listview의 하나의 shot을 클릭시 실행되는 메소드. \n
@@ -327,6 +338,18 @@ class PepperWindow(QMainWindow):
         self.renew_shot_info()
         self.renderlists_selection.clear()
 
+    def renew_template_status_path(self, template_name, input_num):
+        if input_num.isdigit() is False:
+            return
+        input_int = int(input_num)
+        self.pepper.asset = template_name
+        self.pepper.entity = 'asset'
+        working_file_path = self.pepper.working_file_path('simulation', input_int)
+        sep_path = working_file_path.split('/')
+        sep_path.pop()
+        full_path = "/".join(sep_path)
+        self.main_window.statusBar().showMessage(f'Template file path : {full_path}')
+
     def renew_template_info(self):
         """template_info_label에 template info를 디스플레이 해주는 메소드. \n
         선택된 template의 simulation working file에서 작업자의 이름, 수정 시각, revision을 가져온다.
@@ -336,6 +359,8 @@ class PepperWindow(QMainWindow):
         date = time[:10]
         clock = time[11:]
         self.main_window.template_info_label.setText(f"{name}\n{date}\n{clock}")
+        template_name = self.templates_listview.selectedIndexes()[0].data()
+        self.renew_template_status_path(template_name, revision)
 
     def renew_shot_info(self):
         """shot_info_label에 shot info를 디스플레이 해주는 메소드. \n
