@@ -25,6 +25,7 @@ class TestHouPepper(TestCase):
         self.assertEqual(self.hou_pepper.abc_tree_all, test_tree)
 
     def test_abc_tree_path(self):
+        abc_path = '/mnt/project/hook/pepper/shots/sq01/0010/layout_camera/output/camera_cache/v005/pepper_sq01_0010_camera_cache_v005.abc'
         self.abc_tree_path = abc.alembicGetObjectPathListForMenu(abc_path)
 
     def test_abc_range(self):

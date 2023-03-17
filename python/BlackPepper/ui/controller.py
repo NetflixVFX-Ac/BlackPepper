@@ -11,9 +11,8 @@ from BlackPepper.ui.model import PepperModel, PepperDnDModel
 from BlackPepper.ui.view import PepperView, PepperDnDView
 from BlackPepper.pepper import Houpub
 from BlackPepper.process.houpepper import HouPepper
-from BlackPepper.ui.auto_login import Auto_log
+from BlackPepper.auto_login import Auto_log
 from BlackPepper.log.moduler_log import Logger
-import hou
 from datetime import datetime
 
 
@@ -134,6 +133,10 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
         # Set status bar message
         self.login_window.statusBar().showMessage('Select licence version of houdini to log-in')
+        self.main_window.path_btn.setStatusTip('Show full path of render files')
+        self.main_window.save_btn.setStatusTip("Save render files list as preset")
+        self.main_window.reset_btn.setStatusTip('Clear render files list')
+        # set main menubar
         self.main_window.statusBar().showMessage('Select project to find templates')
         # Set tooltips
         self.main_window.append_btn.setToolTip('Append selected shots to renderlist')
@@ -197,12 +200,12 @@ class PepperWindow(QMainWindow):
         로그인 성공 시 입력받은 Houdini license 종류가 pepper의 self.software에 set 된다.
         이후 self.main_window가 바로 실행되어 pepper의 메인 UI가 디스플레이 된다.
         """
-        # Set initial login information
+        # set initial login information
         self.login_log.host = "http://192.168.3.116/api"
         self.login_log.user_id = self.login_window.input_id.text()
         self.login_log.user_pw = self.login_window.input_pw.text()
         self.login_log.user_ext = self.login_window.hipbox.currentText()[1:]
-        # If connect login, get login information and close login window, open main window
+        # if connect login, get login information and close login window, open main window
         if self.login_log.connect_login():
             self.pepper.software = self.login_log.user_ext
             self.login_log.auto_login = True
@@ -244,6 +247,7 @@ class PepperWindow(QMainWindow):
         renderlists는 self.render_model.pepperlist에 담긴 shot들의 name의 value 값만 보여주는 것이고,
         render 버튼 클릭 시 self.render_model.pepperlist 를 Houdini로 전달한다.
         """
+        self.main_window.statusBar().showMessage('Select project to find templates')
         self.create_main_menubar()
         # Get my project
         self.my_projects = self.pepper.get_my_projects()
@@ -300,7 +304,7 @@ class PepperWindow(QMainWindow):
         self.pepper.asset = template_name
         self.pepper.entity = 'asset'
         # Reset comboBox, get template info
-        rev_list = self.pepper.get_every_revision_for_working_file('fx_template')
+        rev_list = self.pepper.get_every_revision_for_working_file('simulation')
         self.renew_template_cbox(rev_list)
         self.renew_template_info()
         # Append shot names to shot listview
