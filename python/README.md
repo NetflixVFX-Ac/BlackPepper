@@ -1,4 +1,4 @@
-![pepper](./img/pepper.png)
+![title](./img/blackpepper_logo_v01.png)
 # What is Black Pepper
 ### Black Pepper is FX templates 에 캐스팅된 샷들을 jpg,mov render를  자동화 해주는 API 이다.
 
