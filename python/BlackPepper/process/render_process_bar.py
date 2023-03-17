@@ -170,6 +170,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """
         self.message(f'finished : {self.cmd}, {self.is_interrupted}')
 
+        self.process.waitForFinished()
+
         if self.is_interrupted:
             return
 
