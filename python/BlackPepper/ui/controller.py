@@ -706,7 +706,7 @@ class PepperWindow(QMainWindow):
                 = self.pepper.path_seperator(precomp)
             houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
-            cmd_list, total_frame_list = houp.make_cmd(precomp)
+            cmd_list, total_frame_list = houp.make_cmd(precomp, self.pepper.software.get("file_extension"))
 
         self.render_process = RenderMainWindow(cmd_list, total_frame_list)
         self.render_process.resize(800, 600)

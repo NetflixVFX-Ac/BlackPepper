@@ -328,7 +328,7 @@ class HouPepper:
         self.cam_list.clear()
         self.cam_path.clear()
 
-    def make_cmd(self, precomp_list):
+    def make_cmd(self, precomp_list, software):
         """터미널에서 실행할 command를 list에 넣어준다. Houdini Mantra를 사용하여 렌더링하기 위해 mantra_render.py를 실행한다.
         mantra_render.py에는 4개의 argument를 받도록 설정하였다. list에 mantra command가 들어가고 sequence file을 mov로
         컨버팅하기 위해 FFmpeg을 사용하는 command를 list에 추가로 넣어준다. alembic file의 camera frame out count를 위해
@@ -351,7 +351,7 @@ class HouPepper:
         self.mantra_command = [
             'python',
             '/home/rapa/git/hook/python/BlackPepper/mantra_render.py',
-            f'{precomp_list.get("fx_working_path")}.hipnc',
+            f'{precomp_list.get("fx_working_path")}.{software}',
             precomp_list.get('jpg_output_path'),
             self.abc_path,
             self.cam_node
