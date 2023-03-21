@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-name = 'BlackPepper'
+name = 'blackpepper'
 
 version = '0.0.1'
 
@@ -10,7 +10,7 @@ requires = [
     'gazu', 'PySide2'
 ]
 variants = [
-    ['platform-linux', 'python-3.9', 'houdini-19.5.493'],
+    ['platform-linux', 'python-3.9', 'houdini-19.5.493']
 ]
 
 
