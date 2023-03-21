@@ -194,7 +194,7 @@ class Auto_log:
             home_json_path()
         """
         now_path = os.path.realpath(__file__)
-        split_path = now_path.split('/')[:-2]
+        split_path = now_path.split('/')[:-1]
         self.dir_path = os.path.join('/'.join(split_path), '.config')
         self.user_path = os.path.join(self.dir_path, 'user.json')
 
