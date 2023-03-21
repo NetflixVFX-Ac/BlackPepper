@@ -357,11 +357,15 @@ class HouPepper:
             self.cam_node
         ]
         self.mantra_cmd = (' '.join(str(s) for s in self.mantra_command))
+        # for s in self.mantra_command:
+        #    self.mantra_cmd = ' '.join(str(s))
         self.cmd_list.append(self.mantra_cmd)
         self.total_frame_list.append(total_frame)
 
         self.sequence_path = precomp_list.get('jpg_output_path')[:-17] + \
             precomp_list.get('jpg_output_path')[-4:] + '_%04d.jpg'
+        # print('aaa', precomp_list.get('jpg_output_path')[:-17])
+        # print('bbb', precomp_list.get('jpg_output_path')[-4:])
 
         self.ffmpeg_command = [
             "ffmpeg",
