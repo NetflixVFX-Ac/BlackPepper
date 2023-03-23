@@ -336,7 +336,7 @@ class PepperWindow(QMainWindow):
         rev_list = self.pepper.get_every_revision_for_output_file('camera_cache', 'layout_camera')
         self.renew_shot_cbox(rev_list)
         self.renew_shot_info()
-        self.renderlists_selection.clear()
+        # self.renderlists_selection.clear()
 
     def renew_template_status_path(self, template_name, input_num):
         if input_num.isdigit() is False:

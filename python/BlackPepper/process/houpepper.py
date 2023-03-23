@@ -259,18 +259,32 @@ class HouPepper:
         j = ['x', 'y', 'z', 'w']
 
         key_np = np.array(key)
+        print("key_np :", key_np)
+        print("key_shape :", key_np.shape)
         s = [1, -1]
+        # [x1, y1, z1]
+        # [x2, y2, z2]
+        # [x3, y3, z3]
         for frame, k in enumerate(key_np):
+            print('dfdedsd ', len(k))
             try:
                 num_key = len(k)
                 if num_key > 1:
                     for n, key_index in enumerate(k):
-                        slope = np.convolve(list(map(lambda x: x[1], key_np)), s, mode='same') / (len(s) - 1)
+                        print("key_np [1] :", key_np[1])
+                        print('lambda x :', len(list(map(lambda x: x[1], key_np))))
+                        slope = np.convolve(list(map(lambda x: x[n], key_np)), s, mode='same') / (len(s) - 1)
+                        print('txyz :', n)
+                        print('frame :', frame)
+                        print('slope :', len(slope))
+                        print('slope[frame] :', slope[frame])
                         if slope[frame] != 0:
                             keyframe = hou.Keyframe(key_index, hou.frameToTime(frame + 1))
                             node.parm('{}{}'.format(parm, j[n])).setKeyframe(keyframe)
             except:
                 slope = np.convolve(list(map(lambda x: x, key_np)), s, mode='same') / (len(s) - 1)
+                print('slope[frame] except :', slope[frame])
+
                 if slope[frame] != 0:
                     keyframe = hou.Keyframe(k, hou.frameToTime(frame + 1))
                     node.parm('{}'.format(parm)).setKeyframe(keyframe)
@@ -295,15 +309,16 @@ class HouPepper:
             check_resolution = self.get_cam_resolution(cam)
             tr, ro, sc = self.get_cam_xform(cam)
             self.set_cam_key(tr, cam_node, 't')
-            self.set_cam_key(ro, cam_node, 'r')
-            self.set_cam_key(sc, cam_node, 's')
+            # self.set_cam_key(ro, cam_node, 'r')
+            # self.set_cam_key(sc, cam_node, 's')
             cam_node.parmTuple('t').lock((1, 1, 1))
             cam_node.parmTuple('r').lock((1, 1, 1))
             cam_node.parmTuple('s').lock((1, 1, 1))
             for text in self.hou_cam_parm_name:
                 exec("self.set_cam_key(self.{}, cam_node, '{}')".format(text, text))
             if check_resolution:
-                self.set_cam_key(self.cam_resolution, cam_node, 'res')
+                pass
+                # self.set_cam_key(self.cam_resolution, cam_node, 'res')
             else:
                 self.cam_node.parm('resx').set(1920)
                 self.cam_node.parm('resy').set(int(1920 / self.filmaspectratio[0]))
