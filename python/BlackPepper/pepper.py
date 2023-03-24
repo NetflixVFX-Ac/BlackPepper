@@ -69,7 +69,7 @@ class Houpub:
         Raises:
             Exception: If input is not string, or if there is no dict named 'project name'
         """
-        self.args_str_check(proj_name)
+        self.str_check(proj_name)
         self._project = gazu.project.get_project_by_name(proj_name)
         self.dict_check(self.project, 'none')
         return
@@ -99,7 +99,7 @@ class Houpub:
                 and if there is no dict named 'sequence name'
         """
         self.dict_check(self.project, 'no_project')
-        self.args_str_check(seq_name)
+        self.str_check(seq_name)
         self._sequence = gazu.shot.get_sequence_by_name(self.project, seq_name)
         self.dict_check(self.sequence, 'none')
         return
@@ -129,7 +129,7 @@ class Houpub:
                 or if there is no dict named 'shot name'
         """
         self.dict_check(self.sequence, 'no_sequence')
-        self.args_str_check(shot_name)
+        self.str_check(shot_name)
         self._shot = gazu.shot.get_shot_by_name(self.sequence, shot_name)
         self.dict_check(self.shot, 'none')
         return
@@ -311,7 +311,7 @@ class Houpub:
             Exception: If self.entity doesn't exist, if self.entity has no task,
                 if task_type_name and software_name is not string, and if task_type is None
         """
-        self.args_str_check(task_type_name)
+        self.str_check(task_type_name)
         _, task = self.get_task(task_type_name)
         gazu.files.new_working_file(task, software=self.software)
         self.read_json_file()
@@ -337,7 +337,8 @@ class Houpub:
             Exception: If self.entity doesn't exist, if self.entity has no task, if self.entity has no working file,
                 if task_type_name or output_type_name is not string, and if task_type or output_type is None
         """
-        self.args_str_check(task_type_name, output_type_name, comments)
+        for check in [task_type_name, output_type_name, comments]:
+            self.str_check(check)
         task_type, task = self.get_task(task_type_name)
         self.dict_check(task_type, f'no_task_type{task_type_name}')
         work_file = gazu.files.get_last_working_file_revision(task)
@@ -363,13 +364,12 @@ class Houpub:
         Returns:
             working file path(revision=input_num)
         """
-        self.args_str_check(task_type_name)
+        self.str_check(task_type_name)
         _, task = self.get_task(task_type_name)
         revision_max = self.get_working_revision_max(task)
         revision_num = self.get_revision_num(revision_max, input_num)
-        path = gazu.files.build_working_file_path(task, software=self.software, revision=revision_num)
-        ext = self.software['file_extension']
-        return path + '.' + ext
+        path = gazu.files.build_working_file_path(task, revision=revision_num)
+        return path
 
     def make_next_working_path(self, task_type_name):
         """self.entity에 해당된 task_type_name을 가진 task의 다음 working file path를 반환한다. \n
@@ -388,7 +388,7 @@ class Houpub:
         Raises:
             Exception: If self.entity doesn't exist, if self.entity has no task. if task_type is None
         """
-        self.args_str_check(task_type_name)
+        self.str_check(task_type_name)
         _, task = self.get_task(task_type_name)
         self.dict_check(task, 'no_task_in_entity')
         last_working_file = gazu.files.get_last_working_file_revision(task)
@@ -427,8 +427,7 @@ class Houpub:
         revision_max = gazu.files.get_last_entity_output_revision(self.entity, output_type, task_type, name='main')
         revision_num = self.get_revision_num(revision_max, input_num)
         path = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type, revision=revision_num)
-        ext = output_type['short_name']
-        return path + '.' + ext
+        return path
 
     def make_next_output_path(self, output_type_name, task_type_name):
         """self.entity에 해당된 task_type의 output_type중 output_file_name의 output file path를 반환한다.
@@ -561,6 +560,8 @@ class Houpub:
         Returns:
             dict for houpepper render queue
         """
+        self.software = 'hip'
+        ext = self.software['file_extension']
         self.dict_check(casted_shot, 'not_dict')
         if 'shot_name' not in casted_shot or 'sequence_name' not in casted_shot:
             self.error('not_dict')
@@ -568,12 +569,12 @@ class Houpub:
         shot_name = casted_shot['shot_name']
         name = '_'.join([self.project['name'], self.asset['name'][5:], sequence_name, shot_name])
         self.entity = 'asset'
-        temp_working_path = self.working_file_path('simulation', input_num=temp_revision)
+        temp_working_path = self.working_file_path('simulation', input_num=temp_revision) + f'.{ext}'
         self.sequence = sequence_name
         self.shot = shot_name
         self.entity = 'shot'
         layout_output_path = self.output_file_path('camera_cache', 'layout_camera', input_num=cam_revision)
-        fx_working_path = self.make_next_working_path('FX')
+        fx_working_path = self.make_next_working_path('FX') + f'.{ext}'
         jpg_output_path = self.make_next_output_path('jpg_sequence', 'FX')
         video_output_path = self.make_next_output_path('movie_file', 'FX')
         precomp = {'name': name, 'temp_working_path': temp_working_path,
@@ -597,42 +598,6 @@ class Houpub:
         jpg_output_path = precomp['jpg_output_path']
         video_output_path = precomp['video_output_path']
         return temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path
-
-    def publish_precomp_working(self, precomp):
-        """self.make_precomp_dict 의 정보들로 fx의 working file을 publish 해준다. \n
-        실제 hip 파일이 오류 없이 정상적으로 생성되었을 때 이 메소드를 작동해야 한다.
-
-        Example:
-            for precomp in pepper.precomp_dict:
-                pepper.publish_precomp_working(precomp)
-
-        Args:
-            precomp(dict): make_precomp_dict에서 만든 dict
-        """
-        split_name = precomp['name'].split('_')
-        self.project = split_name[0]
-        self.sequence = split_name[-2]
-        self.shot = split_name[-1]
-        self.entity = 'shot'
-        self.publish_working_file('FX')
-
-    def publish_precomp_output(self, precomp):
-        """self.make_precomp_dict 의 정보들로 fx의 output file을 publish 해준다. \n
-        실제 mov 파일이 오류 없이 정상적으로 생성되었을 때 이 메소드를 작동해야 한다.
-
-        Example:
-            for precomp in pepper.precomp_dict:
-                pepper.publish_precomp_output(precomp)
-
-        Args:
-            precomp(dict): make_precomp_dict에서 만든 dict
-        """
-        split_name = precomp['name'].split('_')
-        self.project = split_name[0]
-        self.sequence = split_name[-2]
-        self.shot = split_name[-1]
-        self.entity = 'shot'
-        self.publish_output_file('FX', 'Movie_file', 'test_precomp')
 
     def get_every_revision_for_working_file(self, task_type_name):
         """self.entity의 task_name에 해당하는 task의 모든 working file의 revision이 담긴 list를 반환한다.
@@ -973,28 +938,6 @@ class Houpub:
             self.error(code)
         else:
             return test_dict
-
-    def args_str_check(self, *args):
-        """args에 들어온 인자들을 str인지 체크할 수 있는 메소드로 보내준다. \n
-        메소드 내에서만 사용되는 메소드다.
-
-        Example:
-            pepper.args_str_check(task_type_name)
-
-        Args:
-            args : 여러가지 인자들을 받을 수 있다
-
-        Returns:
-            받은 args들을 그대로 반환한다
-        """
-        if type(args) is tuple:
-            str_confirms = ','.join(args)
-            for str_confirm in str_confirms:
-                self.str_check(str_confirm)
-            return str_confirms
-        else:
-            self.str_check(args)
-            return args
 
     def str_check(self, strn):
         """strn의 타입이 str인지 체크한다.

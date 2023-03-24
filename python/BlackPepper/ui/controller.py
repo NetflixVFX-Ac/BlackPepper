@@ -169,23 +169,19 @@ class PepperWindow(QMainWindow):
         log_dict = self.login_log.user_dict
         # Check json file to get auto login information
         if os.path.exists(log_path) and not log_dict['auto']:
-            for auto_loop in log_dict['auto']:
-                if log_id != auto_loop['user_id'] or log_pw != auto_loop['user_pw'] or log_sfw != auto_loop['user_ext']:
-                    self.login_log.user_id = log_id
-                    self.login_log.user_pw = log_pw
-                    self.login_log.user_ext = log_sfw
-                    self.login_log.valid_host = True
-                    self.login_log.valid_user = True
-                    self.login_log.auto_login = True
-                    self.login_log.save_setting()
-                    return
+            self.login_log.user_id = log_id
+            self.login_log.user_pw = log_pw
+            self.login_log.user_ext = log_sfw
+            self.login_log.valid_host = True
+            self.login_log.valid_user = True
+            self.login_log.auto_login = True
+            self.login_log.save_setting()
+            return
         if log_value['valid_host'] and log_value['valid_user']:
             self.login_log.host = log_value['host']
             self.login_log.user_id = log_value['user_id']
             self.login_log.user_pw = log_value['user_pw']
             self.login_log.user_ext = log_value['user_ext']
-            self.pepper.login(self.login_log.host, self.login_log.user_id, self.login_log.user_pw)
-            self.pepper.software = self.login_log.user_ext
             self.login_log.connect_login()
             self.login_window.close()
             self.open_main_window()
