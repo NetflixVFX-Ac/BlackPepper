@@ -23,13 +23,6 @@ class HouPepper:
         self._abc_tree_path = None
         self._abc_range = None
 
-        self.mantra_command = None
-        self.mantra_cmd = None
-        self.sequence_path = None
-        self.ffmpeg_command = None
-        self.output_dir = None
-        self.ffmpeg_cmd = None
-
         self.hou_cam_parm_name = (
             'aperture',
             'aspect',
@@ -348,25 +341,49 @@ class HouPepper:
         """
         total_frame = self.abc_range[1] * hou.fps()
 
-        self.mantra_command = [
+        mantra_jpg_command = [
             'python',
-            '/home/rapa/git/hook/python/BlackPepper/mantra_render.py',
+            '/home/rapa/git/hook/python/BlackPepper/mantra_render_jpg.py',
             f'{precomp_list.get("fx_working_path")}.{software}',
             precomp_list.get('jpg_output_path'),
             self.abc_path,
             self.cam_node
         ]
-        self.mantra_cmd = (' '.join(str(s) for s in self.mantra_command))
-        self.cmd_list.append(self.mantra_cmd)
+        mantra_jpg_cmd = (' '.join(str(s) for s in mantra_jpg_command))
+        self.cmd_list.append(mantra_jpg_cmd)
         self.total_frame_list.append(total_frame)
 
-        self.sequence_path = precomp_list.get('jpg_output_path')[:-17] + \
+        mantra_fx_exr_command = [
+            'python',
+            '/home/rapa/git/hook/python/BlackPepper/mantra_render_fx_exr.py',
+            f'{precomp_list.get("fx_working_path")}.{software}',
+            precomp_list.get('jpg_output_path'),
+            self.abc_path,
+            self.cam_node
+        ]
+        mantra_exr_cmd = (' '.join(str(s) for s in mantra_fx_exr_command))
+        self.cmd_list.append(mantra_exr_cmd)
+        self.total_frame_list.append(total_frame)
+
+        mantra_bg_exr_command = [
+            'python',
+            '/home/rapa/git/hook/python/BlackPepper/mantra_render_bg_exr.py',
+            f'{precomp_list.get("fx_working_path")}.{software}',
+            precomp_list.get('jpg_output_path'),
+            self.abc_path,
+            self.cam_node
+        ]
+        mantra_exr_cmd = (' '.join(str(s) for s in mantra_bg_exr_command))
+        self.cmd_list.append(mantra_exr_cmd)
+        self.total_frame_list.append(total_frame)
+
+        sequence_path = precomp_list.get('jpg_output_path')[:-17] + \
             precomp_list.get('jpg_output_path')[-4:] + '_%04d.jpg'
 
-        self.ffmpeg_command = [
+        ffmpeg_command = [
             "ffmpeg",
             "-framerate 24",  # 초당프레임
-            "-i", self.sequence_path,  # 입력할 파일 이름
+            "-i", sequence_path,  # 입력할 파일 이름
             "-q 0",  # 출력품질 정함(숫자가 높을 수록 품질이 떨어짐)
             "-threads 8",  # 속도향상을 위해 멀티쓰레드를 지정
             "-c:v", "libx264",  # 코덱
@@ -376,15 +393,17 @@ class HouPepper:
             f'{precomp_list.get("video_output_path")}.mov'
         ]
 
-        self.output_dir = os.path.dirname(precomp_list.get("video_output_path"))
-        if not os.path.isdir(self.output_dir):
-            os.makedirs(self.output_dir)
+        output_dir = os.path.dirname(precomp_list.get("video_output_path"))
+        if not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
 
-        self.ffmpeg_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
-        self.cmd_list.append(self.ffmpeg_cmd)
+        ffmpeg_cmd = (' '.join(str(s) for s in ffmpeg_command))
+        self.cmd_list.append(ffmpeg_cmd)
         self.total_frame_list.append(total_frame)
 
         cmd_list = self.cmd_list
         total_frame_list = self.total_frame_list
+        print('cmd list :', cmd_list)
+        print('total frame list :', total_frame_list)
 
         return cmd_list, total_frame_list

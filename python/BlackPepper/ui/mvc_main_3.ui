@@ -564,6 +564,9 @@ color: rgb(45, 45, 45);</string>
             </property>
            </spacer>
           </item>
+          <item row="2" column="1">
+           <layout class="QVBoxLayout" name="verticalLayout_2"/>
+          </item>
          </layout>
         </item>
        </layout>

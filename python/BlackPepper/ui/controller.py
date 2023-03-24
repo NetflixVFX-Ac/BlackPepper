@@ -14,7 +14,8 @@ from BlackPepper.process.houpepper import HouPepper
 from BlackPepper.auto_login import Auto_log
 from BlackPepper.log.moduler_log import Logger
 from datetime import datetime
-
+import hou
+import _alembic_hom_extensions as abc
 
 class PepperWindow(QMainWindow):
     """이 모듈은 pepper를 통해 얻어 온 kitsu 상의 template asset과 casting 된 shot들의 정보들을 UI를 통해 보여준다. \n
@@ -56,12 +57,16 @@ class PepperWindow(QMainWindow):
         # model instance
         self.project_model = PepperModel()
         self.template_model = PepperModel()
+        self.template_model_sub = PepperModel()
         self.shot_model = PepperModel()
         self.render_model = PepperDnDModel()
         self.render_list_model = PepperModel()
         # listview instance
         self.projects_listview = PepperView(self)
         self.templates_listview = PepperView(self)
+        ##############################################
+        self.templates_sub_listview = PepperView(self)
+        ##############################################
         self.shots_listview = PepperView(self)
         self.renderlists_listview = PepperDnDView(self)
         self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
@@ -72,6 +77,11 @@ class PepperWindow(QMainWindow):
         self.templates_listview.setModel(self.template_model)
         self.templates_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
         self.templates_listview.setSpacing(2)
+        ################################################################################
+        self.templates_sub_listview.setModel(self.template_model_sub)
+        self.templates_sub_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
+        self.templates_sub_listview.setSpacing(2)
+        ################################################################################
         self.shots_listview.setModel(self.shot_model)
         self.shots_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
         self.shots_listview.setSpacing(2)
@@ -81,6 +91,9 @@ class PepperWindow(QMainWindow):
         # listview selection model
         self.projects_selection = self.projects_listview.selectionModel()
         self.templates_selection = self.templates_listview.selectionModel()
+        ##############################################
+        self.templates_usb_listview = self.templates_sub_listview.selectionModel()
+        ##############################################
         self.shots_selection = self.shots_listview.selectionModel()
         self.renderlists_selection = self.renderlists_listview.selectionModel()
         # get script_path
@@ -115,6 +128,9 @@ class PepperWindow(QMainWindow):
         # main UI clicked event
         self.projects_listview.clicked.connect(self.project_selected)
         self.templates_listview.clicked.connect(self.template_selected)
+        ##################################################################
+        self.templates_sub_listview.clicked.connect(self.template_sub_selected)
+        ##################################################################
         self.shots_listview.clicked.connect(self.shot_selected)
         self.main_window.reset_btn.clicked.connect(self.clear_list)
         self.main_window.render_btn.clicked.connect(self.render_execute)
@@ -128,7 +144,8 @@ class PepperWindow(QMainWindow):
         self.check_window.render_btn.clicked.connect(self.render_execute)
         # Add listview to UI
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
-        self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
+        self.main_window.verticalLayout_2.addWidget(self.templates_listview)
+        self.main_window.verticalLayout_2.addWidget(self.templates_sub_listview,)
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
         # Set status bar message
@@ -699,9 +716,9 @@ class PepperWindow(QMainWindow):
         for precomp in self.render_model.pepperlist:
             temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
                 = self.pepper.path_seperator(precomp)
-            houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
-                                         f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
-            cmd_list, total_frame_list = houp.make_cmd(precomp, self.pepper.software.get("file_extension"))
+            houp.set_fx_working_for_shot(temp_working_path+'nc', layout_output_path+'.abc',
+                                         f'{fx_working_path}.{self.pepper.software.get("file_extension")}nc')
+            cmd_list, total_frame_list = houp.make_cmd(precomp, self.pepper.software.get("file_extension")+'nc')
 
         self.render_process = RenderMainWindow(cmd_list, total_frame_list)
         self.render_process.resize(800, 600)
@@ -723,6 +740,46 @@ class PepperWindow(QMainWindow):
         self.templates_selection.clear()
         self.shots_selection.clear()
 
+    def template_sub_selected(self, event):
+
+        project_name = self.my_projects[event.row()]
+        abc_path = '/mnt/project/hook/pepper/shots/sq01/0010/layout_camera/output/camera_cache/v005/pepper_sq01_0010_camera_cache_v005.abc'
+        abc_range = abc.alembicTimeRange(abc_path)
+        path = '/home/rapa/sub_temp_test.hipnc'
+        saved_path = '/home/rapa/yh/test/save/test.hipnc'
+        hou.hipFile.load(path)
+        root = hou.node('/out')
+        obj_root = hou.node('/obj')
+        for child in obj_root.children():
+            print('child :', child)
+            obj_list = child
+            return obj_list
+
+        if root is not None:
+            mantra_preview = root.createNode('ifd')
+            mantra_preview.parm('camera').set('obj/cam1Camera/')
+            mantra_preview.parm('vm_picture').set('/home/rapa/yh/test/jpg/test_$F4.jpg')
+            mantra_preview.parm('trange').set(1)
+            for i in mantra_preview.parmTuple('f'):
+                i.deleteAllKeyframes()
+            mantra_preview.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
+            mantra_preview.parm('vm_verbose').set(1)
+
+            mantra_comp = root.createNode('ifd')
+            mantra_comp.parm('vobject').set('')
+            mantra_comp.parm('forceobject').set('fire')
+            mantra_comp.parm('camera').set('obj/cam1Camera/')
+            mantra_comp.parm('vm_picture').set('/home/rapa/yh/test/exr/test_$F4.exr')
+            for i in mantra_comp.parmTuple('f'):
+                i.deleteAllKeyframes()
+            mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
+            mantra_comp.parm('vm_verbose').set(1)
+            hou.hipFile.save(file_name=saved_path)
+
+        # Renew listview
+        self.shot_model.layoutChanged.emit()
+        self.shots_selection.clear()
+        self.renderlists_selection.clear()
 
 def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
