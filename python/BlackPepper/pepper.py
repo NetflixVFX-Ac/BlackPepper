@@ -579,11 +579,9 @@ class Houpub:
         jpg_output_path = self.make_next_output_path('jpg_sequence', 'FX')
         video_output_path = self.make_next_output_path('movie_file', 'FX')
         exr_output_path = self.make_next_output_path('EXR', 'FX')
-        print(exr_output_path)
-        precomp = {'name': name, 'temp_working_path': temp_working_path,
-                   'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
-                   'jpg_output_path': jpg_output_path, 'video_output_path': video_output_path,
-                   'exr_output_path': exr_output_path}
+        precomp = {'name': name, 'temp_working_path': temp_working_path, 'layout_output_path': layout_output_path,
+                   'fx_working_path': fx_working_path, 'jpg_output_path': jpg_output_path,
+                   'video_output_path': video_output_path, 'exr_output_path': exr_output_path}
         return precomp
 
     @staticmethod

@@ -3,9 +3,9 @@ import os
 import json
 import webbrowser
 from BlackPepper.process.render_process_bar import RenderMainWindow
-from PySide2 import QtCore, QtWidgets
+from PySide2.QtCore import QFile, QCoreApplication, Qt
 from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QMainWindow, QAction, QApplication, QMenu
+from PySide2.QtWidgets import QAbstractItemView, QMainWindow, QAction, QApplication, QMenu
 from BlackPepper.ui.model import PepperModel, PepperDnDModel
 from BlackPepper.ui.view import PepperView, PepperDnDView
 from BlackPepper.pepper import Houpub
@@ -36,8 +36,8 @@ class PepperWindow(QMainWindow):
 
         self.fxtemp_asset_type_name = 'fx_template'
         self.fxtemp_task_type_name = 'simulation'
-        self.camrea_task_type_name = 'layout_camera'
-        self.camera_output_type_name = 'camera_cache'
+        self.camera_task_type_name = 'layout_camera'  # camera로 변경
+        self.camera_output_type_name = 'camera_cache'  # alembic으로 변경
         self.software_name = 'hipnc'
 
         self.pepper = Houpub()
@@ -70,7 +70,7 @@ class PepperWindow(QMainWindow):
         self.templates_listview = PepperView(self)
         self.shots_listview = PepperView(self)
         self.renderlists_listview = PepperDnDView(self)
-        self.shots_listview.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.shots_listview.setSelectionMode(QAbstractItemView.ExtendedSelection)
         # set model
         self.projects_listview.setModel(self.project_model)
         self.projects_listview.setStyleSheet("background-color:rgb(52, 52, 52);")
@@ -92,23 +92,23 @@ class PepperWindow(QMainWindow):
         # get script_path
         script_path = os.path.dirname(os.path.realpath(__file__))  # path.realpath : 현재 파일의 경로+이름 을 반환
         # login UI loader
-        login_ui = QtCore.QFile(os.path.join(script_path, 'mvc_login_3.ui'))
-        login_ui.open(QtCore.QFile.ReadOnly)
+        login_ui = QFile(os.path.join(script_path, 'mvc_login_3.ui'))
+        login_ui.open(QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
         self.login_window.setWindowTitle('BlackPepper v1.1.0')
         self.login_window.move(1000, 300)
         self.login_window.show()
         # main UI loader
-        main_ui = QtCore.QFile(os.path.join(script_path, 'mvc_main_3.ui'))
-        main_ui.open(QtCore.QFile.ReadOnly)
+        main_ui = QFile(os.path.join(script_path, 'mvc_main_3.ui'))
+        main_ui.open(QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
         self.main_window.setWindowTitle('BlackPepper v1.1.0')
         self.main_window.move(700, 250)
         # check UI loader
-        check_ui = QtCore.QFile(os.path.join(script_path, 'mvc_YN_3.ui'))
-        check_ui.open(QtCore.QFile.ReadOnly)
+        check_ui = QFile(os.path.join(script_path, 'mvc_YN_3.ui'))
+        check_ui.open(QFile.ReadOnly)
         self.check_ui_loader = QUiLoader()
         self.check_window = self.login_ui_loader.load(check_ui)
         self.check_window.setWindowTitle('Render Check List')
@@ -313,7 +313,7 @@ class PepperWindow(QMainWindow):
             self.pepper.sequence = shot['sequence_name']
             self.pepper.shot = shot['shot_name']
             self.pepper.entity = 'shot'
-            if self.pepper.check_task_status('Done', self.camrea_task_type_name) is True:
+            if self.pepper.check_task_status('Done', self.camera_task_type_name) is True:
                 self.shot_model.pepperlist.append(shot['sequence_name'] + '_' + shot['shot_name'])
         # Renew listview
         self.shot_model.layoutChanged.emit()
@@ -332,7 +332,8 @@ class PepperWindow(QMainWindow):
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
         self.pepper.entity = 'shot'
-        rev_list = self.pepper.get_every_revision_for_output_file(self.camera_output_type_name, self.camrea_task_type_name)
+        rev_list = self.pepper.get_every_revision_for_output_file(self.camera_output_type_name,
+                                                                  self.camera_task_type_name)
         self.renew_shot_cbox(rev_list)
         self.renew_shot_info()
         self.renderlists_selection.clear()
@@ -373,7 +374,7 @@ class PepperWindow(QMainWindow):
         선택된 shot의 camera_cache output file에서 작업자의 이름, 수정 시각, revision을 가져온다.
         """
         revision = self.main_window.shot_rev_cbox.currentText()
-        name, time, rev = self.pepper.get_output_file_data(self.camera_output_type_name, self.camrea_task_type_name,
+        name, time, rev = self.pepper.get_output_file_data(self.camera_output_type_name, self.camera_task_type_name,
                                                            revision, 'shot')
         date = time[:10]
         clock = time[11:]
@@ -740,26 +741,11 @@ class PepperWindow(QMainWindow):
         self.render_process.resize(800, 600)
         self.render_process.move(1000, 250)
         self.render_process.show()
-        #
-        # self.render_list_data.clear()
-        #
-        # self.render_model.layoutChanged.emit()
-        # self.template_model.layoutChanged.emit()
-        # self.shot_model.layoutChanged.emit()
-        #
-        # self.render_model.pepperlist.clear()
-        # self.template_model.pepperlist.clear()
-        # self.shot_model.pepperlist.clear()
-        #
-        # self.projects_selection.clear()
-        # self.renderlists_selection.clear()
-        # self.templates_selection.clear()
-        # self.shots_selection.clear()
 
 
 def main():
-    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-    app = QtWidgets.QApplication(sys.argv)
+    QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
+    app = QApplication(sys.argv)
     window = PepperWindow()
     app.exec_()
 
