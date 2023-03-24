@@ -79,7 +79,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         self.text = QtWidgets.QPlainTextEdit()
         self.text.setReadOnly(True)
-        self.btn_interrupt = QtWidgets.QPushButton("Interrupt")
+        self.btn_interrupt = QtWidgets.QPushButton("Exit")
         self.btn_interrupt.clicked.connect(self.handle_interrupt)
 
         box_layout = QtWidgets.QVBoxLayout()
@@ -235,12 +235,12 @@ class RenderMainWindow(QtWidgets.QMainWindow):
             self.is_interrupted = True
             self.process.terminate()
             self.process = None
-            self.btn_interrupt.setText("Restart")
-            self.message(f'interrupt at : {self.cmd}')
-        else:
-            self.is_interrupted = False
-            self.btn_interrupt.setText("Interrupt")
-            self.start_process()
+        #     self.btn_interrupt.setText("Restart")
+        #     self.message(f'interrupt at : {self.cmd}')
+        # else:
+        #     self.is_interrupted = False
+        #     self.btn_interrupt.setText("Interrupt")
+        #     self.start_process()
         return
 
     @staticmethod
