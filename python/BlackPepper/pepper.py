@@ -450,7 +450,9 @@ class Houpub:
         output_type = gazu.files.get_output_type_by_name(output_type_name)
         self.dict_check(output_type, f'no_output_type{output_type_name}')
         revision_max = gazu.files.get_last_entity_output_revision(self.entity, output_type, task_type, name='main')
-        path = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type, revision=revision_max + 1)
+        if gazu.files.all_output_files_for_entity(self.entity, output_type, task_type, name='main'):
+            revision_max += 1
+        path = gazu.files.build_entity_output_file_path(self.entity, output_type, task_type, revision=revision_max)
         return path
 
     def get_working_revision_max(self, task):
@@ -576,9 +578,12 @@ class Houpub:
         fx_working_path = self.make_next_working_path('FX') + f'.{hou_ext}'
         jpg_output_path = self.make_next_output_path('jpg_sequence', 'FX')
         video_output_path = self.make_next_output_path('movie_file', 'FX')
+        exr_output_path = self.make_next_output_path('EXR', 'FX')
+        print(exr_output_path)
         precomp = {'name': name, 'temp_working_path': temp_working_path,
                    'layout_output_path': layout_output_path, 'fx_working_path': fx_working_path,
-                   'jpg_output_path': jpg_output_path, 'video_output_path': video_output_path}
+                   'jpg_output_path': jpg_output_path, 'video_output_path': video_output_path,
+                   'exr_output_path': exr_output_path}
         return precomp
 
     @staticmethod
@@ -596,7 +601,9 @@ class Houpub:
         fx_working_path = precomp['fx_working_path']
         jpg_output_path = precomp['jpg_output_path']
         video_output_path = precomp['video_output_path']
-        return temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path
+        exr_output_path = precomp['exr_output_path']
+        return temp_working_path, layout_output_path, fx_working_path,\
+            jpg_output_path, video_output_path, exr_output_path
 
     def get_every_revision_for_working_file(self, task_type_name):
         """self.entity의 task_name에 해당하는 task의 모든 working file의 revision이 담긴 list를 반환한다.

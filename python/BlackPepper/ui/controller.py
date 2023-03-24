@@ -698,16 +698,19 @@ class PepperWindow(QMainWindow):
         """
         self.render_list_model.pepperlist.clear()
         for render_file in self.render_model.pepperlist:
-            temp_rev = render_file['temp_working_path'].split('.')[0][-3:]
-            cam_rev = render_file['layout_output_path'].split('.')[0][-3:]
+            temp_working_path, layout_output_path, fx_working_path, \
+                jpg_output_path, video_output_path, exr_output_path = self.pepper.path_seperator(render_file)
+            temp_rev = temp_working_path.split('.')[0][-3:]
+            cam_rev = layout_output_path.split('.')[0][-3:]
             self.render_list_model.pepperlist.append(f"\n{render_file['name']}\n "
                                                      f"Template revision : {temp_rev}\n "
                                                      f"Layout camera revision : {cam_rev}\n " 
-                                                     f"{render_file['temp_working_path']}\n "
-                                                     f"{render_file['layout_output_path']}\n "
-                                                     f"{render_file['fx_working_path']}\n "
-                                                     f"{render_file['jpg_output_path']}\n "
-                                                     f"{render_file['video_output_path']}\n")
+                                                     f"{temp_working_path}\n "
+                                                     f"{layout_output_path}\n "
+                                                     f"{fx_working_path}\n "
+                                                     f"{jpg_output_path}\n "
+                                                     f"{video_output_path}\n "
+                                                     f"{exr_output_path}\n")
         self.render_list_model.layoutChanged.emit()
         self.check_window.show()
 
