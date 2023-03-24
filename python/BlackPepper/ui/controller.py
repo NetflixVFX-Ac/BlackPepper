@@ -3,7 +3,6 @@ import os
 import json
 import webbrowser
 from BlackPepper.process.render_process_bar import RenderMainWindow
-# from BlackPepper.process.mantra_process_bar_w import MantraMainWindow
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QMainWindow, QAction, QApplication, QMenu
@@ -34,6 +33,13 @@ class PepperWindow(QMainWindow):
     """
     def __init__(self):
         super().__init__(parent=None)
+
+        self.fxtemp_asset_type_name = 'fx_template'
+        self.fxtemp_task_type_name = 'simulation'
+        self.camrea_task_type_name = 'layout_camera'
+        self.camera_output_type_name = 'camera_cache'
+        self.software_name = 'hipnc'
+
         self.pepper = Houpub()
         self.login_log = Auto_log()
         self.save_log = Logger()
@@ -90,7 +96,7 @@ class PepperWindow(QMainWindow):
         login_ui.open(QtCore.QFile.ReadOnly)
         self.login_ui_loader = QUiLoader()
         self.login_window = self.login_ui_loader.load(login_ui)
-        self.login_window.setWindowTitle('Black Pepper v0.01')
+        self.login_window.setWindowTitle('BlackPepper v1.1.0')
         self.login_window.move(1000, 300)
         self.login_window.show()
         # main UI loader
@@ -98,7 +104,7 @@ class PepperWindow(QMainWindow):
         main_ui.open(QtCore.QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
-        self.main_window.setWindowTitle('Black Pepper v0.0.1')
+        self.main_window.setWindowTitle('BlackPepper v1.1.0')
         self.main_window.move(700, 250)
         # check UI loader
         check_ui = QtCore.QFile(os.path.join(script_path, 'mvc_YN_3.ui'))
@@ -132,7 +138,7 @@ class PepperWindow(QMainWindow):
         self.main_window.gridLayout_3.addWidget(self.shots_listview, 2, 2)
         self.main_window.gridLayout_3.addWidget(self.renderlists_listview, 2, 5)
         # Set status bar message
-        self.login_window.statusBar().showMessage('Select licence version of houdini to log-in')
+        self.login_window.statusBar().showMessage('')
         self.main_window.path_btn.setStatusTip('Show full path of render files')
         self.main_window.save_btn.setStatusTip("Save render files list as preset")
         self.main_window.reset_btn.setStatusTip('Clear render files list')
@@ -164,14 +170,12 @@ class PepperWindow(QMainWindow):
         self.login_log.host = "http://192.168.3.116/api"
         log_id = self.login_window.input_id.text()
         log_pw = self.login_window.input_pw.text()
-        log_sfw = self.login_window.hipbox.currentText()[1:]
         log_value = self.login_log.load_setting()
         log_dict = self.login_log.user_dict
         # Check json file to get auto login information
         if os.path.exists(log_path) and not log_dict['auto']:
             self.login_log.user_id = log_id
             self.login_log.user_pw = log_pw
-            self.login_log.user_ext = log_sfw
             self.login_log.valid_host = True
             self.login_log.valid_user = True
             self.login_log.auto_login = True
@@ -181,7 +185,6 @@ class PepperWindow(QMainWindow):
             self.login_log.host = log_value['host']
             self.login_log.user_id = log_value['user_id']
             self.login_log.user_pw = log_value['user_pw']
-            self.login_log.user_ext = log_value['user_ext']
             self.login_log.connect_login()
             self.login_window.close()
             self.open_main_window()
@@ -200,7 +203,6 @@ class PepperWindow(QMainWindow):
         self.login_log.host = "http://192.168.3.116/api"
         self.login_log.user_id = self.login_window.input_id.text()
         self.login_log.user_pw = self.login_window.input_pw.text()
-        self.login_log.user_ext = self.login_window.hipbox.currentText()[1:]
         # if connect login, get login information and close login window, open main window
         if self.login_log.connect_login():
             self.pepper.software = self.login_log.user_ext
@@ -243,6 +245,7 @@ class PepperWindow(QMainWindow):
         renderlists는 self.render_model.pepperlist에 담긴 shot들의 name의 value 값만 보여주는 것이고,
         render 버튼 클릭 시 self.render_model.pepperlist 를 Houdini로 전달한다.
         """
+        self.pepper.software = self.software_name
         self.main_window.statusBar().showMessage('Select project to find templates')
         self.create_main_menubar()
         # Get my project
@@ -269,11 +272,11 @@ class PepperWindow(QMainWindow):
         self.all_assets = []
         # Append templates to template listview
         for asset in self.pepper.get_all_assets():
-            if self.pepper.check_asset_type(asset, 'fx_template') is None:
+            if self.pepper.check_asset_type(asset, self.fxtemp_asset_type_name) is None:
                 continue
             self.pepper.asset = asset
             self.pepper.entity = 'asset'
-            if self.pepper.check_task_status('Done', 'simulation') is True:
+            if self.pepper.check_task_status('Done', self.fxtemp_task_type_name) is True:
                 self.all_assets.append(asset)
         self.template_model.pepperlist.clear()
         self.shot_model.pepperlist.clear()
@@ -300,7 +303,7 @@ class PepperWindow(QMainWindow):
         self.pepper.asset = template_name
         self.pepper.entity = 'asset'
         # Reset comboBox, get template info
-        rev_list = self.pepper.get_every_revision_for_working_file('simulation')
+        rev_list = self.pepper.get_every_revision_for_working_file(self.fxtemp_task_type_name)
         self.renew_template_cbox(rev_list)
         self.renew_template_info()
         # Append shot names to shot listview
@@ -310,7 +313,7 @@ class PepperWindow(QMainWindow):
             self.pepper.sequence = shot['sequence_name']
             self.pepper.shot = shot['shot_name']
             self.pepper.entity = 'shot'
-            if self.pepper.check_task_status('Done', 'layout_camera') is True:
+            if self.pepper.check_task_status('Done', self.camrea_task_type_name) is True:
                 self.shot_model.pepperlist.append(shot['sequence_name'] + '_' + shot['shot_name'])
         # Renew listview
         self.shot_model.layoutChanged.emit()
@@ -329,18 +332,25 @@ class PepperWindow(QMainWindow):
         self.pepper.sequence = shot_dict['sequence_name']
         self.pepper.shot = shot_dict['shot_name']
         self.pepper.entity = 'shot'
-        rev_list = self.pepper.get_every_revision_for_output_file('camera_cache', 'layout_camera')
+        rev_list = self.pepper.get_every_revision_for_output_file(self.camera_output_type_name, self.camrea_task_type_name)
         self.renew_shot_cbox(rev_list)
         self.renew_shot_info()
         self.renderlists_selection.clear()
 
     def renew_template_status_path(self, template_name, input_num):
+        """templates_listview의 template 클릭이나 temp_rev_cbox의 데이터 변경 시에 실행 되는 메소드. \n
+        현재 template의 실제 파일 경로를 status bar에 디스플레이 해준다.\n
+
+        Args:
+            template_name(str): Selected template name
+            input_num: Selected revision of template
+        """
         if input_num.isdigit() is False:
             return
         input_int = int(input_num)
         self.pepper.asset = template_name
         self.pepper.entity = 'asset'
-        working_file_path = self.pepper.working_file_path('simulation', input_int)
+        working_file_path = self.pepper.working_file_path(self.fxtemp_task_type_name, input_int)
         sep_path = working_file_path.split('/')
         sep_path.pop()
         full_path = "/".join(sep_path)
@@ -351,7 +361,7 @@ class PepperWindow(QMainWindow):
         선택된 template의 simulation working file에서 작업자의 이름, 수정 시각, revision을 가져온다.
         """
         revision = self.main_window.template_rev_cbox.currentText()
-        name, time, rev = self.pepper.get_working_file_data('simulation', revision, 'asset')
+        name, time, rev = self.pepper.get_working_file_data(self.fxtemp_task_type_name, revision, 'asset')
         date = time[:10]
         clock = time[11:]
         self.main_window.template_info_label.setText(f"{name}\n{date}\n{clock}")
@@ -363,7 +373,8 @@ class PepperWindow(QMainWindow):
         선택된 shot의 camera_cache output file에서 작업자의 이름, 수정 시각, revision을 가져온다.
         """
         revision = self.main_window.shot_rev_cbox.currentText()
-        name, time, rev = self.pepper.get_output_file_data('camera_cache', 'layout_camera', revision, 'shot')
+        name, time, rev = self.pepper.get_output_file_data(self.camera_output_type_name, self.camrea_task_type_name,
+                                                           revision, 'shot')
         date = time[:10]
         clock = time[11:]
         self.main_window.shot_info_label.setText(f"{name}\n{date}\n{clock}")
@@ -371,6 +382,9 @@ class PepperWindow(QMainWindow):
     def renew_template_cbox(self, rev_list):
         """template_rev_cbox에 선택된 template의 모든 revision을 추가해주는 메소드. \n
         comboBox의 정보대로 렌더할 shot의 template revision이 결정된다.
+
+        Args:
+            rev_list(list): Revision list of selected template
         """
         self.main_window.template_rev_cbox.clear()
         for rev in rev_list:
@@ -379,6 +393,9 @@ class PepperWindow(QMainWindow):
     def renew_shot_cbox(self, rev_list):
         """shot_rev_cbox에 선택된 shot의 모든 revision을 추가해주는 메소드. \n
         comboBox의 정보대로 렌더할 shot의 camera_cache revision이 결정된다.
+
+        Args:
+            rev_list(list): Revision list of selected shot
         """
         self.main_window.shot_rev_cbox.clear()
         for rev in rev_list:
@@ -417,6 +434,9 @@ class PepperWindow(QMainWindow):
     def check_and_append_render_list(self, path_dict):
         """Render list에 중복된 dict가 들어가지 않게 체크해주고, 중복되지 않는다면 dict를 Render list에 추가해주는 메소드. \n
         Shot name이 같아도 revision이 다르다면 Render list에 들어갈 수 있다.
+
+        Args:
+            path_dict(dict): Precomp dict from pepper
         """
         if path_dict in self.render_model.pepperlist:
             return
@@ -563,6 +583,12 @@ class PepperWindow(QMainWindow):
         self.main_filemenu.addAction(exit_action)
 
     def append_renderlist_to_menubar(self, render_list):
+        """저장된 Renderlist를 self.render_model.pepperlist에 다시 가져와주는 메소드. \n
+        File의 submenu 안의 renderlist를 클릭시 실행된다. 해당 renderlist의 이름으로 json file 안의 딕셔너리에서 value값을 찾아온다.
+
+        Args:
+            render_list(str): Renderlist name
+        """
         file_action = QAction(render_list, self)
         file_action.triggered.connect(lambda: self.get_renderlist(file_action.text()))
         return file_action
@@ -570,6 +596,9 @@ class PepperWindow(QMainWindow):
     def get_renderlist(self, text):
         """저장된 Renderlist를 self.render_model.pepperlist에 다시 가져와주는 메소드. \n
         File의 submenu 안의 renderlist를 클릭시 실행된다. 해당 renderlist의 이름으로 json file 안의 딕셔너리에서 value값을 찾아온다.
+
+        Args:
+            text(str): Renderlist name
         """
         if text.startswith("saved"):
             list_type = 'saved'
@@ -708,21 +737,21 @@ class PepperWindow(QMainWindow):
         self.render_process.resize(800, 600)
         self.render_process.move(1000, 250)
         self.render_process.show()
-
-        self.render_list_data.clear()
-
-        self.render_model.layoutChanged.emit()
-        self.template_model.layoutChanged.emit()
-        self.shot_model.layoutChanged.emit()
-
-        self.render_model.pepperlist.clear()
-        self.template_model.pepperlist.clear()
-        self.shot_model.pepperlist.clear()
-
-        self.projects_selection.clear()
-        self.renderlists_selection.clear()
-        self.templates_selection.clear()
-        self.shots_selection.clear()
+        #
+        # self.render_list_data.clear()
+        #
+        # self.render_model.layoutChanged.emit()
+        # self.template_model.layoutChanged.emit()
+        # self.shot_model.layoutChanged.emit()
+        #
+        # self.render_model.pepperlist.clear()
+        # self.template_model.pepperlist.clear()
+        # self.shot_model.pepperlist.clear()
+        #
+        # self.projects_selection.clear()
+        # self.renderlists_selection.clear()
+        # self.templates_selection.clear()
+        # self.shots_selection.clear()
 
 
 def main():

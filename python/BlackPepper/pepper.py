@@ -560,8 +560,7 @@ class Houpub:
         Returns:
             dict for houpepper render queue
         """
-        self.software = 'hip'
-        ext = self.software['file_extension']
+        hou_ext = self.software['file_extension']
         self.dict_check(casted_shot, 'not_dict')
         if 'shot_name' not in casted_shot or 'sequence_name' not in casted_shot:
             self.error('not_dict')
@@ -569,12 +568,12 @@ class Houpub:
         shot_name = casted_shot['shot_name']
         name = '_'.join([self.project['name'], self.asset['name'][5:], sequence_name, shot_name])
         self.entity = 'asset'
-        temp_working_path = self.working_file_path('simulation', input_num=temp_revision) + f'.{ext}'
+        temp_working_path = self.working_file_path('simulation', input_num=temp_revision) + f'.{hou_ext}'
         self.sequence = sequence_name
         self.shot = shot_name
         self.entity = 'shot'
-        layout_output_path = self.output_file_path('camera_cache', 'layout_camera', input_num=cam_revision)
-        fx_working_path = self.make_next_working_path('FX') + f'.{ext}'
+        layout_output_path = self.output_file_path('camera_cache', 'layout_camera', input_num=cam_revision) + '.abc'
+        fx_working_path = self.make_next_working_path('FX') + f'.{hou_ext}'
         jpg_output_path = self.make_next_output_path('jpg_sequence', 'FX')
         video_output_path = self.make_next_output_path('movie_file', 'FX')
         precomp = {'name': name, 'temp_working_path': temp_working_path,
