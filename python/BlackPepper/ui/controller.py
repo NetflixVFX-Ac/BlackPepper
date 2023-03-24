@@ -748,11 +748,11 @@ class PepperWindow(QMainWindow):
             return
         self.save_recent_renderlists()
         for precomp in self.render_model.pepperlist:
-            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path \
-                = self.pepper.path_seperator(precomp)
-            houp.set_fx_working_for_shot(temp_working_path+'nc', layout_output_path+'.abc',
-                                         f'{fx_working_path}.{self.pepper.software.get("file_extension")}nc')
-            cmd_list, total_frame_list = houp.make_cmd(precomp, self.pepper.software.get("file_extension")+'nc')
+            temp_working_path, layout_output_path, fx_working_path, \
+            jpg_output_path, video_output_path, exr_output_path = self.pepper.path_seperator(precomp)
+            houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
+                                         f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
+            cmd_list, total_frame_list = houp.make_cmd(precomp, self.pepper.software.get("file_extension"))
 
         self.render_process = RenderMainWindow(cmd_list, total_frame_list)
         self.render_process.resize(800, 600)

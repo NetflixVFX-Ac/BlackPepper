@@ -353,27 +353,15 @@ class HouPepper:
         self.cmd_list.append(mantra_jpg_cmd)
         self.total_frame_list.append(total_frame)
 
-        mantra_fx_exr_command = [
+        mantra_exr_command = [
             'python',
-            '/home/rapa/git/hook/python/BlackPepper/mantra_render_fx_exr.py',
+            '/home/rapa/git/hook/python/BlackPepper/mantra_render_exr.py',
             f'{precomp_list.get("fx_working_path")}.{software}',
-            precomp_list.get('jpg_output_path'),
+            precomp_list.get('exr_output_path'),
             self.abc_path,
             self.cam_node
         ]
-        mantra_exr_cmd = (' '.join(str(s) for s in mantra_fx_exr_command))
-        self.cmd_list.append(mantra_exr_cmd)
-        self.total_frame_list.append(total_frame)
-
-        mantra_bg_exr_command = [
-            'python',
-            '/home/rapa/git/hook/python/BlackPepper/mantra_render_bg_exr.py',
-            f'{precomp_list.get("fx_working_path")}.{software}',
-            precomp_list.get('jpg_output_path'),
-            self.abc_path,
-            self.cam_node
-        ]
-        mantra_exr_cmd = (' '.join(str(s) for s in mantra_bg_exr_command))
+        mantra_exr_cmd = (' '.join(str(s) for s in mantra_exr_command))
         self.cmd_list.append(mantra_exr_cmd)
         self.total_frame_list.append(total_frame)
 

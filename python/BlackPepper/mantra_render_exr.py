@@ -47,7 +47,7 @@ def set_mantra_fx_for_comp(hip_path, output_path, abc_path, cam_node):
         mantra_comp.parm('vobject').set('')
         mantra_comp.parm('forceobject').set(fx_name)
         mantra_comp.parm('camera').set(cam_setting)
-        mantra_comp.parm('vm_picture').set(f'{output_path[:-17]}{output_path[-4:]}_$F4.exr')
+        mantra_comp.parm('vm_picture').set(f'{output_path}_$F4.exr')
         mantra_comp.parm('trange').set(1)
         for i in mantra_comp.parmTuple('f'):
             i.deleteAllKeyframes()

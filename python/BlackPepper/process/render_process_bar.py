@@ -192,6 +192,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                 self.pepper.entity = 'shot'
                 self.pepper.publish_output_file('FX', 'jpg_sequence', 'jpg publish')
                 self.pepper.publish_output_file('FX', 'movie_file', 'mov publish')
+                self.pepper.publish_output_file('FX', 'EXR', 'exr publish')
                 thumbnail = self.pepper.publish_preview('FX', 'Ready To Start', 'test', path)
                 gazu.task.set_main_preview(thumbnail)
 
