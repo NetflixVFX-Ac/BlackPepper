@@ -6,3 +6,4 @@
 *.xml
 .idea/workspace.xml
 *.json
+*.spec
