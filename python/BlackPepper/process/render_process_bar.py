@@ -171,7 +171,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """
         self.message(f'finished : {self.cmd}, {self.is_interrupted}')
 
-        # self.process.waitForFinished()
+        self.process.waitForFinished()
 
         if self.is_interrupted:
             return
@@ -191,8 +191,10 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                 self.pepper.sequence = sequence.upper()
                 self.pepper.shot = shot
                 self.pepper.entity = 'shot'
+                self.pepper.publish_working_file('FX')
                 self.pepper.publish_output_file('FX', 'jpg_sequence', 'jpg publish')
                 self.pepper.publish_output_file('FX', 'movie_file', 'mov publish')
+                self.pepper.publish_output_file('FX', 'EXR', 'exr publish')
                 thumbnail = self.pepper.publish_preview('FX', 'Ready To Start', 'test', path)
                 gazu.task.set_main_preview(thumbnail)
 

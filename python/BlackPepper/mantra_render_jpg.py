@@ -6,7 +6,7 @@ import hou
 import _alembic_hom_extensions as abc
 
 
-def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
+def set_mantra_for_preview(hip_path, output_path, abc_path, cam_node):
     """Houdini python module _alembic_hom_extensions를 활용하여 Alembic file에서 Camera frame range를 가져온다. \n
     shot FX working file path를 argument로 받아, shutil를 활용하여 홈 경로에 새로만든 temp directory에 복사한다. \n
     Houdini python module Hou를 활용하여 복사한 Houdini file을 실행시키고, out에 Mantra 노드를 생성하여 render를 시작한다. \n
@@ -32,15 +32,16 @@ def set_mantra_for_render(hip_path, output_path, abc_path, cam_node):
     hou.hipFile.load(temp_path)
     root = hou.node('/out')
     if root is not None:
-        mantre_node = root.createNode('ifd')
-        mantre_node.parm('camera').set(cam_setting)
-        mantre_node.parm('vm_picture').set(f'{output_path[:-17]}{output_path[-4:]}_$F4.jpg')
-        mantre_node.parm('trange').set(1)
-        for i in mantre_node.parmTuple('f'):
+        mantra_comp = root.createNode('ifd')
+        mantra_comp.parm('camera').set(cam_setting)
+        mantra_comp.parm('vm_picture').set(f'{output_path[:-17]}{output_path[-4:]}_$F4.jpg')
+        mantra_comp.parm('trange').set(1)
+        for i in mantra_comp.parmTuple('f'):
             i.deleteAllKeyframes()
-        mantre_node.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
-        mantre_node.parm('vm_verbose').set(1)
-        mantre_node.parm("execute").pressButton()
+        # mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
+        mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), 1, 1])
+        mantra_comp.parm('vm_verbose').set(1)
+        mantra_comp.parm("execute").pressButton()
     output_dir = os.path.dirname(output_path) + '/*.jpg'
     error_dir = os.path.dirname(output_path) + '/*.jpg.mantra_checkpoint'
     file_list = glob.glob(output_dir)
@@ -68,7 +69,7 @@ def main():
     output_path = args[2]
     abc_path = args[3]
     cam_node = args[4]
-    set_mantra_for_render(hip_path, output_path, abc_path, cam_node)
+    set_mantra_for_preview(hip_path, output_path, abc_path, cam_node)
 
 
 if __name__ == "__main__":
