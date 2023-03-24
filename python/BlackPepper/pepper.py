@@ -691,7 +691,7 @@ class Houpub:
         task_status = self.get_task_status(task_status_name)
         gazu.task.add_comment(task, task_status, comment=comment_text)
         comment = gazu.task.get_last_comment_for_task(task)
-        preview_dict = gazu.task.add_preview(task, comment, preview_file_path)
+        preview_dict = gazu.task.add_preview(task, comment, preview_file_path=preview_file_path)
         return preview_dict
 
     # -------------------------------------------
