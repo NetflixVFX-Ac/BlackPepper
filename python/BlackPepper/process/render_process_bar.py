@@ -238,7 +238,8 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         if not self.is_interrupted:
             self.is_interrupted = True
             if self.process is not None and self.process.state() == QtCore.QProcess.Running:
-                self.process.kill()
+                self.process.terminate()
+                self.process.waitForFinished()
                 self.process = None
                 QCoreApplication.processEvents()
                 QTimer.singleShot(0, self.close)
