@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 import BlackPepper.ui.controller as bp
 
 
