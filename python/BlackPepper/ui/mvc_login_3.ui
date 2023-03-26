@@ -60,7 +60,6 @@ color: rgb(180, 180, 180);
          <font>
           <family>Courier New</family>
           <pointsize>10</pointsize>
-          <weight>50</weight>
           <italic>false</italic>
           <bold>false</bold>
          </font>
@@ -89,7 +88,6 @@ color: rgb(180, 180, 180);
          <font>
           <family>Courier New</family>
           <pointsize>10</pointsize>
-          <weight>50</weight>
           <italic>false</italic>
           <bold>false</bold>
          </font>
@@ -140,7 +138,6 @@ color: rgb(180, 180, 180);
          <font>
           <family>Courier New</family>
           <pointsize>10</pointsize>
-          <weight>50</weight>
           <italic>false</italic>
           <bold>false</bold>
          </font>
@@ -198,37 +195,6 @@ color: rgb(180, 180, 180);
          </spacer>
         </item>
         <item>
-         <widget class="QComboBox" name="hipbox">
-          <property name="minimumSize">
-           <size>
-            <width>90</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>120</width>
-            <height>100</height>
-           </size>
-          </property>
-          <item>
-           <property name="text">
-            <string>.hipnc</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>.hip</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>.hiplc</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item>
          <spacer name="horizontalSpacer_4">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -273,7 +239,7 @@ color: rgb(45, 45, 45);</string>
      <x>0</x>
      <y>0</y>
      <width>485</width>
-     <height>23</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>
