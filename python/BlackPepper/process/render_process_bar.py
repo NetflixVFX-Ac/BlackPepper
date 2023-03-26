@@ -3,6 +3,7 @@ import os.path
 import re
 from PySide2 import QtWidgets, QtCore
 from BlackPepper.pepper import Houpub
+from PySide2.QtCore import QTimer, QCoreApplication
 
 
 class RenderMainWindow(QtWidgets.QMainWindow):
@@ -79,7 +80,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
 
         self.text = QtWidgets.QPlainTextEdit()
         self.text.setReadOnly(True)
-        self.btn_interrupt = QtWidgets.QPushButton("Interrupt")
+        self.btn_interrupt = QtWidgets.QPushButton("Exit")
         self.btn_interrupt.clicked.connect(self.handle_interrupt)
 
         box_layout = QtWidgets.QVBoxLayout()
@@ -190,6 +191,7 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                 self.pepper.sequence = sequence.upper()
                 self.pepper.shot = shot
                 self.pepper.entity = 'shot'
+                self.pepper.publish_working_file('FX')
                 self.pepper.publish_output_file('FX', 'jpg_sequence', 'jpg publish')
                 self.pepper.publish_output_file('FX', 'movie_file', 'mov publish')
                 self.pepper.publish_output_file('FX', 'EXR', 'exr publish')
@@ -232,17 +234,15 @@ class RenderMainWindow(QtWidgets.QMainWindow):
         """interrupt button 클릭 시, 실행되는 메소드다. 진행 중인 Process를 중단시키고 Restart button으로 변경한다. \n
         변경 된 button을 다시 클릭할 경우, Process를 처음부터 다시 실행한다.
         """
+
         if not self.is_interrupted:
             self.is_interrupted = True
-            self.process.terminate()
-            self.process = None
-            self.btn_interrupt.setText("Restart")
-            self.message(f'interrupt at : {self.cmd}')
-        else:
-            self.is_interrupted = False
-            self.btn_interrupt.setText("Interrupt")
-            self.start_process()
-        return
+            if self.process is not None and self.process.state() == QtCore.QProcess.Running:
+                self.process.terminate()
+                self.process.waitForFinished()
+                self.process = None
+                QCoreApplication.processEvents()
+                QTimer.singleShot(0, self.close)
 
     @staticmethod
     def ffmpeg_simple_percent_parser(output, total):

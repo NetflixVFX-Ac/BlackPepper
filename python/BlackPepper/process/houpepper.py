@@ -3,6 +3,8 @@ import numpy as np
 import hou
 import _alembic_hom_extensions as abc
 
+import pepper
+
 
 class HouPepper:
     """
@@ -351,6 +353,19 @@ class HouPepper:
         ]
         mantra_jpg_cmd = (' '.join(str(s) for s in mantra_jpg_command))
         self.cmd_list.append(mantra_jpg_cmd)
+
+        self.total_frame_list.append(total_frame)
+
+        mantra_exr_command = [
+            'python',
+            '/home/rapa/git/hook/python/BlackPepper/mantra_render_exr.py',
+            f'{precomp_list.get("fx_working_path")}.{software}',
+            precomp_list.get('exr_output_path'),
+            self.abc_path,
+            self.cam_node
+        ]
+        mantra_exr_cmd = (' '.join(str(s) for s in mantra_exr_command))
+        self.cmd_list.append(mantra_exr_cmd)
         self.total_frame_list.append(total_frame)
 
         mantra_exr_command = [
@@ -367,6 +382,8 @@ class HouPepper:
 
         sequence_path = precomp_list.get('jpg_output_path')[:-17] + \
             precomp_list.get('jpg_output_path')[-4:] + '_%04d.jpg'
+        # print('aaa', precomp_list.get('jpg_output_path')[:-17])
+        # print('bbb', precomp_list.get('jpg_output_path')[-4:])
 
         ffmpeg_command = [
             "ffmpeg",

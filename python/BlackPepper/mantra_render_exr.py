@@ -40,7 +40,6 @@ def set_mantra_fx_for_comp(hip_path, output_path, abc_path, cam_node):
             break
 
     fx_name = check.group(1)
-    print(fx_name)
 
     if root is not None:
         mantra_comp = root.createNode('ifd')
@@ -89,3 +88,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
