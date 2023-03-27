@@ -292,16 +292,15 @@ class HouPepper:
             check_resolution = self.get_cam_resolution(cam)
             tr, ro, sc = self.get_cam_xform(cam)
             self.set_cam_key(tr, cam_node, 't')
-            # self.set_cam_key(ro, cam_node, 'r')
-            # self.set_cam_key(sc, cam_node, 's')
+            self.set_cam_key(ro, cam_node, 'r')
+            self.set_cam_key(sc, cam_node, 's')
             cam_node.parmTuple('t').lock((1, 1, 1))
             cam_node.parmTuple('r').lock((1, 1, 1))
             cam_node.parmTuple('s').lock((1, 1, 1))
             for text in self.hou_cam_parm_name:
                 exec("self.set_cam_key(self.{}, cam_node, '{}')".format(text, text))
             if check_resolution:
-                pass
-                # self.set_cam_key(self.cam_resolution, cam_node, 'res')
+                self.set_cam_key(self.cam_resolution, cam_node, 'res')
             else:
                 self.cam_node.parm('resx').set(1920)
                 self.cam_node.parm('resy').set(int(1920 / self.filmaspectratio[0]))
@@ -345,11 +344,11 @@ class HouPepper:
             cmd_list, total_frame_list
         """
         total_frame = self.abc_range[1] * hou.fps()
-
+        print('cam node :', self.cam_node)
         mantra_jpg_command = [
             'python',
             '/home/rapa/git/hook/python/BlackPepper/mantra_render_jpg.py',
-            f'{precomp_list.get("fx_working_path")}.{software}',
+            precomp_list.get("fx_working_path"),
             precomp_list.get('jpg_output_path'),
             self.abc_path,
             self.cam_node
@@ -361,7 +360,7 @@ class HouPepper:
         mantra_exr_command = [
             'python',
             '/home/rapa/git/hook/python/BlackPepper/mantra_render_exr.py',
-            f'{precomp_list.get("fx_working_path")}.{software}',
+            precomp_list.get("fx_working_path"),
             precomp_list.get('exr_output_path'),
             self.abc_path,
             self.cam_node
