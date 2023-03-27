@@ -2,17 +2,18 @@ import sys
 import os
 import json
 import webbrowser
-from BlackPepper.process.render_process_bar import RenderMainWindow
+from BlackPepper.process.render_process_bar_hq import RenderMainWindow
 from PySide2.QtCore import QFile, QCoreApplication, Qt
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QAbstractItemView, QMainWindow, QAction, QApplication, QMenu
 from BlackPepper.ui.model import PepperModel, PepperDnDModel
 from BlackPepper.ui.view import PepperView, PepperDnDView
 from BlackPepper.pepper import Houpub
-from BlackPepper.process.houpepper import HouPepper
+from BlackPepper.process.houpepper_hq import HouPepper
 from BlackPepper.auto_login import Auto_log
 from BlackPepper.log.moduler_log import Logger
 from datetime import datetime
+# from BlackPepper.hq_render import Hqrender
 
 
 class PepperWindow(QMainWindow):
@@ -38,7 +39,7 @@ class PepperWindow(QMainWindow):
         self.fxtemp_task_type_name = 'simulation'
         self.camera_task_type_name = 'layout_camera'  # camera로 변경
         self.camera_output_type_name = 'camera_cache'  # alembic으로 변경
-        self.software_name = 'hipnc'
+        self.software_name = 'hiplc'
 
         self.pepper = Houpub()
         self.login_log = Auto_log()
@@ -100,7 +101,7 @@ class PepperWindow(QMainWindow):
         self.login_window.move(1000, 300)
         self.login_window.show()
         # main UI loader
-        main_ui = QFile(os.path.join(script_path, 'mvc_main_3_hq.ui'))
+        main_ui = QFile(os.path.join(script_path, 'mvc_main_3.ui'))
         main_ui.open(QFile.ReadOnly)
         self.main_ui_loader = QUiLoader()
         self.main_window = self.main_ui_loader.load(main_ui)
@@ -123,7 +124,9 @@ class PepperWindow(QMainWindow):
         self.templates_listview.clicked.connect(self.template_selected)
         self.shots_listview.clicked.connect(self.shot_selected)
         self.main_window.reset_btn.clicked.connect(self.clear_list)
-        self.main_window.render_btn.clicked.connect(self.render_execute)
+        # edit Hqueue render btn
+        # self.main_window.render_btn.clicked.connect(self.render_execute)
+        self.main_window.render_btn.clicked.connect(self.hq_execute)
         self.main_window.append_btn.clicked.connect(self.append_render_list)
         self.main_window.del_btn.clicked.connect(self.delete_render_list)
         self.main_window.save_btn.clicked.connect(self.save_user_renderlists)
@@ -131,7 +134,6 @@ class PepperWindow(QMainWindow):
         self.main_window.template_rev_cbox.currentTextChanged.connect(self.renew_template_info)
         # main UI clicked event
         self.check_window.close_btn.clicked.connect(self.close_fullpath)
-        self.check_window.render_btn.clicked.connect(self.render_execute)
         # Add listview to UI
         self.main_window.gridLayout_3.addWidget(self.projects_listview, 2, 0)
         self.main_window.gridLayout_3.addWidget(self.templates_listview, 2, 1)
@@ -720,7 +722,7 @@ class PepperWindow(QMainWindow):
         """
         self.check_window.close()
 
-    def render_execute(self):
+    def hq_execute(self):
         """render list에 있는 shot의 path를 읽어와 template에 Alembic file의 camera값이 들어간 fx working file을 만든다. \n
         precomp의 dictionary value로 만든 command list와 total frame list를 활용하여 Render Progress UI를 실행한다. \n
         Render Progress UI에서는 Houdini Mantra sequence file render, FFmpeg jpg to mov converting 순으로 진행된다. \n
@@ -733,14 +735,17 @@ class PepperWindow(QMainWindow):
         for precomp in self.render_model.pepperlist:
             temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path, exr_output_path\
                 = self.pepper.path_seperator(precomp)
-            houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
-                                         f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
-            cmd_list, total_frame_list = houp.make_cmd(precomp, self.pepper.software.get("file_extension"))
+            houp.set_fx_working_for_shot(temp_working_path, layout_output_path, fx_working_path)
+
+            cmd_list, total_frame_list = houp.make_cmd_hq(precomp, self.pepper.software.get("file_extension"))
+            # hq = Hqrender()
+            # hq.submit_hqueue_job()
 
         self.render_process = RenderMainWindow(cmd_list, total_frame_list)
-        self.render_process.resize(800, 600)
-        self.render_process.move(1000, 250)
-        self.render_process.show()
+        # self.render_process.resize(800, 600)
+        # self.render_process.move(1000, 250)
+        # self.render_process.show()
+        # webbrowser.open("http://192.168.3.103:5000/")
 
 
 def main():
