@@ -776,7 +776,7 @@ class Houpub:
         return [task_type['name'] for task_type in gazu.task.all_task_types_for_asset(self.asset)]
 
     def get_casted_assets_for_shot(self):
-        """self.shot에 캐스팅 된 모든 asset의 type name과 asset name을 dict로 반환해준다. \n
+        """self.shot에 캐스팅 된 모든 asset의 type name과 asset name을 dict로 반환해준다. \n    
         self.project, self.sequence, self.shot이 없을 시 작동하지 않는다.
 
         Examples:

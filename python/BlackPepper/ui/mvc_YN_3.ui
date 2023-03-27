@@ -84,20 +84,7 @@ color: rgb(180, 180, 180);
        </spacer>
       </item>
       <item>
-       <widget class="QListView" name="checklist">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>200</width>
-          <height>350</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:rgb(52, 52, 52);</string>
-        </property>
-       </widget>
+       <widget class="QTextBrowser" name="path_window"/>
       </item>
       <item>
        <spacer name="verticalSpacer_2">

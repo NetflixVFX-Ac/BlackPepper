@@ -64,7 +64,6 @@ class PepperWindow(QMainWindow):
         self.template_model = PepperModel()
         self.shot_model = PepperModel()
         self.render_model = PepperDnDModel()
-        self.render_list_model = PepperModel()
         # listview instance
         self.projects_listview = PepperView(self)
         self.templates_listview = PepperView(self)
@@ -113,7 +112,7 @@ class PepperWindow(QMainWindow):
         self.check_window = self.login_ui_loader.load(check_ui)
         self.check_window.setWindowTitle('Render Check List')
         self.check_window.move(1000, 300)
-        self.check_window.checklist.setModel(self.render_list_model)
+        self.full_path = self.check_window.path_window
         # login UI clicked event
         self.login_window.login_btn.clicked.connect(self.user_login)
         self.login_window.input_id.returnPressed.connect(self.user_login)
@@ -697,22 +696,24 @@ class PepperWindow(QMainWindow):
         main UI의 listview에서는 볼 수 없었던 fx template의 working file path, camera_cache의 output file path,
         shot의 FX working file과 output file이 저장될 path, 그리고 template와 camera_cache의 revision을 볼 수 있다.
         """
-        self.render_list_model.pepperlist.clear()
+        self.full_path.clear()
+        text = ''
         for render_file in self.render_model.pepperlist:
             temp_working_path, layout_output_path, fx_working_path, \
                 jpg_output_path, video_output_path, exr_output_path = self.pepper.path_seperator(render_file)
             temp_rev = temp_working_path.split('.')[0][-3:]
             cam_rev = layout_output_path.split('.')[0][-3:]
-            self.render_list_model.pepperlist.append(f"\n{render_file['name']}\n "
-                                                     f"Template revision : {temp_rev}\n "
-                                                     f"Layout camera revision : {cam_rev}\n " 
-                                                     f"{temp_working_path}\n "
-                                                     f"{layout_output_path}\n "
-                                                     f"{fx_working_path}\n "
-                                                     f"{jpg_output_path}\n "
-                                                     f"{video_output_path}\n "
-                                                     f"{exr_output_path}\n")
-        self.render_list_model.layoutChanged.emit()
+            full_path = (f"\n{render_file['name']}\n "
+                         f"Template revision : {temp_rev}\n "
+                         f"Layout camera revision : {cam_rev}\n " 
+                         f"{temp_working_path}\n "
+                         f"{layout_output_path}\n "
+                         f"{fx_working_path}\n "
+                         f"{jpg_output_path}\n "
+                         f"{video_output_path}\n "
+                         f"{exr_output_path}\n")
+            text += full_path
+        self.full_path.setPlainText(text)
         self.check_window.show()
 
     def close_fullpath(self):
