@@ -4,6 +4,7 @@ import re
 from PySide2 import QtWidgets, QtCore
 from BlackPepper.pepper import Houpub
 from PySide2.QtCore import QTimer, QCoreApplication
+import webbrowser
 
 
 class RenderMainWindow(QtWidgets.QMainWindow):
@@ -190,11 +191,12 @@ class RenderMainWindow(QtWidgets.QMainWindow):
                 self.pepper.sequence = sequence.upper()
                 self.pepper.shot = shot
                 self.pepper.entity = 'shot'
-                # self.pepper.publish_working_file('FX')
-                # self.pepper.publish_output_file('FX', 'jpg_sequence', 'jpg publish')
-                # self.pepper.publish_output_file('FX', 'movie_file', 'mov publish')
-                # self.pepper.publish_output_file('FX', 'EXR', 'exr publish')
-                # thumbnail = self.pepper.publish_preview('FX', 'Ready To Start', 'test', path)
+                self.pepper.publish_working_file('FX')
+                self.pepper.publish_output_file('FX', 'jpg_sequence', 'jpg publish')
+                self.pepper.publish_output_file('FX', 'movie_file', 'mov publish')
+                self.pepper.publish_output_file('FX', 'EXR', 'exr publish')
+
+                # thumbnail = self.pepper.publish_preview('FX', 'Ready To Start', 'hq_sw', path)
                 # gazu.task.set_main_preview(thumbnail)
 
         if len(self.cmd_list) > 0:

@@ -59,7 +59,7 @@ def set_mantra_fx_for_comp(hip_path, output_path, abc_path, cam_node):
         hou.hipFile.load(temp_path)
         hqueue_node = hou.node("/out").createNode("hq_render")
         # 작업 이름 설정
-        hqueue_node.parm("hq_job_name").set(temp_path)
+        hqueue_node.parm("hq_job_name").set(hip_path+"_exr job")
         # hip 파일 설정
         hqueue_node.parm("hq_hip").set(temp_path)
         hqueue_node.parm("hq_driver").set("/out/mantra1")

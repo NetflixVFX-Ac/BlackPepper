@@ -745,7 +745,7 @@ class PepperWindow(QMainWindow):
         # self.render_process.resize(800, 600)
         # self.render_process.move(1000, 250)
         # self.render_process.show()
-        # webbrowser.open("http://192.168.3.103:5000/")
+        webbrowser.open("http://192.168.3.103:5000/")
 
 
 def main():
