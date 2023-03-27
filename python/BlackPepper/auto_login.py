@@ -21,7 +21,6 @@ class Auto_log:
         self._host = None
         self._user_id = None
         self._user_pw = None
-        self._user_ext = None
         self._valid_host = False
         self._valid_user = False
 
@@ -129,25 +128,6 @@ class Auto_log:
             AuthFailedException: password가 맞지 않을 때
         """
         self._user_pw = upw
-
-    @property
-    def user_ext(self):
-        return self._user_ext
-
-    @user_ext.setter
-    def user_ext(self, ext):
-        """houdini의 extension을 hip, hipnc, hiplc타입을 가져온다.
-
-        Examples:
-            Auto_log.user_ext = 'hip'
-
-        Args:
-            ext(str): 'hip', 'hipnc', or 'hiplc'
-
-        Raises:
-            Exception: If software_name is not hip, hipnc, or hiplc.
-        """
-        self._user_ext = ext
 
     @property
     def user(self):
@@ -301,7 +281,6 @@ class Auto_log:
             'host': self.host,
             'user_id': self.user_id,
             'user_pw': self.user_pw,
-            'user_ext': self.user_ext,
             'valid_host': self.valid_host,
             'valid_user': self.valid_user,
             'auto_login': self.auto_login
@@ -319,7 +298,6 @@ class Auto_log:
         self.host = ''
         self.user_id = ''
         self.user_pw = ''
-        self.user_ext = ''
         self.valid_host = False
         self.valid_user = False
         self.auto_login = False

@@ -3,7 +3,7 @@ import numpy as np
 import hou
 import _alembic_hom_extensions as abc
 
-import pepper
+
 
 
 class HouPepper:

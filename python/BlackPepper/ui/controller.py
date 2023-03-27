@@ -204,7 +204,6 @@ class PepperWindow(QMainWindow):
         self.login_log.user_pw = self.login_window.input_pw.text()
         # if connect login, get login information and close login window, open main window
         if self.login_log.connect_login():
-            self.pepper.software = self.login_log.user_ext
             self.login_log.auto_login = True
             self.login_log.save_setting()
             self.login_window.close()
