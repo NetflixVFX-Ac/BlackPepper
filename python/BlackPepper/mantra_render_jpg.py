@@ -53,6 +53,8 @@ def set_mantra_for_preview(hip_path, output_path, abc_path, cam_node):
             print("jpg.mantra checkpoint exists")
     else:
         print("missing sequence frame")
+    saved_path = '/home/rapa/yh/test/save/test_save.hipnc'
+    hou.hipFile.save(file_name=saved_path)
 
 
 def main():

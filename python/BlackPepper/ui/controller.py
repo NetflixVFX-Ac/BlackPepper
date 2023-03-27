@@ -336,7 +336,7 @@ class PepperWindow(QMainWindow):
                                                                   self.camera_task_type_name)
         self.renew_shot_cbox(rev_list)
         self.renew_shot_info()
-        self.renderlists_selection.clear()
+        # self.renderlists_selection.clear()
 
     def renew_template_status_path(self, template_name, input_num):
         """templates_listview의 template 클릭이나 temp_rev_cbox의 데이터 변경 시에 실행 되는 메소드. \n
@@ -733,8 +733,7 @@ class PepperWindow(QMainWindow):
         for precomp in self.render_model.pepperlist:
             temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path, exr_output_path\
                 = self.pepper.path_seperator(precomp)
-            houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
-                                         f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
+            houp.set_fx_working_for_shot(temp_working_path, layout_output_path, fx_working_path)
             cmd_list, total_frame_list = houp.make_cmd(precomp, self.pepper.software.get("file_extension"))
 
         self.render_process = RenderMainWindow(cmd_list, total_frame_list)

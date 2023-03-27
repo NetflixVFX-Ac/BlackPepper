@@ -255,17 +255,19 @@ class HouPepper:
 
         key_np = np.array(key)
         s = [1, -1]
+
         for frame, k in enumerate(key_np):
             try:
                 num_key = len(k)
                 if num_key > 1:
                     for n, key_index in enumerate(k):
-                        slope = np.convolve(list(map(lambda x: x[1], key_np)), s, mode='same') / (len(s) - 1)
+                        slope = np.convolve(list(map(lambda x: x[n], key_np)), s, mode='same') / (len(s) - 1)
                         if slope[frame] != 0:
                             keyframe = hou.Keyframe(key_index, hou.frameToTime(frame + 1))
                             node.parm('{}{}'.format(parm, j[n])).setKeyframe(keyframe)
             except:
                 slope = np.convolve(list(map(lambda x: x, key_np)), s, mode='same') / (len(s) - 1)
+
                 if slope[frame] != 0:
                     keyframe = hou.Keyframe(k, hou.frameToTime(frame + 1))
                     node.parm('{}'.format(parm)).setKeyframe(keyframe)
@@ -342,11 +344,11 @@ class HouPepper:
             cmd_list, total_frame_list
         """
         total_frame = self.abc_range[1] * hou.fps()
-
+        print('cam node :', self.cam_node)
         mantra_jpg_command = [
             'python',
             '/home/rapa/git/hook/python/BlackPepper/mantra_render_jpg.py',
-            f'{precomp_list.get("fx_working_path")}.{software}',
+            precomp_list.get("fx_working_path"),
             precomp_list.get('jpg_output_path'),
             self.abc_path,
             self.cam_node
@@ -358,7 +360,7 @@ class HouPepper:
         mantra_exr_command = [
             'python',
             '/home/rapa/git/hook/python/BlackPepper/mantra_render_exr.py',
-            f'{precomp_list.get("fx_working_path")}.{software}',
+            precomp_list.get("fx_working_path"),
             precomp_list.get('exr_output_path'),
             self.abc_path,
             self.cam_node
@@ -367,15 +369,13 @@ class HouPepper:
         self.cmd_list.append(mantra_exr_cmd)
         self.total_frame_list.append(total_frame)
 
-        self.sequence_path = precomp_list.get('jpg_output_path')[:-17] + \
+        sequence_path = precomp_list.get('jpg_output_path')[:-17] + \
             precomp_list.get('jpg_output_path')[-4:] + '_%04d.jpg'
-        # print('aaa', precomp_list.get('jpg_output_path')[:-17])
-        # print('bbb', precomp_list.get('jpg_output_path')[-4:])
 
-        self.ffmpeg_command = [
+        ffmpeg_command = [
             "ffmpeg",
             "-framerate 24",  # 초당프레임
-            "-i", self.sequence_path,  # 입력할 파일 이름
+            "-i", sequence_path,  # 입력할 파일 이름
             "-q 0",  # 출력품질 정함(숫자가 높을 수록 품질이 떨어짐)
             "-threads 8",  # 속도향상을 위해 멀티쓰레드를 지정
             "-c:v", "libx264",  # 코덱
@@ -385,12 +385,12 @@ class HouPepper:
             f'{precomp_list.get("video_output_path")}.mov'
         ]
 
-        self.output_dir = os.path.dirname(precomp_list.get("video_output_path"))
-        if not os.path.isdir(self.output_dir):
-            os.makedirs(self.output_dir)
+        output_dir = os.path.dirname(precomp_list.get("video_output_path"))
+        if not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
 
-        self.ffmpeg_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
-        self.cmd_list.append(self.ffmpeg_cmd)
+        ffmpeg_cmd = (' '.join(str(s) for s in ffmpeg_command))
+        self.cmd_list.append(ffmpeg_cmd)
         self.total_frame_list.append(total_frame)
 
         cmd_list = self.cmd_list
