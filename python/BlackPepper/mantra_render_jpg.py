@@ -31,6 +31,10 @@ def set_mantra_for_preview(hip_path, output_path, abc_path, cam_node):
     shutil.copyfile(hip_path, temp_path)
     hou.hipFile.load(temp_path)
     root = hou.node('/out')
+    cam = hou.node(cam_setting)
+    # plate_path = '/mnt/Project/JS/rapa/shots/sq01/0010/plate/output/jpg_sequence/v001/rapa_sq01_0010_jpg_sequence_v001.1$F3.jpeg'
+    # cam.parm('vm_background').set(plate_path)
+
     if root is not None:
         mantra_comp = root.createNode('ifd')
         mantra_comp.parm('camera').set(cam_setting)
@@ -39,7 +43,9 @@ def set_mantra_for_preview(hip_path, output_path, abc_path, cam_node):
         for i in mantra_comp.parmTuple('f'):
             i.deleteAllKeyframes()
         # mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
-        mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), 1, 1])
+        # print("abc_range 0 :", abc_range[0]*hou.fps())
+        # print("abc_range 1 :", abc_range[1]*hou.fps())
+        mantra_comp.parmTuple('f').set([1, 3, 1])
         mantra_comp.parm('vm_verbose').set(1)
         mantra_comp.parm("execute").pressButton()
     output_dir = os.path.dirname(output_path) + '/*.jpg'

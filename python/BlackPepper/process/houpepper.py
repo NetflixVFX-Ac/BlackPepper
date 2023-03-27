@@ -125,6 +125,13 @@ class HouPepper:
                 self.abc_tree_path = abc.alembicGetObjectPathListForMenu(self.abc_path)
                 self.get_abc_cam_tree(self.abc_tree_all)
         self.abc_range = abc.alembicTimeRange(self.abc_path)
+        # print('abc_range', self.abc_range)
+        # print(self.abc_range[0] - 1000/hou.fps())
+        if self.abc_range[0] > 1:
+            self.abc_range = (self.abc_range[0] - 1000/hou.fps(), self.abc_range[1] - 1000/hou.fps())
+        # print('abc_range', self.abc_range[0]*hou.fps())
+        # print('abc_range', self.abc_range[1]*hou.fps())
+
 
     def get_abc_cam_tree(self, abc_tree_all):
         """Alembic 파일 내 Node에서 이름이 camera인 노드를 찾는다. \n
@@ -287,6 +294,7 @@ class HouPepper:
         name = [abc.alembicGetSceneHierarchy(abc_path, i)[0] for i in self.cam_path]
         for cam in self.cam_path:
             cam_node = hou.node('/obj').createNode('cam', name[self.cam_path.index(cam)])
+            # print('cam_node :', cam_node)
             self.cam_node = cam_node
             self.set_cam_view(cam)
             check_resolution = self.get_cam_resolution(cam)
@@ -297,6 +305,7 @@ class HouPepper:
             cam_node.parmTuple('t').lock((1, 1, 1))
             cam_node.parmTuple('r').lock((1, 1, 1))
             cam_node.parmTuple('s').lock((1, 1, 1))
+
             for text in self.hou_cam_parm_name:
                 exec("self.set_cam_key(self.{}, cam_node, '{}')".format(text, text))
             if check_resolution:
@@ -344,7 +353,6 @@ class HouPepper:
             cmd_list, total_frame_list
         """
         total_frame = self.abc_range[1] * hou.fps()
-        print('cam node :', self.cam_node)
         mantra_jpg_command = [
             'python',
             '/home/rapa/git/hook/python/BlackPepper/mantra_render_jpg.py',
