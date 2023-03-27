@@ -254,31 +254,19 @@ class HouPepper:
         j = ['x', 'y', 'z', 'w']
 
         key_np = np.array(key)
-        print("key_np :", key_np)
-        print("key_shape :", key_np.shape)
         s = [1, -1]
-        # [x1, y1, z1]
-        # [x2, y2, z2]
-        # [x3, y3, z3]
+
         for frame, k in enumerate(key_np):
-            print('dfdedsd ', len(k))
             try:
                 num_key = len(k)
                 if num_key > 1:
                     for n, key_index in enumerate(k):
-                        print("key_np [1] :", key_np[1])
-                        print('lambda x :', len(list(map(lambda x: x[1], key_np))))
                         slope = np.convolve(list(map(lambda x: x[n], key_np)), s, mode='same') / (len(s) - 1)
-                        print('txyz :', n)
-                        print('frame :', frame)
-                        print('slope :', len(slope))
-                        print('slope[frame] :', slope[frame])
                         if slope[frame] != 0:
                             keyframe = hou.Keyframe(key_index, hou.frameToTime(frame + 1))
                             node.parm('{}{}'.format(parm, j[n])).setKeyframe(keyframe)
             except:
                 slope = np.convolve(list(map(lambda x: x, key_np)), s, mode='same') / (len(s) - 1)
-                print('slope[frame] except :', slope[frame])
 
                 if slope[frame] != 0:
                     keyframe = hou.Keyframe(k, hou.frameToTime(frame + 1))
@@ -382,15 +370,13 @@ class HouPepper:
         self.cmd_list.append(mantra_exr_cmd)
         self.total_frame_list.append(total_frame)
 
-        self.sequence_path = precomp_list.get('jpg_output_path')[:-17] + \
+        sequence_path = precomp_list.get('jpg_output_path')[:-17] + \
             precomp_list.get('jpg_output_path')[-4:] + '_%04d.jpg'
-        # print('aaa', precomp_list.get('jpg_output_path')[:-17])
-        # print('bbb', precomp_list.get('jpg_output_path')[-4:])
 
-        self.ffmpeg_command = [
+        ffmpeg_command = [
             "ffmpeg",
             "-framerate 24",  # 초당프레임
-            "-i", self.sequence_path,  # 입력할 파일 이름
+            "-i", sequence_path,  # 입력할 파일 이름
             "-q 0",  # 출력품질 정함(숫자가 높을 수록 품질이 떨어짐)
             "-threads 8",  # 속도향상을 위해 멀티쓰레드를 지정
             "-c:v", "libx264",  # 코덱
@@ -400,12 +386,12 @@ class HouPepper:
             f'{precomp_list.get("video_output_path")}.mov'
         ]
 
-        self.output_dir = os.path.dirname(precomp_list.get("video_output_path"))
-        if not os.path.isdir(self.output_dir):
-            os.makedirs(self.output_dir)
+        output_dir = os.path.dirname(precomp_list.get("video_output_path"))
+        if not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
 
-        self.ffmpeg_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
-        self.cmd_list.append(self.ffmpeg_cmd)
+        ffmpeg_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
+        self.cmd_list.append(ffmpeg_cmd)
         self.total_frame_list.append(total_frame)
 
         cmd_list = self.cmd_list
