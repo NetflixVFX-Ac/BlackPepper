@@ -390,7 +390,7 @@ class HouPepper:
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
 
-        ffmpeg_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
+        ffmpeg_cmd = (' '.join(str(s) for s in ffmpeg_command))
         self.cmd_list.append(ffmpeg_cmd)
         self.total_frame_list.append(total_frame)
 
