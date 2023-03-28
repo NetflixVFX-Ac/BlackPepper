@@ -42,8 +42,8 @@ def set_mantra_for_preview(hip_path, output_path, abc_path, cam_node):
         mantra_comp.parm('trange').set(1)
         for i in mantra_comp.parmTuple('f'):
             i.deleteAllKeyframes()
-        # mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
-        mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), 1, 1])
+        mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
+        # mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), 3, 1])
         # mantra_comp.parm('vm_verbose').set(1)
         # mantra_comp.parm("execute").pressButton()
         hou.hipFile.save(temp_path)
@@ -51,7 +51,7 @@ def set_mantra_for_preview(hip_path, output_path, abc_path, cam_node):
 
         hqueue_node = hou.node("/out").createNode("hq_render")
         # 작업 이름 설정
-        hqueue_node.parm("hq_job_name").set(hip_path+"_jpg job")
+        hqueue_node.parm("hq_job_name").set("JPG : " + hip_path)
         # hip 파일 설정
         hqueue_node.parm("hq_hip").set(temp_path)
         hqueue_node.parm("hq_driver").set("/out/mantra1")

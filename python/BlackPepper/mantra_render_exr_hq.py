@@ -5,6 +5,8 @@ import glob
 import re
 import hou
 import _alembic_hom_extensions as abc
+# from BlackPepper.ui.controller_hq import PepperWindow
+# con = PepperWindow()
 
 
 def set_mantra_fx_for_comp(hip_path, output_path, abc_path, cam_node):
@@ -52,14 +54,15 @@ def set_mantra_fx_for_comp(hip_path, output_path, abc_path, cam_node):
         mantra_comp.parm('trange').set(1)
         for i in mantra_comp.parmTuple('f'):
             i.deleteAllKeyframes()
-        # mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
-        mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), 1, 1])
+        mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
+        # mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), 3, 1])
         # mantra_comp.parm('vm_verbose').set(1)
         hou.hipFile.save(temp_path)
         hou.hipFile.load(temp_path)
         hqueue_node = hou.node("/out").createNode("hq_render")
         # 작업 이름 설정
-        hqueue_node.parm("hq_job_name").set(hip_path+"_exr job")
+        hqueue_node.parm("hq_job_name").set("EXR : " + hip_path)
+        # print(11, con.render_model.pepperlist['name'])
         # hip 파일 설정
         hqueue_node.parm("hq_hip").set(temp_path)
         hqueue_node.parm("hq_driver").set("/out/mantra1")
