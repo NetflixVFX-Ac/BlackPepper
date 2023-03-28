@@ -344,7 +344,7 @@ class Houpub:
         work_file = gazu.files.get_last_working_file_revision(task)
         self.dict_check(work_file, 'no_work_file')
         output_type = gazu.files.get_output_type_by_name(output_type_name)
-        self.dict_check(task_type, f'no_task_type{output_type_name}')
+        self.dict_check(output_type, f'no_task_type{output_type_name}')
         gazu.files.new_entity_output_file(self.entity, output_type, task_type, working_file=work_file,
                                           representation=output_type['short_name'], comment=comments)
         self.read_json_file()
@@ -562,6 +562,11 @@ class Houpub:
         Returns:
             dict for houpepper render queue
         """
+        cameratask = 'layout_camera'
+        cameraoutput = 'camera_cache'
+        if self.project['name'] == 'RAPA':
+            cameratask = 'camera'
+            cameraoutput = 'alembic'
         hou_ext = self.software['file_extension']
         self.dict_check(casted_shot, 'not_dict')
         if 'shot_name' not in casted_shot or 'sequence_name' not in casted_shot:
@@ -569,12 +574,14 @@ class Houpub:
         sequence_name = casted_shot['sequence_name']
         shot_name = casted_shot['shot_name']
         name = '_'.join([self.project['name'], self.asset['name'][5:], sequence_name, shot_name])
+        if self.project['name'] == 'RAPA':
+            name = '_'.join([self.project['name'], self.asset['name'], sequence_name, shot_name])
         self.entity = 'asset'
         temp_working_path = self.working_file_path('simulation', input_num=temp_revision) + f'.{hou_ext}'
         self.sequence = sequence_name
         self.shot = shot_name
         self.entity = 'shot'
-        layout_output_path = self.output_file_path('camera_cache', 'layout_camera', input_num=cam_revision) + '.abc'
+        layout_output_path = self.output_file_path(cameraoutput, cameratask, input_num=cam_revision) + '.abc'
         fx_working_path = self.make_next_working_path('FX') + f'.{hou_ext}'
         jpg_output_path = self.make_next_output_path('jpg_sequence', 'FX')
         video_output_path = self.make_next_output_path('movie_file', 'FX')
@@ -1034,3 +1041,41 @@ class Houpub:
             raise Exception(f"There's no output type named '{code[14:]}'")
         else:
             raise Exception("NO ERROR CODE")
+
+    def casting_multiple_assets(self, *args):
+        asset_castings = gazu.casting.get_shot_casting(self.shot)
+        for asset_name in args:
+            asset = gazu.asset.get_asset_by_name(self.project, asset_name)
+            new_casting = {"asset_id": asset['id'], "nb_occurences": 1}
+            asset_castings.append(new_casting)
+        gazu.casting.update_shot_casting(self.project, self.shot, casting=asset_castings)
+
+    def casting_create(self, nb):
+        asset_castings = gazu.casting.get_shot_casting(self.shot)
+        new_casting = {"asset_id": self.asset['id'], "nb_occurences": nb}
+        asset_castings.append(new_casting)
+        gazu.casting.update_shot_casting(self.project, self.shot, casting=asset_castings)
+
+    def casting_delete(self):
+        asset_name = self.asset['name']
+        asset_castings = gazu.casting.get_shot_casting(self.shot)
+        filtered_assets = [asset for asset in asset_castings if asset_name != asset['asset_name']]
+        gazu.casting.update_shot_casting(self.project, self.shot, casting=filtered_assets)
+
+
+p = Houpub()
+p.login('http://192.168.3.116/api', 'pepper@hook.com', 'pepperpepper')
+p.project = 'RAPA'
+p.sequence = 'SQ01'
+p.shot = '0010'
+p.entity = 'shot'
+# p.asset = 'fire'
+# p.entity = 'asset'
+# p.publish_working_file('camera')
+# p.publish_output_file('plate', 'EXR', 'test')
+# p.casting_multiple_assets('dancing_particle', 'fire')
+# p.casting_create(1)
+# a = p.working_file_path('camera')
+a = p.output_file_path('EXR', 'plate')
+# b = p.make_next_output_path('alembic', 'camera')
+print(a)

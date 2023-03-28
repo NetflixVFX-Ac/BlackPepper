@@ -36,8 +36,8 @@ class PepperWindow(QMainWindow):
 
         self.fxtemp_asset_type_name = 'fx_template'
         self.fxtemp_task_type_name = 'simulation'
-        self.camera_task_type_name = 'layout_camera'  # camera로 변경
-        self.camera_output_type_name = 'camera_cache'  # alembic으로 변경
+        self.camera_task_type_name = 'camera'  # camera로 변경
+        self.camera_output_type_name = 'alembic'  # alembic으로 변경
         self.software_name = 'hipnc'
 
         self.pepper = Houpub()
@@ -267,6 +267,11 @@ class PepperWindow(QMainWindow):
         """
         project_name = self.my_projects[event.row()]
         self.pepper.project = project_name
+        self.camera_task_type_name = 'layout_camera'
+        self.camera_output_type_name = 'camera_cache'
+        if self.pepper.project['name'] == 'RAPA':
+            self.camera_task_type_name = 'camera'
+            self.camera_output_type_name = 'alembic'
         self.all_assets = []
         # Append templates to template listview
         for asset in self.pepper.get_all_assets():
@@ -275,7 +280,10 @@ class PepperWindow(QMainWindow):
             self.pepper.asset = asset
             self.pepper.entity = 'asset'
             if self.pepper.check_task_status('Done', self.fxtemp_task_type_name) is True:
-                self.all_assets.append(asset)
+                if self.pepper.project['name'] == 'RAPA':
+                    self.all_assets.append(asset)
+                else:
+                    self.all_assets.append(asset[5:])
         self.template_model.pepperlist.clear()
         self.shot_model.pepperlist.clear()
         for asset in self.all_assets:
