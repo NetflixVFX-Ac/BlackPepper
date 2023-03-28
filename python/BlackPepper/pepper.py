@@ -1063,12 +1063,12 @@ class Houpub:
         gazu.casting.update_shot_casting(self.project, self.shot, casting=filtered_assets)
 
 
-p = Houpub()
-p.login('http://192.168.3.116/api', 'pepper@hook.com', 'pepperpepper')
-p.project = 'RAPA'
-p.sequence = 'SQ01'
-p.shot = '0010'
-p.entity = 'shot'
+# p = Houpub()
+# p.login('http://192.168.3.116/api', 'pepper@hook.com', 'pepperpepper')
+# p.project = 'RAPA'
+# p.sequence = 'SQ01'
+# p.shot = '0010'
+# p.entity = 'shot'
 # p.asset = 'fire'
 # p.entity = 'asset'
 # p.publish_working_file('camera')
@@ -1076,6 +1076,6 @@ p.entity = 'shot'
 # p.casting_multiple_assets('dancing_particle', 'fire')
 # p.casting_create(1)
 # a = p.working_file_path('camera')
-a = p.output_file_path('EXR', 'plate')
+# a = p.output_file_path('EXR', 'plate')
 # b = p.make_next_output_path('alembic', 'camera')
-print(a)
+# print(a)

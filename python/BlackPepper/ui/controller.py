@@ -306,6 +306,8 @@ class PepperWindow(QMainWindow):
             event: Listview click event
         """
         template_name = self.all_assets[event.row()]
+        if self.pepper.project['name'] != 'RAPA':
+            template_name = 'temp_' + template_name
         self.pepper.asset = template_name
         self.pepper.entity = 'asset'
         # Reset comboBox, get template info
@@ -373,6 +375,8 @@ class PepperWindow(QMainWindow):
         clock = time[11:]
         self.main_window.template_info_label.setText(f"{name}\n{date}\n{clock}")
         template_name = self.templates_listview.selectedIndexes()[0].data()
+        if self.pepper.project['name'] != 'RAPA':
+            template_name = 'temp_' + template_name
         self.renew_template_status_path(template_name, revision)
 
     def renew_shot_info(self):
@@ -706,8 +710,8 @@ class PepperWindow(QMainWindow):
         self.full_path.clear()
         text = ''
         for render_file in self.render_model.pepperlist:
-            temp_working_path, layout_output_path, fx_working_path, \
-                jpg_output_path, video_output_path, exr_output_path = self.pepper.path_seperator(render_file)
+            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path, \
+                exr_output_path = self.pepper.path_seperator(render_file)
             temp_rev = temp_working_path.split('.')[0][-3:]
             cam_rev = layout_output_path.split('.')[0][-3:]
             full_path = (f"\n{render_file['name']}\n "
@@ -718,7 +722,7 @@ class PepperWindow(QMainWindow):
                          f"{fx_working_path}\n "
                          f"{jpg_output_path}\n "
                          f"{video_output_path}\n "
-                         f"{exr_output_path}\n")
+                         f"{exr_output_path}\n ")
             text += full_path
         self.full_path.setPlainText(text)
         self.check_window.show()
@@ -739,8 +743,8 @@ class PepperWindow(QMainWindow):
             return
         self.save_recent_renderlists()
         for precomp in self.render_model.pepperlist:
-            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path, exr_output_path\
-                = self.pepper.path_seperator(precomp)
+            temp_working_path, layout_output_path, fx_working_path, jpg_output_path, video_output_path, \
+                exr_output_path = self.pepper.path_seperator(precomp)
             houp.set_fx_working_for_shot(temp_working_path, layout_output_path,
                                          f'{fx_working_path}.{self.pepper.software.get("file_extension")}')
             cmd_list, total_frame_list = houp.make_cmd(precomp, self.pepper.software.get("file_extension"))
