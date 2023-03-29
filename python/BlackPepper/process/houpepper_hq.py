@@ -346,26 +346,26 @@ class HouPepper:
         mantra_jpg_command = [
             'python',
             '/home/rapa/git/hook/python/BlackPepper/mantra_render_jpg_hq.py',
-            precomp_list.get("fx_working_path"),
+            '/mnt/Project/JS/rapa/shots/sq01/0010/fx/working/v010/rapa_sq01_0010_fx_010_hq_jpg.hiplc',
             precomp_list.get('jpg_output_path'),
             self.abc_path,
-            self.cam_node
+            'object'
         ]
         mantra_jpg_cmd = (' '.join(str(s) for s in mantra_jpg_command))
-        self.cmd_list.append(mantra_jpg_cmd)
-        self.total_frame_list.append(total_frame)
+        # self.cmd_list.append(mantra_jpg_cmd)
+        # self.total_frame_list.append(total_frame)
 
         mantra_exr_command = [
             'python',
             '/home/rapa/git/hook/python/BlackPepper/mantra_render_exr_hq.py',
-            precomp_list.get("fx_working_path"),
+            '/mnt/Project/JS/rapa/shots/sq01/0010/fx/working/v010/rapa_sq01_0010_fx_010_hq_exr.hiplc',
             precomp_list.get('exr_output_path'),
             self.abc_path,
-            self.cam_node
+            'object1'
         ]
         mantra_exr_cmd = (' '.join(str(s) for s in mantra_exr_command))
-        self.cmd_list.append(mantra_exr_cmd)
-        self.total_frame_list.append(total_frame)
+        # self.cmd_list.append(mantra_exr_cmd)
+        # self.total_frame_list.append(total_frame)
 
 
         self.sequence_path = precomp_list.get('jpg_output_path')[:-17] + \
@@ -389,8 +389,8 @@ class HouPepper:
             os.makedirs(self.output_dir)
 
         self.ffmpeg_cmd = (' '.join(str(s) for s in self.ffmpeg_command))
-        self.cmd_list.append(self.ffmpeg_cmd)
-        self.total_frame_list.append(total_frame)
+        # self.cmd_list.append(self.ffmpeg_cmd)
+        # self.total_frame_list.append(total_frame)
 
         cmd_list = self.cmd_list
         total_frame_list = self.total_frame_list

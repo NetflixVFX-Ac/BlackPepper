@@ -43,7 +43,7 @@ def set_mantra_for_preview(hip_path, output_path, abc_path, cam_node):
         for i in mantra_comp.parmTuple('f'):
             i.deleteAllKeyframes()
         mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), abc_range[1] * hou.fps(), 1])
-        # mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), 3, 1])
+        # mantra_comp.parmTuple('f').set([abc_range[0] * hou.fps(), 1, 1])
         # mantra_comp.parm('vm_verbose').set(1)
         # mantra_comp.parm("execute").pressButton()
         hou.hipFile.save(temp_path)

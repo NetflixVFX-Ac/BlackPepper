@@ -568,13 +568,13 @@ class Houpub:
             self.error('not_dict')
         sequence_name = casted_shot['sequence_name']
         shot_name = casted_shot['shot_name']
-        name = '_'.join([self.project['name'], self.asset['name'][5:], sequence_name, shot_name])
+        name = '_'.join([self.project['name'], self.asset['name'], sequence_name, shot_name])
         self.entity = 'asset'
         temp_working_path = self.working_file_path('simulation', input_num=temp_revision) + f'.{hou_ext}'
         self.sequence = sequence_name
         self.shot = shot_name
         self.entity = 'shot'
-        layout_output_path = self.output_file_path('camera_cache', 'layout_camera', input_num=cam_revision) + '.abc'
+        layout_output_path = self.output_file_path('alembic', 'camera', input_num=cam_revision) + '.abc'
         fx_working_path = self.make_next_working_path('FX') + f'.{hou_ext}'
         jpg_output_path = self.make_next_output_path('jpg_sequence', 'FX')
         video_output_path = self.make_next_output_path('movie_file', 'FX')

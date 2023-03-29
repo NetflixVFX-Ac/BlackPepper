@@ -37,8 +37,8 @@ class PepperWindow(QMainWindow):
 
         self.fxtemp_asset_type_name = 'fx_template'
         self.fxtemp_task_type_name = 'simulation'
-        self.camera_task_type_name = 'layout_camera'  # camera로 변경
-        self.camera_output_type_name = 'camera_cache'  # alembic으로 변경
+        self.camera_task_type_name = 'camera'  # camera로 변경
+        self.camera_output_type_name = 'alembic'  # alembic으로 변경
         self.software_name = 'hiplc'
 
         self.pepper = Houpub()
